@@ -208,7 +208,7 @@ call_api(Cmd, State) ->
             {ok, mutex_gs:acquire(Name), State};
         % Снять блокировку
         {{cmd, <<"release">>}, {name, Name}} ->
-            {ok, close, mutex_gs:release(Name), State};
+            {ok, mutex_gs:release(Name), State};
         % Неизвестный тип команды
         _ ->
             io:format("unknown input data ~p~n", [Cmd]),

@@ -1,13 +1,11 @@
 %% Author: djay
 %% Created: 16.03.2014
-%% Description: GenServer для обработки очереди блокировок
-%%
-%%
+%% Description: gen server для обработки очереди блокировок
 
 -module(mutex_gs).
 -behaviour(gen_server).
 
--include("../../include/structs.hrl").
+-include("../../include/mutex.hrl").
 
 -export([start_link/0, get/2, acquire/1, release/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
@@ -23,7 +21,7 @@ start_link() ->
 %%--------------------------------------------------------------------
 init(_Args) ->
     erlang:send_after(?LOCK_CLEANUP_TIMEOUT, self(), cleanup),
-    {ok, dict:new()}.
+    {ok, #mutex{debug_mode = true}}.
 
 %%--------------------------------------------------------------------
 %% Получить указатель на блокировку
@@ -58,13 +56,13 @@ release(Name) ->
 %% @param State
 %%--------------------------------------------------------------------
 handle_call({get, Name, Timeout}, {Pid, _}, State) ->
-    {reply, Name, dict:store({Pid, Name}, #lock{
+    {reply, Name, State#mutex{locks = dict:store({Pid, Name}, #lock{
         pid     = Pid, 
         name    = Name, 
         timeout = Timeout,
         state   = ?LOCK_STATE_FREE,
         created = common:microtime()
-    }, State)};
+    }, State#mutex.locks)}};
 
 %%--------------------------------------------------------------------
 %% Установить блокировку
@@ -74,7 +72,7 @@ handle_call({get, Name, Timeout}, {Pid, _}, State) ->
 %%--------------------------------------------------------------------
 handle_call({acquire, Name}, {Pid, _}, State) ->
     % Находим блокировку по pid
-    case dict:find({Pid, Name}, State) of
+    case dict:find({Pid, Name}, State#mutex.locks) of
         error         -> {reply, not_found, State};
         {ok, Current} ->
             % Проверяем, что еще не занята
@@ -86,7 +84,7 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
                         Lock#lock.name == Current#lock.name 
                             andalso Lock#lock.state == ?LOCK_STATE_BUSY 
                             andalso Lock#lock.release > common:microtime()
-                    end, State)),
+                    end, State#mutex.locks)),
                     if
                         Locked > 0 -> {reply, busy, State};
                         true       -> 
@@ -96,10 +94,10 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
                                 Timeout -> common:microtime() + Timeout
                             end,
                             % Блокировка успешно занята
-                            {reply, acquired, dict:store(Pid, Current#lock{
+                            {reply, acquired, State#mutex{locks = dict:store(Pid, Current#lock{
                                 state   = ?LOCK_STATE_BUSY, 
                                 release = Release
-                            }, State)}
+                            }, State#mutex.locks)}}
                     end
             end
     end;
@@ -112,9 +110,9 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
 %% @param State
 %%--------------------------------------------------------------------
 handle_call({release, Name}, {Pid, _}, State) ->
-    case dict:find({Pid, Name}, State) of
+    case dict:find({Pid, Name}, State#mutex.locks) of
         error   -> {reply, not_found, State};
-        {ok, _} -> {reply, released, dict:erase(Pid, State)}
+        {ok, _} -> {reply, released, State#mutex{locks = dict:erase(Pid, State#mutex.locks)}}
     end.
 
 %%--------------------------------------------------------------------
@@ -132,17 +130,16 @@ handle_info(cleanup, State) ->
     % Очищаем протухшие активные блокировки
     CleanupBusy = dict:filter(fun(_, Lock) -> 
         (Lock#lock.state == ?LOCK_STATE_BUSY 
-             andalso Lock#lock.release < common:microtime()) == false end, State),
+             andalso Lock#lock.release < common:microtime()) == false end, State#mutex.locks),
     % Ощищаем протухшие созданные блокировки
     CleanupFree = dict:filter(fun(_, Lock) ->
         MaxLiveTime = Lock#lock.created + ?LOCK_MAX_ALIVE_TIMEOUT,
         (Lock#lock.state == ?LOCK_STATE_FREE andalso MaxLiveTime < common:microtime()) == false
     end, CleanupBusy),
-    
-    io:fwrite("Cleanup, in pool left ~w~n", [dict:size(CleanupFree)]),
+    debug_msg("Cleanup, in pool left ~w~n", [dict:size(CleanupFree)], State),
     % Повторяем через интервал
     erlang:send_after(?LOCK_CLEANUP_TIMEOUT, self(), cleanup),
-    {noreply, CleanupFree}.
+    {noreply, State#mutex{locks = CleanupFree}}.
 
 %%--------------------------------------------------------------------
 %% Обработчик остановки процесса
@@ -156,3 +153,15 @@ terminate(_Reason, _State) ->
 %%--------------------------------------------------------------------
 code_change(_OldVrs, State, _Extra) ->
     {ok, State}.
+
+%%--------------------------------------------------------------------
+%% Режим отладки
+%% 
+%% @param list  MsgTemplate
+%% @param list  Args
+%% @param mutex State
+%%--------------------------------------------------------------------
+debug_msg(MsgTemplate, Args, State) when State#mutex.debug_mode == true ->
+    io:fwrite(MsgTemplate, Args);
+debug_msg(_, _, _) ->
+    debug_mode_disabled.

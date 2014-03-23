@@ -1,6 +1,7 @@
 %% Author: djay
 %% Created: 16.03.2014
 %% Description: TODO: Add description to my_mutex_sup
+
 -module(mutex_sup).
 -behaviour(supervisor).
 
