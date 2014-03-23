@@ -3,6 +3,8 @@
 include __DIR__ . '/../src/Mutex/Mutex.php';
 include __DIR__ . '/../src/Base/Base.php';
 
+use Mutex\Mutex;
+
 $mutex = new Mutex('127.0.0.1', 7007);
 $mutex->get('key1', false);
 

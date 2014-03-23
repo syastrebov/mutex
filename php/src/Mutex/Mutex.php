@@ -1,7 +1,10 @@
 <?php
 
+namespace Mutex;
+
 /**
  * Class Mutex
+ * @package Mutex
  */
 class Mutex
 {
