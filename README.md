@@ -12,13 +12,14 @@ PHP-Erlang Mutex
 
 Пример использования:
 
-$mutex = new Mutex('127.0.0.1', 7007);
-$mutex->get('key1', false);
 
-if ($mutex->acquire()) {
-    // критическая секция
-    // …
+    $mutex = new Mutex('127.0.0.1', 7007);
+    $mutex->get('key1', false);
     
-    $mutex->release();
-}
+    if ($mutex->acquire()) {
+        // критическая секция
+        // …
+        
+        $mutex->release();
+    }
 
