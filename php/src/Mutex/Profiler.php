@@ -8,5 +8,5 @@ namespace Mutex;
  */
 class Profiler
 {
-    
+
 } 

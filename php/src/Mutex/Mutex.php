@@ -23,12 +23,14 @@ class Mutex
      *
      * @param string $hostname
      * @param string $port
+     *
+     * @throws Exception
      */
     public function __construct($hostname, $port)
     {
         $this->socket = fsockopen($hostname, $port, $errno, $errstr);
         if (!$this->socket) {
-            echo "$errstr ($errno)<br />\n";
+            throw new Exception(sprintf('%s (%s)', $errstr, $errno));
         }
     }
 
@@ -39,16 +41,28 @@ class Mutex
      * @param int    $timeout
      *
      * @return string
+     * @throws Exception
      */
     public function get($name, $timeout)
     {
-        $this->send(array('cmd' => 'get', 'name' => $name, 'timeout' => $timeout));
-        $this->name = $this->receive();
+        $this->name = null;
 
-        if (!is_string($this->name) || !strlen($this->name)) {
-            $this->name = null;
+        if (!is_string($name) || !(strlen($name) > 0)) {
+            throw new Exception('Невалидное имя блокировки.');
         }
 
+        $this->send(array(
+            'cmd'     => 'get',
+            'name'    => $name,
+            'timeout' => $timeout
+        ));
+
+        $response = $this->receive();
+        if ($response != $name) {
+            throw new Exception(sprintf('Не удалось получить указатель на блокировку, причина: %s', $response));
+        }
+
+        $this->name = $response;
         return $this->name;
     }
 
