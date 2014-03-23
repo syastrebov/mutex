@@ -1,10 +1,16 @@
 <?php
 
+/**
+ *
+ */
+
 namespace Mutex;
 
 /**
  * Class Mutex
+ * 
  * @package Mutex
+ * @author  Sergey Yastrebov <serg.yastrebov@gmail.com>
  */
 class Mutex
 {
@@ -21,8 +27,8 @@ class Mutex
     /**
      * Constructor
      *
-     * @param string $hostname
-     * @param string $port
+     * @param string $hostname Хост сервиса блокировок
+     * @param string $port     Порт сервиса блокировок (по умолчанию 7007)
      *
      * @throws Exception
      */
@@ -37,8 +43,8 @@ class Mutex
     /**
      * Получить указатель на блокировку
      *
-     * @param string $name
-     * @param int    $timeout
+     * @param string $name    Имя указателя блокировки
+     * @param int    $timeout Время жизни блокировки (по истечении времени блокировка снимается)
      *
      * @return string
      * @throws Exception
@@ -54,7 +60,7 @@ class Mutex
         $this->send(array(
             'cmd'     => 'get',
             'name'    => $name,
-            'timeout' => $timeout
+            'timeout' => $timeout,
         ));
 
         $response = $this->receive();
@@ -69,7 +75,8 @@ class Mutex
     /**
      * Установить блокировку
      *
-     * @param string $name
+     * @param string $name Имя указателя блокировки
+     *
      * @return bool
      */
     public function acquire($name=null)
@@ -87,6 +94,7 @@ class Mutex
                     case 'busy':
                         usleep(10000);
                         continue;
+                        break;
                     case 'not_found':
                     default:
                         return false;
@@ -100,7 +108,8 @@ class Mutex
     /**
      * Снять блокировку
      *
-     * @param string $name
+     * @param string $name Имя указателя блокировки
+     *
      * @return bool
      */
     public function release($name=null)
@@ -133,13 +142,18 @@ class Mutex
     /**
      * Отправить запрос
      *
-     * @param $data
+     * @param array $data отправляемый запрос на сервис
+     *
+     * @return bool
      */
-    protected function send($data)
+    protected function send(array $data)
     {
         if ($this->socket) {
             fwrite($this->socket, json_encode($data));
+            return true;
         }
+
+        return false;
     }
 
     /**
