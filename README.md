@@ -10,7 +10,7 @@ PHP-Erlang Mutex
 
 =====
 
-Пример использования:
+Примеры использования:
 
 
     $mutex = new Mutex('127.0.0.1', 7007);
@@ -23,3 +23,14 @@ PHP-Erlang Mutex
         $mutex->release();
     }
 
+Очередь блокировок:
+
+    $mutex->get('key1', false);
+    $mutex->get('key2', false);
+    
+    if ($mutex->acquire('key1')) {
+        if ($mutex->acquire('key2')) {
+            $mutex->release('key2');
+        }
+        $mutex->release('key1');
+    }
