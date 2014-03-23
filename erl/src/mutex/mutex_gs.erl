@@ -83,7 +83,9 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
                 ?LOCK_STATE_FREE ->
                     % Проверяем есть ли занятые блокировки по ключу
                     Locked = dict:size(dict:filter(fun(_, Lock) -> 
-                        Lock#lock.name == Current#lock.name andalso Lock#lock.state == ?LOCK_STATE_BUSY andalso Lock#lock.release > common:microtime()
+                        Lock#lock.name == Current#lock.name 
+                            andalso Lock#lock.state == ?LOCK_STATE_BUSY 
+                            andalso Lock#lock.release > common:microtime()
                     end, State)),
                     if
                         Locked > 0 -> {reply, busy, State};
@@ -94,7 +96,10 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
                                 Timeout -> common:microtime() + Timeout
                             end,
                             % Блокировка успешно занята
-                            {reply, acquired, dict:store(Pid, Current#lock{state = ?LOCK_STATE_BUSY, release = Release}, State)}
+                            {reply, acquired, dict:store(Pid, Current#lock{
+                                state   = ?LOCK_STATE_BUSY, 
+                                release = Release
+                            }, State)}
                     end
             end
     end;
@@ -126,10 +131,13 @@ handle_cast(stop, State) ->
 handle_info(cleanup, State) ->
     % Очищаем протухшие активные блокировки
     CleanupBusy = dict:filter(fun(_, Lock) -> 
-        (Lock#lock.state == ?LOCK_STATE_BUSY andalso Lock#lock.release < common:microtime()) == false end, State),
+        (Lock#lock.state == ?LOCK_STATE_BUSY 
+             andalso Lock#lock.release < common:microtime()) == false end, State),
     % Ощищаем протухшие созданные блокировки
-    CleanupFree = dict:filter(fun(_, Lock) -> 
-        (Lock#lock.state == ?LOCK_STATE_FREE andalso (Lock#lock.created + ?LOCK_MAX_ALIVE_TIMEOUT) < common:microtime()) == false end, CleanupBusy),
+    CleanupFree = dict:filter(fun(_, Lock) ->
+        MaxLiveTime = Lock#lock.created + ?LOCK_MAX_ALIVE_TIMEOUT,
+        (Lock#lock.state == ?LOCK_STATE_FREE andalso MaxLiveTime < common:microtime()) == false
+    end, CleanupBusy),
     
     io:fwrite("Cleanup, in pool left ~w~n", [dict:size(CleanupFree)]),
     % Повторяем через интервал
