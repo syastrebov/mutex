@@ -9,25 +9,25 @@ use Mutex\Profiler;
 $mutex = new Mutex('127.0.0.1', 7007);
 $mutex->get('key1', false);
 
-Profiler::msg('start');
+Profiler::debugMessage('start');
 if ($mutex->acquire()) {
-    Profiler::msg('acquired');
+    Profiler::debugMessage('acquired');
     sleep(10);
     $mutex->release();
 }
-Profiler::msg('end');
+Profiler::debugMessage('end');
 
 $mutex->get('key1', false);
 $mutex->get('key2', false);
 
 if ($mutex->acquire('key1')) {
-    Profiler::msg('acquired key1');
+    Profiler::debugMessage('acquired key1');
     if ($mutex->acquire('key2')) {
-        Profiler::msg('acquired key2');
+        Profiler::debugMessage('acquired key2');
         $mutex->release();
     }
     $mutex->release();
 }
-Profiler::msg('end');
+Profiler::debugMessage('end');
 
 

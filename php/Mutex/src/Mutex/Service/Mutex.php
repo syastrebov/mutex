@@ -10,7 +10,9 @@
  * @link     https://github.com/syastrebov/mutex
  */
 
-namespace Mutex;
+namespace Mutex\Service;
+
+use Mutex\Exception\Exception;
 
 /**
  * Class Mutex

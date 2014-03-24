@@ -10,8 +10,9 @@
  * @link     https://github.com/syastrebov/mutex
  */
 
-namespace Mutex;
+namespace Mutex\Service;
 
+use Mutex\Model\ProfileStackModel;
 use DateTime;
 
 /**
@@ -20,10 +21,27 @@ use DateTime;
  */
 class Profiler
 {
+    private $_stack = array();
+
     /**
+     * Зафиксировать вызов метода
+     *
+     * @param string $filename
+     * @param string $method
+     * @param string $key
+     * @param string $stackTrace
+     */
+    public function callMethod($filename, $method, $key, $stackTrace)
+    {
+        $this->_stack[] = new ProfileStackModel();
+    }
+
+    /**
+     * Отладочное сообщение
+     *
      * @param string $str
      */
-    public static function msg($str)
+    public static function debugMessage($str)
     {
         $time = new DateTime;
         echo sprintf("%s on %s\r\n", $str, $time->format('H:i:s'));

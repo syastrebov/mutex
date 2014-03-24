@@ -27,30 +27,30 @@ $mutex->get('B', false);
 
 if (isset($argv[1])) {
     if ($mutex->acquire('A')) {
-        Profiler::msg('acquired A');
+        Profiler::debugMessage('acquired A');
         sleep(10);
 
         if ($mutex->acquire('B')) {
             sleep(10);
 
-            Profiler::msg('acquired B');
+            Profiler::debugMessage('acquired B');
             $mutex->release('B');
         }
         $mutex->release('A');
     }
-    Profiler::msg('end');
+    Profiler::debugMessage('end');
 } else {
     if ($mutex->acquire('B')) {
-        Profiler::msg('acquired B');
+        Profiler::debugMessage('acquired B');
         sleep(10);
 
         if ($mutex->acquire('A')) {
             sleep(10);
 
-            Profiler::msg('acquired A');
+            Profiler::debugMessage('acquired A');
             $mutex->release('A');
         }
         $mutex->release('B');
     }
-    Profiler::msg('end');
+    Profiler::debugMessage('end');
 }
