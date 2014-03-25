@@ -28,6 +28,11 @@ class ProfileStackModel
     /**
      * @var string
      */
+    private $_class;
+
+    /**
+     * @var string
+     */
     private $_method;
 
     /**
@@ -59,6 +64,7 @@ class ProfileStackModel
      * Constructor
      *
      * @param string   $filename
+     * @param string   $class
      * @param string   $method
      * @param int      $line
      * @param string   $key
@@ -66,14 +72,79 @@ class ProfileStackModel
      * @param DateTime $dateTime
      * @param string   $stackTrace
      */
-    public function __construct($filename, $method, $line, $key, $response, DateTime $dateTime, $stackTrace=null)
+    public function __construct($filename, $class, $method, $line, $key, $response, DateTime $dateTime, $stackTrace=null)
     {
         $this->_filename   = $filename;
+        $this->_class      = $class;
         $this->_method     = $method;
         $this->_line       = $line;
         $this->_key        = $key;
         $this->_response   = $response;
         $this->_dateTime   = $dateTime;
         $this->_stackTrace = $stackTrace;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->_filename;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLine()
+    {
+        return $this->_line;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->_class;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->_key;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResponse()
+    {
+        return $this->_response;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateTime()
+    {
+        return clone $this->_dateTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateTimeFormat()
+    {
+        return $this->_dateTime->format('Y.m.d H:i:s');
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getStackTrace()
+    {
+        return $this->_stackTrace;
     }
 }

@@ -102,7 +102,10 @@ class Profiler
      */
     public function dump()
     {
+        /** @var ProfileStackModel $trace */
+        foreach ($this->_stack as $trace) {
 
+        }
     }
 
     /**
