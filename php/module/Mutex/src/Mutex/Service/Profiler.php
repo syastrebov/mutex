@@ -29,15 +29,24 @@ class Profiler
     /**
      * Зафиксировать вызов метода
      *
-     * @param string $filename
-     * @param string $method
-     * @param int    $line
      * @param string $key
-     * @param string $stackTrace
+     * @param mixed  $response
      */
-    public function callMethod($filename, $method, $line, $key, $stackTrace=null)
+    public function log($key, $response)
     {
-        $this->_stack[] = new ProfileStackModel($filename, $method, $line, $key, $stackTrace);
+        $stackTrace = debug_backtrace();
+        if (is_array($stackTrace) && count($stackTrace) > 1) {
+            $entryPoint = $stackTrace[1];
+
+            $this->_stack[] = new ProfileStackModel(
+                isset($entryPoint['file']) ? $entryPoint['file'] : null,
+                isset($entryPoint['function']) ? $entryPoint['function'] : null,
+                isset($entryPoint['line']) ? $entryPoint['line'] : null,
+                $key,
+                $response,
+                $stackTrace
+            );
+        }
     }
 
     /**

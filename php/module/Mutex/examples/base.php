@@ -8,6 +8,7 @@ use Mutex\Exception\Exception;
 
 try {
     $mutex = new Mutex('127.0.0.1', 7007);
+    $mutex->setProfiler(new Profiler());
     $mutex->get('key1', false);
 
     Profiler::debugMessage('start');

@@ -25,12 +25,17 @@ class Mutex
     /**
      * @var resource
      */
-    private $socket;
+    private $_socket;
 
     /**
      * @var string
      */
-    private $name;
+    private $_name;
+
+    /**
+     * @var Profiler
+     */
+    private $_profiler;
 
     /**
      * Constructor
@@ -42,10 +47,22 @@ class Mutex
      */
     public function __construct($hostname, $port)
     {
-        $this->socket = @fsockopen($hostname, $port, $errno, $errstr);
-        if (!$this->socket) {
+        $this->_socket = @fsockopen($hostname, $port, $errno, $errstr);
+        if (!$this->_socket) {
             throw new Exception(sprintf('%s (%s)', $errstr, $errno));
         }
+    }
+
+    /**
+     * Отладчик
+     *
+     * @param Profiler $profiler
+     * @return $this
+     */
+    public function setProfiler(Profiler $profiler)
+    {
+        $this->_profiler = $profiler;
+        return $this;
     }
 
     /**
@@ -59,7 +76,7 @@ class Mutex
      */
     public function get($name, $timeout)
     {
-        $this->name = null;
+        $this->_name = null;
 
         if (!is_string($name) || !(strlen($name) > 0)) {
             throw new Exception('Невалидное имя блокировки.');
@@ -75,9 +92,12 @@ class Mutex
         if ($response != $name) {
             throw new Exception(sprintf('Не удалось получить указатель на блокировку, причина: %s', $response));
         }
+        if ($this->_profiler) {
+            $this->_profiler->log($name, $response);
+        }
 
-        $this->name = $response;
-        return $this->name;
+        $this->_name = $response;
+        return $this->_name;
     }
 
     /**
@@ -89,11 +109,15 @@ class Mutex
      */
     public function acquire($name=null)
     {
-        $name = $name ? $name : $this->name;
+        $name = $name ? $name : $this->_name;
         if ($name) {
             while (true) {
                 $this->send(array('cmd' => 'acquire', 'name' => $name));
                 $response = $this->receive();
+
+                if ($this->_profiler) {
+                    $this->_profiler->log($name, $response);
+                }
 
                 switch ($response) {
                     case 'acquired':
@@ -122,10 +146,14 @@ class Mutex
      */
     public function release($name=null)
     {
-        $name = $name ? $name : $this->name;
+        $name = $name ? $name : $this->_name;
         if ($name) {
             $this->send(array('cmd' => 'release', 'name' => $name));
             $response = $this->receive();
+
+            if ($this->_profiler) {
+                $this->_profiler->log($name, $response);
+            }
 
             switch ($response) {
                 case 'released':
@@ -144,7 +172,7 @@ class Mutex
      */
     public function __destruct()
     {
-        fclose($this->socket);
+        fclose($this->_socket);
     }
 
     /**
@@ -156,8 +184,8 @@ class Mutex
      */
     protected function send(array $data)
     {
-        if ($this->socket) {
-            fwrite($this->socket, json_encode($data));
+        if ($this->_socket) {
+            fwrite($this->_socket, json_encode($data));
             return true;
         }
 
@@ -172,7 +200,7 @@ class Mutex
     protected function receive()
     {
         $input = '';
-        while (false !== ($char = fgetc($this->socket))) {
+        while (false !== ($char = fgetc($this->_socket))) {
             if ($char === "\000") {
                 return $input;
             } else {

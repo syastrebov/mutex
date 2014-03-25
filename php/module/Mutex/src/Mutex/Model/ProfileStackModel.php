@@ -39,6 +39,11 @@ class ProfileStackModel
     private $_key;
 
     /**
+     * @var mixed
+     */
+    private $_response;
+
+    /**
      * @var null|string
      */
     private $_stackTrace;
@@ -50,14 +55,16 @@ class ProfileStackModel
      * @param string $method
      * @param int    $line
      * @param string $key
+     * @param mixed  $response
      * @param string $stackTrace
      */
-    public function __construct($filename, $method, $line, $key, $stackTrace=null)
+    public function __construct($filename, $method, $line, $key, $response, $stackTrace=null)
     {
         $this->_filename   = $filename;
         $this->_method     = $method;
         $this->_line       = $line;
         $this->_key        = $key;
+        $this->_response   = $response;
         $this->_stackTrace = $stackTrace;
     }
 }
