@@ -36,14 +36,15 @@ class Profiler
     {
         $stackTrace = debug_backtrace();
         if (is_array($stackTrace) && count($stackTrace) > 1) {
-            $entryPoint = $stackTrace[1];
+            $entry = $stackTrace[1];
 
             $this->_stack[] = new ProfileStackModel(
-                isset($entryPoint['file']) ? $entryPoint['file'] : null,
-                isset($entryPoint['function']) ? $entryPoint['function'] : null,
-                isset($entryPoint['line']) ? $entryPoint['line'] : null,
+                isset($entry['file'])     ? $entry['file']     : null,
+                isset($entry['function']) ? $entry['function'] : null,
+                isset($entry['line'])     ? $entry['line']     : null,
                 $key,
                 $response,
+                new DateTime(),
                 $stackTrace
             );
         }

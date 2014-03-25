@@ -12,6 +12,8 @@
 
 namespace Mutex\Model;
 
+use DateTime;
+
 /**
  * Class ProfileStackModel
  * @package Mutex\Model
@@ -44,6 +46,11 @@ class ProfileStackModel
     private $_response;
 
     /**
+     * @var DateTime
+     */
+    private $_dateTime;
+
+    /**
      * @var null|string
      */
     private $_stackTrace;
@@ -51,20 +58,22 @@ class ProfileStackModel
     /**
      * Constructor
      *
-     * @param string $filename
-     * @param string $method
-     * @param int    $line
-     * @param string $key
-     * @param mixed  $response
-     * @param string $stackTrace
+     * @param string   $filename
+     * @param string   $method
+     * @param int      $line
+     * @param string   $key
+     * @param mixed    $response
+     * @param DateTime $dateTime
+     * @param string   $stackTrace
      */
-    public function __construct($filename, $method, $line, $key, $response, $stackTrace=null)
+    public function __construct($filename, $method, $line, $key, $response, DateTime $dateTime, $stackTrace=null)
     {
         $this->_filename   = $filename;
         $this->_method     = $method;
         $this->_line       = $line;
         $this->_key        = $key;
         $this->_response   = $response;
+        $this->_dateTime   = $dateTime;
         $this->_stackTrace = $stackTrace;
     }
 }
