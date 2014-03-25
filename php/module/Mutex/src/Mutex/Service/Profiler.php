@@ -16,15 +16,43 @@ use Mutex\Model\ProfileStackModel;
 use DateTime;
 
 /**
+ * Отладчик для mutex'a
+ * Строит карту вызова блокировок
+ *
  * Class Profiler
  * @package Mutex
  */
 class Profiler
 {
     /**
+     * @var string
+     */
+    private $_requestUri;
+
+    /**
      * @var array
      */
     private $_stack = array();
+
+    /**
+     * Constructor
+     *
+     * @param string $requestUri Точка входа
+     */
+    public function __construct($requestUri)
+    {
+        $this->_requestUri = $requestUri;
+    }
+
+    /**
+     * Запрашиваемый адрес (точка входа)
+     *
+     * @return string
+     */
+    public function getRequestUri()
+    {
+        return $this->_requestUri;
+    }
 
     /**
      * Зафиксировать вызов метода

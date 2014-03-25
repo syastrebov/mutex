@@ -7,8 +7,11 @@ use Mutex\Service\Profiler;
 use Mutex\Exception\Exception;
 
 try {
+    $profiler = new Profiler(__FILE__);
+    Profiler::debugMessage($profiler->getRequestUri());
+
     $mutex = new Mutex('127.0.0.1', 7007);
-    $mutex->setProfiler(new Profiler());
+    $mutex->setProfiler($profiler);
     $mutex->get('key1', false);
 
     Profiler::debugMessage('start');
