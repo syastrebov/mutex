@@ -3,5 +3,6 @@ erl/ebin/*.dump
 .idea
 php/.idea
 php/test/log
+php/test/.DS_Store
 erl/.settings
 erl/.project
