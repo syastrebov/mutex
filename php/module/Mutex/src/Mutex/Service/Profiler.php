@@ -12,6 +12,7 @@
 
 namespace Mutex\Service;
 
+use Mutex\Exception\ProfilerException as Exception;
 use Mutex\Model\ProfileStackModel;
 use DateTime;
 use Mutex\ProfilerStorageInterface;
@@ -87,7 +88,7 @@ class Profiler
 
             $this->_stack[] = new ProfileStackModel(
                 isset($entry['file'])     ? $entry['file']     : null,
-                isset($entry['class'])    ? $entry['class']     : null,
+                isset($entry['class'])    ? $entry['class']    : null,
                 isset($entry['function']) ? $entry['function'] : null,
                 isset($entry['line'])     ? $entry['line']     : null,
                 $key,
@@ -133,7 +134,9 @@ class Profiler
      */
     public function map()
     {
-
+        if (!$this->_storage) {
+            throw new Exception('Не задано хранилище');
+        }
     }
 
     /**
