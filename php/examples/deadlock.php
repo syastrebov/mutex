@@ -14,7 +14,7 @@
  *
  */
 
-include __DIR__ . '/../../../config/bootstrap.php';
+include __DIR__ . '/../config/bootstrap.php';
 
 use Mutex\Service\Mutex;
 use Mutex\Service\Profiler;
