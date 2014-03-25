@@ -42,7 +42,7 @@ class Mutex
      */
     public function __construct($hostname, $port)
     {
-        $this->socket = fsockopen($hostname, $port, $errno, $errstr);
+        $this->socket = @fsockopen($hostname, $port, $errno, $errstr);
         if (!$this->socket) {
             throw new Exception(sprintf('%s (%s)', $errstr, $errno));
         }

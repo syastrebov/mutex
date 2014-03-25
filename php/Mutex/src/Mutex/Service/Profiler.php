@@ -21,6 +21,9 @@ use DateTime;
  */
 class Profiler
 {
+    /**
+     * @var array
+     */
     private $_stack = array();
 
     /**
@@ -28,12 +31,13 @@ class Profiler
      *
      * @param string $filename
      * @param string $method
+     * @param int    $line
      * @param string $key
      * @param string $stackTrace
      */
-    public function callMethod($filename, $method, $key, $stackTrace)
+    public function callMethod($filename, $method, $line, $key, $stackTrace=null)
     {
-        $this->_stack[] = new ProfileStackModel();
+        $this->_stack[] = new ProfileStackModel($filename, $method, $line, $key, $stackTrace);
     }
 
     /**

@@ -14,43 +14,46 @@
  *
  */
 
-include __DIR__ . '/../src/Mutex/Mutex.php';
-include __DIR__ . '/../src/Mutex/Profiler.php';
+include __DIR__ . '/../../config/bootstrap.php';
 
-use Mutex\Mutex;
-use Mutex\Profiler;
+use Mutex\Service\Mutex;
+use Mutex\Service\Profiler;
 
-$mutex = new Mutex('127.0.0.1', 7007);
+try {
+    $mutex = new Mutex('127.0.0.1', 7007);
 
-$mutex->get('A', false);
-$mutex->get('B', false);
+    $mutex->get('A', false);
+    $mutex->get('B', false);
 
-if (isset($argv[1])) {
-    if ($mutex->acquire('A')) {
-        Profiler::debugMessage('acquired A');
-        sleep(10);
-
-        if ($mutex->acquire('B')) {
-            sleep(10);
-
-            Profiler::debugMessage('acquired B');
-            $mutex->release('B');
-        }
-        $mutex->release('A');
-    }
-    Profiler::debugMessage('end');
-} else {
-    if ($mutex->acquire('B')) {
-        Profiler::debugMessage('acquired B');
-        sleep(10);
-
+    if (isset($argv[1])) {
         if ($mutex->acquire('A')) {
+            Profiler::debugMessage('acquired A');
             sleep(10);
 
-            Profiler::debugMessage('acquired A');
+            if ($mutex->acquire('B')) {
+                sleep(10);
+
+                Profiler::debugMessage('acquired B');
+                $mutex->release('B');
+            }
             $mutex->release('A');
         }
-        $mutex->release('B');
+        Profiler::debugMessage('end');
+    } else {
+        if ($mutex->acquire('B')) {
+            Profiler::debugMessage('acquired B');
+            sleep(10);
+
+            if ($mutex->acquire('A')) {
+                sleep(10);
+
+                Profiler::debugMessage('acquired A');
+                $mutex->release('A');
+            }
+            $mutex->release('B');
+        }
+        Profiler::debugMessage('end');
     }
-    Profiler::debugMessage('end');
+} catch (Exception $e) {
+    Profiler::debugMessage($e->getMessage());
 }
