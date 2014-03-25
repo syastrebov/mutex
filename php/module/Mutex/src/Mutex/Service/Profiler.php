@@ -14,6 +14,7 @@ namespace Mutex\Service;
 
 use Mutex\Model\ProfileStackModel;
 use DateTime;
+use Mutex\ProfilerStorageInterface;
 
 /**
  * Отладчик для mutex'a
@@ -35,6 +36,11 @@ class Profiler
     private $_stack = array();
 
     /**
+     * @var ProfilerStorageInterface
+     */
+    private $_storage;
+
+    /**
      * Constructor
      *
      * @param string $requestUri Точка входа
@@ -52,6 +58,19 @@ class Profiler
     public function getRequestUri()
     {
         return $this->_requestUri;
+    }
+
+    /**
+     * Хранилище стека вызова
+     * Для построения карты блокировок
+     *
+     * @param ProfilerStorageInterface $storage
+     * @return $this
+     */
+    public function setStorage(ProfilerStorageInterface $storage)
+    {
+        $this->_storage = $storage;
+        return $this;
     }
 
     /**
@@ -76,6 +95,30 @@ class Profiler
                 $stackTrace
             );
         }
+    }
+
+    /**
+     * Отобразить очередь вызова блокировок
+     */
+    public function dump()
+    {
+
+    }
+
+    /**
+     * Сохранить очередь вызова
+     */
+    public function save()
+    {
+
+    }
+
+    /**
+     * Построить карту вызова
+     */
+    public function map()
+    {
+
     }
 
     /**
