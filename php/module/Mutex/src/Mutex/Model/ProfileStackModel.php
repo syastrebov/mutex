@@ -119,6 +119,14 @@ class ProfileStackModel
     /**
      * @return string
      */
+    public function getMethod()
+    {
+        return $this->_method;
+    }
+
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->_key;

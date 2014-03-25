@@ -87,6 +87,7 @@ class Profiler
 
             $this->_stack[] = new ProfileStackModel(
                 isset($entry['file'])     ? $entry['file']     : null,
+                isset($entry['class'])    ? $entry['class']     : null,
                 isset($entry['function']) ? $entry['function'] : null,
                 isset($entry['line'])     ? $entry['line']     : null,
                 $key,
@@ -102,9 +103,20 @@ class Profiler
      */
     public function dump()
     {
-        /** @var ProfileStackModel $trace */
         foreach ($this->_stack as $trace) {
-
+            /** @var ProfileStackModel $trace */
+            self::debugMessage(
+                sprintf(
+                    "%s::%s (%s [%d]) key = %s, response = %s",
+                    $trace->getClass(),
+                    $trace->getMethod(),
+                    $trace->getFile(),
+                    $trace->getLine(),
+                    $trace->getKey(),
+                    $trace->getResponse()
+                ),
+                $trace->getDateTime()
+            );
         }
     }
 
@@ -127,11 +139,12 @@ class Profiler
     /**
      * Отладочное сообщение
      *
-     * @param string $str
+     * @param string   $str
+     * @param DateTime $time
      */
-    public static function debugMessage($str)
+    public static function debugMessage($str, DateTime $time=null)
     {
-        $time = new DateTime;
+        $time = $time ?: new DateTime;
         echo sprintf("%s on %s\r\n", $str, $time->format('H:i:s'));
         flush();
     }

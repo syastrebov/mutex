@@ -34,6 +34,8 @@ try {
         $mutex->release();
     }
     Profiler::debugMessage('end');
+    $profiler->dump();
+
 } catch (Exception $e) {
     Profiler::debugMessage($e->getMessage());
 }
