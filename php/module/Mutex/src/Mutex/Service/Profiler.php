@@ -137,6 +137,11 @@ class Profiler
         if (!$this->_storage) {
             throw new Exception('Не задано хранилище');
         }
+
+        $list = $this->_storage->getList();
+        foreach ($list as $trace) {
+            /** @var ProfileStackModel $trace */
+        }
     }
 
     /**
