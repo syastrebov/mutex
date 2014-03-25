@@ -37,5 +37,12 @@ interface ProfilerStorageInterface
      *
      * @return bool
      */
-    public function save($requestUri, ProfileStackModel $model);
+    public function insert($requestUri, ProfileStackModel $model);
+
+    /**
+     * Получить список записей
+     *
+     * @return array
+     */
+    public function getList();
 }
