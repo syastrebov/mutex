@@ -72,8 +72,16 @@ class ProfileStackModel
      * @param DateTime $dateTime
      * @param string   $stackTrace
      */
-    public function __construct($filename, $class, $method, $line, $key, $response, DateTime $dateTime, $stackTrace=null)
-    {
+    public function __construct(
+        $filename,
+        $class,
+        $method,
+        $line,
+        $key,
+        $response,
+        DateTime $dateTime,
+        $stackTrace=null
+    ) {
         $this->_filename   = $filename;
         $this->_class      = $class;
         $this->_method     = $method;
