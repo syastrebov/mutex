@@ -14,26 +14,21 @@ try {
     $mutex->setProfiler($profiler);
     $mutex->get('key1', false);
 
-    Profiler::debugMessage('start');
     if ($mutex->acquire()) {
-        Profiler::debugMessage('acquired');
         sleep(10);
         $mutex->release();
     }
-    Profiler::debugMessage('end');
 
     $mutex->get('key1', false);
     $mutex->get('key2', false);
 
     if ($mutex->acquire('key1')) {
-        Profiler::debugMessage('acquired key1');
         if ($mutex->acquire('key2')) {
-            Profiler::debugMessage('acquired key2');
             $mutex->release();
         }
         $mutex->release();
     }
-    Profiler::debugMessage('end');
+
     $profiler->dump();
 
 } catch (Exception $e) {

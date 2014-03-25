@@ -2,5 +2,6 @@ erl/ebin/*.beam
 erl/ebin/*.dump
 .idea
 php/.idea
+php/test/log
 erl/.settings
 erl/.project
