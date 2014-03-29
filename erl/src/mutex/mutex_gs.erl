@@ -119,7 +119,7 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
 handle_call({release, Name}, {Pid, _}, State) ->
     case dict:find({Pid, Name}, State#mutex.locks) of
         error   -> {reply, not_found, State};
-        {ok, _} -> {reply, released, State#mutex{locks = dict:erase(Pid, State#mutex.locks)}}
+        {ok, _} -> {reply, released, State#mutex{locks = dict:erase({Pid, Name}, State#mutex.locks)}}
     end.
 
 %%--------------------------------------------------------------------

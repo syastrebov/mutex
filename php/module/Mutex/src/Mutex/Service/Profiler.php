@@ -79,10 +79,10 @@ class Profiler
      *
      * @param string $key
      * @param mixed  $response
+     * @param array  $stackTrace
      */
-    public function log($key, $response)
+    public function log($key, $response, array $stackTrace)
     {
-        $stackTrace = debug_backtrace();
         if (is_array($stackTrace) && count($stackTrace) > 1) {
             $entry = $stackTrace[1];
 

@@ -136,6 +136,16 @@ class Mutex
     }
 
     /**
+     * Закрыть соединение с сервисом
+     */
+    public function closeConnection()
+    {
+        if ($this->_socket) {
+            @fclose($this->_socket);
+        }
+    }
+
+    /**
      * Получить указатель на блокировку
      *
      * @param string   $name    Имя указателя блокировки
@@ -148,7 +158,7 @@ class Mutex
     {
         $this->_name = null;
 
-        if ((!is_int($name) && !is_string($name)) || strlen($name) == 0) {
+        if ((!is_int($name) && !is_string($name)) || strlen($name) == 0 || $name === null) {
             throw new Exception('Недопустимое имя блокировки.');
         }
         if ((!is_int($timeout) && $timeout !== false) || (is_int($timeout) && $timeout < 0)) {
@@ -162,10 +172,7 @@ class Mutex
         ));
 
         $this->_name = $this->receive();
-
-        if ($this->_profiler) {
-            $this->_profiler->log($name, $this->_name);
-        }
+        $this->log($name, $this->_name, debug_backtrace());
 
         return $this->_name;
     }
@@ -183,10 +190,8 @@ class Mutex
             while (true) {
                 $this->send(array('cmd' => 'acquire', 'name' => $name));
                 $response = $this->receive();
+                $this->log($name, $response, debug_backtrace());
 
-                if ($this->_profiler) {
-                    $this->_profiler->log($name, $response);
-                }
                 if ($response == 'busy') {
                     usleep(10000);
                 } else {
@@ -197,7 +202,7 @@ class Mutex
             return true;
 
         } else {
-            $this->_profiler->log($name, 'Не задан указатель');
+            $this->log($name, 'Не задан указатель', debug_backtrace());
         }
 
         return false;
@@ -215,18 +220,31 @@ class Mutex
         if ($name) {
             $this->send(array('cmd' => 'release', 'name' => $name));
             $response = $this->receive();
-
-            if ($this->_profiler) {
-                $this->_profiler->log($name, $response);
-            }
+            $this->log($name, $response, debug_backtrace());
 
             return true;
 
         } else {
-            $this->_profiler->log($name, 'Не задан указатель');
+            $this->log($name, 'Не задан указатель', debug_backtrace());
         }
 
         return false;
+    }
+
+    /**
+     * Зафиксировать вызов метода
+     *
+     * @param string $key
+     * @param mixed  $response
+     * @param array  $stackTrace
+     */
+    public function log($key, $response, $stackTrace)
+    {
+        if (is_array($stackTrace) && count($stackTrace) > 1) {
+            if ($this->_profiler) {
+                $this->_profiler->log($key, $response, $stackTrace);
+            }
+        }
     }
 
     /**
@@ -234,9 +252,7 @@ class Mutex
      */
     public function __destruct()
     {
-        if ($this->_socket) {
-            @fclose($this->_socket);
-        }
+        $this->closeConnection();
     }
 
     /**
