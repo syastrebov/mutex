@@ -15,10 +15,10 @@ namespace Mutex\Model;
 use DateTime;
 
 /**
- * Class ProfileStackModel
+ * Class ProfileStack
  * @package Mutex\Model
  */
-class ProfileStackModel
+class ProfileStack
 {
     /**
      * @var string

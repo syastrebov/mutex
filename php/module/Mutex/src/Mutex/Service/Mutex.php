@@ -83,6 +83,16 @@ class Mutex
     }
 
     /**
+     * Отладчик
+     *
+     * @return Profiler
+     */
+    public function getProfiler()
+    {
+        return $this->_profiler;
+    }
+
+    /**
      * Логирование исключительных ситуаций вызова блокировок
      *
      * @param LoggerInterface $logger

@@ -12,7 +12,7 @@
 
 namespace Mutex;
 
-use Mutex\Model\ProfileStackModel;
+use Mutex\Model\ProfileStack as ProfileStackModel;
 
 /**
  * Хранилище карты вызова блокировок

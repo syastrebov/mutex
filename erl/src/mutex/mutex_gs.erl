@@ -6,9 +6,14 @@
 -behaviour(gen_server).
 
 -include("../../include/mutex.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 -export([start_link/0, get/2, acquire/1, release/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+
+-ifdef(TEST).
+-export([cleanup_busy/1, cleanup_free/1]).
+-endif.
 
 %%--------------------------------------------------------------------
 %% Создание экземпляра процесса
@@ -93,8 +98,10 @@ handle_call({acquire, Name}, {Pid, _}, State) ->
                                 false   -> common:microtime() + ?LOCK_MAX_TIMEOUT;
                                 Timeout -> common:microtime() + Timeout
                             end,
+                            debug_msg("common:microtime = ~p release = ~p~n", 
+                                      [common:microtime(), Current#lock.timeout], State),
                             % Блокировка успешно занята
-                            {reply, acquired, State#mutex{locks = dict:store(Pid, Current#lock{
+                            {reply, acquired, State#mutex{locks = dict:store({Pid, Name}, Current#lock{
                                 state   = ?LOCK_STATE_BUSY, 
                                 release = Release
                             }, State#mutex.locks)}}
@@ -128,14 +135,9 @@ handle_cast(stop, State) ->
 %%--------------------------------------------------------------------
 handle_info(cleanup, State) ->
     % Очищаем протухшие активные блокировки
-    CleanupBusy = dict:filter(fun(_, Lock) -> 
-        (Lock#lock.state == ?LOCK_STATE_BUSY 
-             andalso Lock#lock.release < common:microtime()) == false end, State#mutex.locks),
+    CleanupBusy = cleanup_busy(State#mutex.locks),
     % Ощищаем протухшие созданные блокировки
-    CleanupFree = dict:filter(fun(_, Lock) ->
-        MaxLiveTime = Lock#lock.created + ?LOCK_MAX_ALIVE_TIMEOUT,
-        (Lock#lock.state == ?LOCK_STATE_FREE andalso MaxLiveTime < common:microtime()) == false
-    end, CleanupBusy),
+    CleanupFree = cleanup_free(CleanupBusy),
     debug_msg("Cleanup, in pool left ~w~n", [dict:size(CleanupFree)], State),
     % Повторяем через интервал
     erlang:send_after(?LOCK_CLEANUP_TIMEOUT, self(), cleanup),
@@ -153,6 +155,29 @@ terminate(_Reason, _State) ->
 %%--------------------------------------------------------------------
 code_change(_OldVrs, State, _Extra) ->
     {ok, State}.
+
+%%--------------------------------------------------------------------
+%% Очистка протухших занятых блокировок
+%% 
+%% @param dict Locks
+%% @return dict
+%%--------------------------------------------------------------------
+cleanup_busy(Locks) ->
+    dict:filter(fun(_, Lock) -> 
+        (Lock#lock.state == ?LOCK_STATE_BUSY andalso Lock#lock.release < common:microtime()) == false 
+    end, Locks).
+
+%%--------------------------------------------------------------------
+%% Очистка протухших свободных блокировок
+%% 
+%% @param dict Locks
+%% @return dict
+%%--------------------------------------------------------------------
+cleanup_free(Locks) ->
+    dict:filter(fun(_, Lock) ->
+        MaxLiveTime = Lock#lock.created + ?LOCK_MAX_ALIVE_TIMEOUT,
+        (Lock#lock.state == ?LOCK_STATE_FREE andalso MaxLiveTime =< common:microtime()) == false
+    end, Locks).
 
 %%--------------------------------------------------------------------
 %% Режим отладки

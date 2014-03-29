@@ -13,7 +13,7 @@
 namespace Mutex\Service;
 
 use Mutex\Exception\ProfilerException as Exception;
-use Mutex\Model\ProfileStackModel;
+use Mutex\Model\ProfileStack as ProfileStackModel;
 use Mutex\ProfilerStorageInterface;
 use DateTime;
 
