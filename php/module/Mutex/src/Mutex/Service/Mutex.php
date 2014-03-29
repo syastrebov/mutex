@@ -13,6 +13,7 @@
 namespace Mutex\Service;
 
 use Mutex\Exception\Exception;
+use Mutex\LoggerInterface;
 
 /**
  * Class Mutex
@@ -22,6 +23,19 @@ use Mutex\Exception\Exception;
  */
 class Mutex
 {
+    const DEFAULT_HOST = '127.0.0.1';
+    const DEFAULT_PORT = 7007;
+
+    /**
+     * @var string
+     */
+    private $_hostname;
+
+    /**
+     * @var int
+     */
+    private $_port;
+
     /**
      * @var resource
      */
@@ -38,25 +52,29 @@ class Mutex
     private $_profiler;
 
     /**
+     * @var LoggerInterface
+     */
+    private $_logger;
+
+    /**
      * Constructor
      *
      * @param string $hostname Хост сервиса блокировок
-     * @param string $port     Порт сервиса блокировок (по умолчанию 7007)
+     * @param int    $port     Порт сервиса блокировок (по умолчанию 7007)
      *
      * @throws Exception
      */
-    public function __construct($hostname, $port)
+    public function __construct($hostname=self::DEFAULT_HOST, $port=self::DEFAULT_PORT)
     {
-        $this->_socket = @fsockopen($hostname, $port, $errno, $errstr);
-        if (!$this->_socket) {
-            throw new Exception(sprintf('%s (%s)', $errstr, $errno));
-        }
+        $this->_hostname = $hostname;
+        $this->_port     = $port;
     }
 
     /**
      * Отладчик
      *
      * @param Profiler $profiler
+     *
      * @return $this
      */
     public function setProfiler(Profiler $profiler)
@@ -66,20 +84,67 @@ class Mutex
     }
 
     /**
+     * Логирование исключительных ситуаций вызова блокировок
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return $this
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->_logger = $logger;
+        return $this;
+    }
+
+    /**
+     * Доступно ли подключение к сервису
+     *
+     * @return bool
+     */
+    public function isAlive()
+    {
+        return $this->_socket && !feof($this->_socket);
+    }
+
+    /**
+     * Подключиться к сервису блокировок
+     *
+     * @throws \Mutex\Exception\Exception
+     * @return $this
+     */
+    public function establishConnection()
+    {
+        $this->_socket = @fsockopen($this->_hostname, $this->_port, $errno, $errstr);
+        if (!$this->_socket) {
+            if ($errno === 0) {
+                throw new Exception(sprintf('%s', $errstr));
+            }
+            if ($this->_logger) {
+                $this->_logger->insert(sprintf('%s (%s)', $errstr, $errno));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Получить указатель на блокировку
      *
-     * @param string $name    Имя указателя блокировки
-     * @param int    $timeout Время жизни блокировки (по истечении времени блокировка снимается)
+     * @param string   $name    Имя указателя блокировки
+     * @param int|bool $timeout Время жизни блокировки, микросекунды (по истечении времени блокировка снимается)
      *
      * @return string
      * @throws Exception
      */
-    public function get($name, $timeout)
+    public function get($name, $timeout=false)
     {
         $this->_name = null;
 
-        if (!is_string($name) || !(strlen($name) > 0)) {
-            throw new Exception('Невалидное имя блокировки.');
+        if ((!is_int($name) && !is_string($name)) || strlen($name) == 0) {
+            throw new Exception('Недопустимое имя блокировки.');
+        }
+        if ((!is_int($timeout) && $timeout !== false) || (is_int($timeout) && $timeout < 0)) {
+            throw new Exception('Недопустимое имя блокировки.');
         }
 
         $this->send(array(
@@ -89,7 +154,7 @@ class Mutex
         ));
 
         $response = $this->receive();
-        if ($response != $name) {
+        if ($this->isAlive() && $response != $name) {
             throw new Exception(sprintf('Не удалось получить указатель на блокировку, причина: %s', $response));
         }
         if ($this->_profiler) {
@@ -129,7 +194,7 @@ class Mutex
                         break;
                     case 'not_found':
                     default:
-                        return false;
+                        return true;
                 }
             }
         }
@@ -160,7 +225,7 @@ class Mutex
                     return true;
                 case 'not_found':
                 default:
-                    return false;
+                    return true;
             }
         }
 
@@ -172,7 +237,9 @@ class Mutex
      */
     public function __destruct()
     {
-        fclose($this->_socket);
+        if ($this->_socket) {
+            @fclose($this->_socket);
+        }
     }
 
     /**
@@ -184,8 +251,8 @@ class Mutex
      */
     protected function send(array $data)
     {
-        if ($this->_socket) {
-            fwrite($this->_socket, json_encode($data));
+        if ($this->isAlive()) {
+            @fwrite($this->_socket, json_encode($data));
             return true;
         }
 
@@ -200,7 +267,7 @@ class Mutex
     protected function receive()
     {
         $input = '';
-        while (false !== ($char = fgetc($this->_socket))) {
+        while (false !== ($char = @fgetc($this->_socket))) {
             if ($char === "\000") {
                 return $input;
             } else {

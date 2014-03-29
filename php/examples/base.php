@@ -11,7 +11,11 @@ try {
     Profiler::debugMessage($profiler->getRequestUri());
 
     $mutex = new Mutex('127.0.0.1', 7007);
-    $mutex->setProfiler($profiler);
+    $mutex->establishConnection()->setProfiler($profiler);
+    if (!$mutex->isAlive()) {
+        throw new Exception('Не удалось подключиться к сервису');
+    }
+
     $mutex->get('key1', false);
 
     if ($mutex->acquire()) {

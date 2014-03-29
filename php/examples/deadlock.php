@@ -21,6 +21,10 @@ use Mutex\Service\Profiler;
 
 try {
     $mutex = new Mutex('127.0.0.1', 7007);
+    $mutex->establishConnection()->setProfiler($profiler);
+    if (!$mutex->isAlive()) {
+        throw new Exception('Не удалось подключиться к сервису');
+    }
 
     $mutex->get('A', false);
     $mutex->get('B', false);

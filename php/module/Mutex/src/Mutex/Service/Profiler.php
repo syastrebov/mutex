@@ -14,8 +14,8 @@ namespace Mutex\Service;
 
 use Mutex\Exception\ProfilerException as Exception;
 use Mutex\Model\ProfileStackModel;
-use DateTime;
 use Mutex\ProfilerStorageInterface;
+use DateTime;
 
 /**
  * Отладчик для mutex'a
