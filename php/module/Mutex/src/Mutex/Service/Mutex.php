@@ -74,7 +74,6 @@ class Mutex
      * Отладчик
      *
      * @param Profiler $profiler
-     *
      * @return $this
      */
     public function setProfiler(Profiler $profiler)
@@ -87,7 +86,6 @@ class Mutex
      * Логирование исключительных ситуаций вызова блокировок
      *
      * @param LoggerInterface $logger
-     *
      * @return $this
      */
     public function setLogger(LoggerInterface $logger)
@@ -169,7 +167,6 @@ class Mutex
      * Установить блокировку
      *
      * @param string $name Имя указателя блокировки
-     *
      * @return bool
      */
     public function acquire($name=null)
@@ -206,7 +203,6 @@ class Mutex
      * Снять блокировку
      *
      * @param string $name Имя указателя блокировки
-     *
      * @return bool
      */
     public function release($name=null)
@@ -246,7 +242,6 @@ class Mutex
      * Отправить запрос
      *
      * @param array $data отправляемый запрос на сервис
-     *
      * @return bool
      */
     protected function send(array $data)

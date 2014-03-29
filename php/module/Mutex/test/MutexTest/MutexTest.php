@@ -86,6 +86,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     {
         $this->_mutex = new Mutex();
         $this->_mutex->establishConnection();
+
         $this->assertEquals('A', $this->_mutex->get('A'));
         $this->assertEquals('B', $this->_mutex->get('B'));
     }
@@ -106,6 +107,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     {
         $this->_mutex = new Mutex();
         $this->_mutex->establishConnection();
+
         $this->assertEquals('A', $this->_mutex->get('A'));
         $this->assertTrue($this->_mutex->acquire());
         $this->assertTrue($this->_mutex->release('A'));
@@ -134,6 +136,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     {
         $this->_mutex = new Mutex();
         $this->_mutex->establishConnection();
+
         $this->assertFalse($this->_mutex->acquire());
     }
 
@@ -143,6 +146,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     public function testAcquireWithoutPointerAndConnection()
     {
         $this->_mutex = new Mutex();
+
         $this->assertFalse($this->_mutex->acquire());
         $this->assertFalse($this->_mutex->release());
     }
