@@ -161,15 +161,12 @@ class Mutex
             'timeout' => $timeout,
         ));
 
-        $response = $this->receive();
-        if ($this->isAlive() && $response != $name) {
-            throw new Exception(sprintf('Не удалось получить указатель на блокировку, причина: %s', $response));
-        }
+        $this->_name = $this->receive();
+
         if ($this->_profiler) {
-            $this->_profiler->log($name, $response);
+            $this->_profiler->log($name, $this->_name);
         }
 
-        $this->_name = $response;
         return $this->_name;
     }
 
@@ -190,19 +187,17 @@ class Mutex
                 if ($this->_profiler) {
                     $this->_profiler->log($name, $response);
                 }
-
-                switch ($response) {
-                    case 'busy':
-                        break;
-                    case 'acquired':
-                    case 'already_acquired':
-                    case 'not_found':
-                    default:
-                        return true;
+                if ($response == 'busy') {
+                    usleep(10000);
+                } else {
+                    break;
                 }
-
-                usleep(10000);
             }
+
+            return true;
+
+        } else {
+            $this->_profiler->log($name, 'Не задан указатель');
         }
 
         return false;
@@ -225,12 +220,10 @@ class Mutex
                 $this->_profiler->log($name, $response);
             }
 
-            switch ($response) {
-                case 'released':
-                case 'not_found':
-                default:
-                    return true;
-            }
+            return true;
+
+        } else {
+            $this->_profiler->log($name, 'Не задан указатель');
         }
 
         return false;
