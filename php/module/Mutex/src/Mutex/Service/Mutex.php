@@ -192,17 +192,16 @@ class Mutex
                 }
 
                 switch ($response) {
+                    case 'busy':
+                        break;
                     case 'acquired':
                     case 'already_acquired':
-                        return true;
-                    case 'busy':
-                        usleep(10000);
-                        continue;
-                        break;
                     case 'not_found':
                     default:
                         return true;
                 }
+
+                usleep(10000);
             }
         }
 
@@ -228,7 +227,6 @@ class Mutex
 
             switch ($response) {
                 case 'released':
-                    return true;
                 case 'not_found':
                 default:
                     return true;

@@ -22,6 +22,11 @@ use Mutex\Service\Profiler;
 class MutexTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Отображать ход выполнения
+     */
+    const PROFILER_DUMP_ENABLED = false;
+
+    /**
      * @var Mutex
      */
     private $_mutex;
@@ -42,7 +47,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     public function testInvalidConnectionParams()
     {
         $this->_mutex = new Mutex('0.0.0.0', 0);
-        $this->_mutex->setLogger(new LoggerDummy())->establishConnection();
+        $this->_mutex
+            ->setLogger(new LoggerDummy())
+            ->establishConnection();
     }
 
     /**
@@ -58,7 +65,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
                 ->isAlive()
         );
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -88,7 +97,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
                 ->isAlive()
         );
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -104,7 +115,12 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('A', $this->_mutex->get('A'));
         $this->assertEquals('B', $this->_mutex->get('B'));
 
-        $this->_mutex->getProfiler()->dump();
+        $this->_mutex->release('A');
+        $this->_mutex->release('B');
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -114,9 +130,13 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     {
         $this->_mutex = new Mutex();
         $this->_mutex->setProfiler(new Profiler(__FUNCTION__));
-        $this->assertNull($this->_mutex->get('A'));
 
-        $this->_mutex->getProfiler()->dump();
+        $this->assertNull($this->_mutex->get('A'));
+        $this->_mutex->release('A');
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -131,9 +151,11 @@ class MutexTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('A', $this->_mutex->get('A'));
         $this->assertTrue($this->_mutex->acquire());
-        $this->assertTrue($this->_mutex->release('A'));
+        $this->assertTrue($this->_mutex->release());
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -152,7 +174,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->_mutex->acquire());
         $this->assertFalse($this->_mutex->release());
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -168,7 +192,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->_mutex->acquire());
         $this->assertFalse($this->_mutex->release());
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -182,7 +208,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->_mutex->acquire());
         $this->assertFalse($this->_mutex->release());
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -200,7 +228,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->_mutex->acquire());
         $this->assertTrue($this->_mutex->release());
 
-        $this->_mutex->getProfiler()->dump();
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -219,7 +249,10 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         sleep(40);
 
         $this->assertTrue($this->_mutex->release());
-        $this->_mutex->getProfiler()->dump();
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -234,21 +267,41 @@ class MutexTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($this->_mutex->get('A', 500));
 
-        sleep(125);
+        sleep(140);
 
         $this->assertTrue($this->_mutex->acquire());
-        $this->_mutex->getProfiler()->dump();
+        $this->assertTrue($this->_mutex->release());
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     public function testDisconnectWhileAcquired()
     {
-        $this->_mutex = new Mutex();
-        $this->_mutex
-            ->setProfiler(new Profiler(__FUNCTION__))
-            ->establishConnection();
+//        $this->_mutex = new Mutex();
+//        $this->_mutex
+//            ->setProfiler(new Profiler(__FUNCTION__))
+//            ->establishConnection();
+//
+//        $this->assertNotNull($this->_mutex->get('A', 500));
+//        if (self::PROFILER_DUMP_ENABLED) {
+//            $this->_mutex->getProfiler()->dump();
+//        }
+    }
 
-        $this->assertNotNull($this->_mutex->get('A', 500));
-        $this->_mutex->getProfiler()->dump();
+    /**
+     * Отладчик
+     */
+    public function testGetProfiler()
+    {
+        $this->_mutex = new Mutex();
+        $this->assertTrue(
+            $this->_mutex
+                ->setProfiler(new Profiler(__FUNCTION__))
+                ->getProfiler()
+            instanceof Profiler
+        );
     }
 
     /**
