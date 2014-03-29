@@ -238,21 +238,21 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testReleaseNotFound()
     {
-//        $this->_mutex = new Mutex();
-//        $this->_mutex
-//            ->setProfiler(new Profiler(__FUNCTION__))
-//            ->establishConnection();
-//
-//        $this->assertNotNull($this->_mutex->get('A', 500));
-//        $this->assertTrue($this->_mutex->acquire());
-//
-//        sleep(40);
-//
-//        $this->assertTrue($this->_mutex->release());
-//
-//        if (self::PROFILER_DUMP_ENABLED) {
-//            $this->_mutex->getProfiler()->dump();
-//        }
+        $this->_mutex = new Mutex();
+        $this->_mutex
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->establishConnection();
+
+        $this->assertNotNull($this->_mutex->get('A', 500));
+        $this->assertTrue($this->_mutex->acquire());
+
+        sleep(40);
+
+        $this->assertTrue($this->_mutex->release());
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
@@ -260,21 +260,21 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireNotFound()
     {
-//        $this->_mutex = new Mutex();
-//        $this->_mutex
-//            ->setProfiler(new Profiler(__FUNCTION__))
-//            ->establishConnection();
-//
-//        $this->assertNotNull($this->_mutex->get('A', 500));
-//
-//        sleep(140);
-//
-//        $this->assertTrue($this->_mutex->acquire());
-//        $this->assertTrue($this->_mutex->release());
-//
-//        if (self::PROFILER_DUMP_ENABLED) {
-//            $this->_mutex->getProfiler()->dump();
-//        }
+        $this->_mutex = new Mutex();
+        $this->_mutex
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->establishConnection();
+
+        $this->assertNotNull($this->_mutex->get('A', 500));
+
+        sleep(140);
+
+        $this->assertTrue($this->_mutex->acquire());
+        $this->assertTrue($this->_mutex->release());
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
     }
 
     /**
