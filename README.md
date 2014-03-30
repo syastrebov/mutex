@@ -14,6 +14,7 @@ PHP-Erlang Mutex
 
 
     $mutex = new Mutex('127.0.0.1', 7007);
+    $mutex->->establishConnection();
     $mutex->get('key1', false);
     
     if ($mutex->acquire()) {
