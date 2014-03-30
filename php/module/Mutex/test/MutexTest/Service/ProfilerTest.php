@@ -56,6 +56,17 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Неправильно заданная точка входа
+     *
+     * @expectedException \Mutex\Exception\ProfilerException
+     * @dataProvider providerInvalidRequestUri
+     */
+    public function testInvalidRequestUri($requestUri)
+    {
+        new Profiler($requestUri);
+    }
+
+    /**
      * Показать ход выполнения
      */
     public function testDump()
@@ -89,9 +100,41 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $this->_mutex->release();
     }
 
+    /**
+     * Не задано хранилище при поптыке построить карту
+     * 
+     * @expectedException \Mutex\Exception\ProfilerException
+     */
+    public function testMapStorageNotSet()
+    {
+        $profiler = new Profiler(__FUNCTION__);
+        $profiler->map();
+    }
+
+    /**
+     * Карта блокировок отладчика
+     */
     public function testMap()
     {
         $profiler = new Profiler(__FUNCTION__);
         $profiler->setStorage(ProfilerStorageDummy::getInstance());
+        $profiler->map();
+    }
+
+    /**
+     * Неправильно заданная точка входа
+     *
+     * @return array
+     */
+    public function providerInvalidRequestUri()
+    {
+        return array(
+            array(1),
+            array(null),
+            array(false),
+            array(array()),
+            array(1.2),
+            array(new \stdClass())
+        );
     }
 }

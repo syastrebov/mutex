@@ -45,9 +45,14 @@ class Profiler
      * Constructor
      *
      * @param string $requestUri Точка входа
+     * @throws Exception
      */
     public function __construct($requestUri)
     {
+        if (!is_string($requestUri)) {
+            throw new Exception('Недопустимый request uri');
+        }
+
         $this->_requestUri = $requestUri;
     }
 
