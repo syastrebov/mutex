@@ -10,7 +10,8 @@
  * @link     https://github.com/syastrebov/mutex
  */
 
-namespace MutexTest;
+namespace MutexTest\Service;
+
 use Mutex\Service\Logger\LoggerDummy;
 use Mutex\Service\Mutex;
 use Mutex\Service\Profiler;
@@ -331,28 +332,6 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         if (self::PROFILER_DUMP_ENABLED) {
             $this->_mutex->getProfiler()->dump();
         }
-    }
-
-    /**
-     * Отладчик
-     */
-    public function testGetProfiler()
-    {
-        $this->_mutex = new Mutex();
-        $this->_mutex->establishConnection();
-
-        $this->assertNotNull($this->_mutex->get('A'));
-        $this->_mutex->acquire();
-        $this->_mutex->release();
-
-        $this->assertTrue(
-            $this->_mutex
-                ->setProfiler(new Profiler(__FUNCTION__))
-                ->getProfiler()
-            instanceof Profiler
-        );
-
-        $this->_mutex->getProfiler()->dump();
     }
 
     /**

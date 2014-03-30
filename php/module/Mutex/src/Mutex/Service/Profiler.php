@@ -85,8 +85,7 @@ class Profiler
     {
         if (is_array($stackTrace) && count($stackTrace) > 1) {
             $entry = $stackTrace[1];
-
-            $this->_stack[] = new ProfileStackModel(
+            $model = new ProfileStackModel(
                 isset($entry['file'])     ? $entry['file']     : null,
                 isset($entry['class'])    ? $entry['class']    : null,
                 isset($entry['function']) ? $entry['function'] : null,
@@ -96,6 +95,11 @@ class Profiler
                 new DateTime(),
                 $stackTrace
             );
+
+            $this->_stack[] = $model;
+            if ($this->_storage) {
+                $this->_storage->insert($this->getRequestUri(), $model);
+            }
         }
     }
 
@@ -119,14 +123,6 @@ class Profiler
                 $trace->getDateTime()
             );
         }
-    }
-
-    /**
-     * Сохранить очередь вызова
-     */
-    public function save()
-    {
-
     }
 
     /**
