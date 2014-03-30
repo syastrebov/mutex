@@ -158,6 +158,7 @@ handle_info({tcp_error, _, Reason}, State) ->
 %% @param State
 %%--------------------------------------------------------------------
 terminate(_Reason, _State) ->
+    mutex_gs:release_pid(self()),
     io:fwrite("Terminated ~w~n", [self()]),
     ok.
 

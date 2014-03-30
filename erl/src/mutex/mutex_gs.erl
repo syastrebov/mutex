@@ -8,7 +8,7 @@
 -include("../../include/mutex.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
--export([start_link/0, get/2, acquire/1, release/1]).
+-export([start_link/0, get/2, acquire/1, release/1, release_pid/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 -ifdef(TEST).
@@ -52,6 +52,14 @@ acquire(Name) ->
 %%--------------------------------------------------------------------
 release(Name) ->
     gen_server:call(?MODULE, {release, Name}).
+
+%%--------------------------------------------------------------------
+%% Снять все блокировки пользователя
+%% 
+%% @param list Name
+%%--------------------------------------------------------------------
+release_pid(Pid) ->
+    gen_server:cast(?MODULE, {release, Pid}).
 
 %%--------------------------------------------------------------------
 %% Получить ссылку на блокировку
@@ -123,7 +131,19 @@ handle_call({release, Name}, {Pid, _}, State) ->
     end.
 
 %%--------------------------------------------------------------------
-%% Заглушка для обработчика входящих сообщений типа cast
+%% Снять все блокировки пользователя при отключении пользователя
+%%
+%% @param pid Pid
+%% @param State
+%%--------------------------------------------------------------------
+handle_cast({release, Pid}, State) ->
+    debug_msg("release all ~p, in pool ~p~n", [Pid, dict:size(State#mutex.locks)], State),
+    ClearPid = dict:filter(fun(_, Lock) -> Lock#lock.pid =/= Pid end, State#mutex.locks),
+    debug_msg("Cleanup, in pool left ~p~n", [dict:size(ClearPid)], State),
+    {noreply, State#mutex{locks = ClearPid}};
+
+%%--------------------------------------------------------------------
+%% Остановить процесс
 %% @param State
 %%--------------------------------------------------------------------
 handle_cast(stop, State) ->

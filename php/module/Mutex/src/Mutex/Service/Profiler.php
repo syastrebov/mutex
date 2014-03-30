@@ -75,7 +75,7 @@ class Profiler
     }
 
     /**
-     * Зафиксировать вызов метода
+     * Залогировать вызов метода
      *
      * @param string $key
      * @param mixed  $response

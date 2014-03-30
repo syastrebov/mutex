@@ -214,9 +214,9 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Попытка блокировки занятой секции (тест busy)
+     * Попытка повторной блокировки занятой секции (тест already_acquired)
      */
-    public function testAcquireBusy()
+    public function testAlreadyAcquired()
     {
         $this->_mutex = new Mutex();
         $this->_mutex
@@ -225,6 +225,39 @@ class MutexTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($this->_mutex->get('A', 500));
         $this->assertTrue($this->_mutex->acquire());
+        $this->assertTrue($this->_mutex->acquire());
+        $this->assertTrue($this->_mutex->release());
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
+    }
+
+    /**
+     * Попытка блокировки занятой секции (тест busy)
+     */
+    public function testAcquiredBusy()
+    {
+        $this->_mutex = new Mutex();
+        $this->_mutex
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->establishConnection();
+
+        $this->assertNotNull($this->_mutex->get('A', 500));
+        $this->assertTrue($this->_mutex->acquire());
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->_mutex->getProfiler()->dump();
+        }
+
+        unset($this->_mutex);
+
+        $this->_mutex = new Mutex();
+        $this->_mutex
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->establishConnection();
+
+        $this->assertNotNull($this->_mutex->get('A', 500));
         $this->assertTrue($this->_mutex->acquire());
         $this->assertTrue($this->_mutex->release());
 
@@ -267,7 +300,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($this->_mutex->get('A', 500));
 
-        sleep(140);
+        sleep(160);
 
         $this->assertTrue($this->_mutex->acquire());
         $this->assertTrue($this->_mutex->release());
@@ -288,11 +321,11 @@ class MutexTest extends \PHPUnit_Framework_TestCase
             ->establishConnection();
 
         $this->assertNotNull($this->_mutex->get('A'));
-        $this->assertTrue($this->_mutex->acquire());
+        $this->assertTrue($this->_mutex->acquire(), 1000);
 
-//        $this->_mutex->closeConnection();
+        $this->_mutex->closeConnection();
 
-//        $this->assertFalse($this->_mutex->isAlive());
+        $this->assertFalse($this->_mutex->isAlive());
         $this->assertTrue($this->_mutex->release());
 
         if (self::PROFILER_DUMP_ENABLED) {

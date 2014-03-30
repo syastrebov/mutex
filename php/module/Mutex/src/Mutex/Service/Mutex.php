@@ -143,6 +143,8 @@ class Mutex
         if ($this->_socket) {
             @fclose($this->_socket);
         }
+
+        $this->_socket = null;
     }
 
     /**
@@ -162,7 +164,7 @@ class Mutex
             throw new Exception('Недопустимое имя блокировки.');
         }
         if ((!is_int($timeout) && $timeout !== false) || (is_int($timeout) && $timeout < 0)) {
-            throw new Exception('Недопустимое имя блокировки.');
+            throw new Exception('Недопустимое время блокировки.');
         }
 
         $this->send(array(
@@ -185,7 +187,7 @@ class Mutex
      */
     public function acquire($name=null)
     {
-        $name = $name ? $name : $this->_name;
+        $name = $name ? : $this->_name;
         if ($name) {
             while (true) {
                 $this->send(array('cmd' => 'acquire', 'name' => $name));
@@ -216,7 +218,7 @@ class Mutex
      */
     public function release($name=null)
     {
-        $name = $name ? $name : $this->_name;
+        $name = $name ? : $this->_name;
         if ($name) {
             $this->send(array('cmd' => 'release', 'name' => $name));
             $response = $this->receive();
@@ -232,7 +234,7 @@ class Mutex
     }
 
     /**
-     * Зафиксировать вызов метода
+     * Залогировать вызов метода
      *
      * @param string $key
      * @param mixed  $response
@@ -240,15 +242,13 @@ class Mutex
      */
     public function log($key, $response, $stackTrace)
     {
-        if (is_array($stackTrace) && count($stackTrace) > 1) {
-            if ($this->_profiler) {
-                $this->_profiler->log($key, $response, $stackTrace);
-            }
+        if ($this->_profiler) {
+            $this->_profiler->log($key, $response, $stackTrace);
         }
     }
 
     /**
-     * Закрыть соединение с сервисом блокировок
+     * Destructor
      */
     public function __destruct()
     {
