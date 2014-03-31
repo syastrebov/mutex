@@ -15,11 +15,23 @@ namespace Mutex\Model;
 use DateTime;
 
 /**
+ * Модель лога профайлера
+ *
  * Class ProfileStack
  * @package Mutex\Model
  */
 class ProfileStack
 {
+    /**
+     * @var string
+     */
+    private $_requestUri;
+
+    /**
+     * @var string
+     */
+    private $_requestHash;
+
     /**
      * @var string
      */
@@ -63,6 +75,8 @@ class ProfileStack
     /**
      * Constructor
      *
+     * @param string   $requestUri
+     * @param string   $requestHash
      * @param string   $filename
      * @param string   $class
      * @param string   $method
@@ -73,6 +87,8 @@ class ProfileStack
      * @param string   $stackTrace
      */
     public function __construct(
+        $requestUri,
+        $requestHash,
         $filename,
         $class,
         $method,
@@ -82,17 +98,39 @@ class ProfileStack
         DateTime $dateTime,
         $stackTrace=null
     ) {
-        $this->_filename   = $filename;
-        $this->_class      = $class;
-        $this->_method     = $method;
-        $this->_line       = $line;
-        $this->_key        = $key;
-        $this->_response   = $response;
-        $this->_dateTime   = $dateTime;
-        $this->_stackTrace = $stackTrace;
+        $this->_requestUri  = $requestUri;
+        $this->_requestHash = $requestHash;
+        $this->_filename    = $filename;
+        $this->_class       = $class;
+        $this->_method      = $method;
+        $this->_line        = $line;
+        $this->_key         = $key;
+        $this->_response    = $response;
+        $this->_dateTime    = $dateTime;
+        $this->_stackTrace  = $stackTrace;
     }
 
     /**
+     * Запрашиваемый адрес (точка входа)
+     *
+     * @return string
+     */
+    public function getRequestUri()
+    {
+        return $this->_requestUri;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestHash()
+    {
+        return $this->_requestHash;
+    }
+
+    /**
+     * Файл
+     *
      * @return string
      */
     public function getFile()
@@ -101,6 +139,8 @@ class ProfileStack
     }
 
     /**
+     * Строка
+     *
      * @return int
      */
     public function getLine()
@@ -109,6 +149,8 @@ class ProfileStack
     }
 
     /**
+     * Класс
+     *
      * @return string
      */
     public function getClass()
@@ -117,6 +159,8 @@ class ProfileStack
     }
 
     /**
+     * Метод
+     *
      * @return string
      */
     public function getMethod()
@@ -125,6 +169,8 @@ class ProfileStack
     }
 
     /**
+     * Имя указателя блокировки
+     *
      * @return string
      */
     public function getKey()
@@ -133,6 +179,8 @@ class ProfileStack
     }
 
     /**
+     * Сервис вернул ответ
+     *
      * @return mixed
      */
     public function getResponse()

@@ -18,7 +18,7 @@ use Mutex\ProfilerStorageInterface;
 use DateTime;
 
 /**
- * Отладчик для mutex'a
+ * Профайлер отладчик для mutex'a
  * Строит карту вызова блокировок
  *
  * Class Profiler
@@ -27,16 +27,29 @@ use DateTime;
 class Profiler
 {
     /**
+     * Время инициализации профайлера
+     *
+     * @var DateTime
+     */
+    private $_initDateTime;
+
+    /**
+     * Запрашиваемый адрес (точка входа)
+     *
      * @var string
      */
     private $_requestUri;
 
     /**
+     * Стек вызова блокировок
+     *
      * @var array
      */
     private $_stack = array();
 
     /**
+     * Хранилище истории блокировок
+     *
      * @var ProfilerStorageInterface
      */
     private $_storage;
@@ -53,7 +66,8 @@ class Profiler
             throw new Exception('Недопустимый request uri');
         }
 
-        $this->_requestUri = $requestUri;
+        $this->_requestUri   = $requestUri;
+        $this->_initDateTime = new DateTime();
     }
 
     /**
@@ -64,6 +78,17 @@ class Profiler
     public function getRequestUri()
     {
         return $this->_requestUri;
+    }
+
+    /**
+     * Уникальный ключ запроса
+     * Применяется для разделения истории запросов
+     *
+     * @return string
+     */
+    public function getRequestHash()
+    {
+        return md5($this->getRequestUri() . $this->_initDateTime->format('Y.m.d H:i:s'));
     }
 
     /**
@@ -91,6 +116,8 @@ class Profiler
         if (is_array($stackTrace) && count($stackTrace) > 1) {
             $entry = $stackTrace[1];
             $model = new ProfileStackModel(
+                $this->getRequestUri(),
+                $this->getRequestHash(),
                 isset($entry['file'])     ? $entry['file']     : null,
                 isset($entry['class'])    ? $entry['class']    : null,
                 isset($entry['function']) ? $entry['function'] : null,
@@ -103,7 +130,7 @@ class Profiler
 
             $this->_stack[] = $model;
             if ($this->_storage) {
-                $this->_storage->insert($this->getRequestUri(), $model);
+                $this->_storage->insert($model);
             }
         }
     }
@@ -139,10 +166,19 @@ class Profiler
             throw new Exception('Не задано хранилище');
         }
 
+        $map = array();
+
         $list = $this->_storage->getList();
         foreach ($list as $trace) {
             /** @var ProfileStackModel $trace */
+            if (!isset($requestUri[$trace->getRequestUri()][$trace->getRequestHash()])) {
+                $map[$trace->getRequestUri()][$trace->getRequestHash()] = array();
+            }
+
+            $map[$trace->getRequestUri()][$trace->getRequestHash()][] = $trace;
         }
+
+        return $map;
     }
 
     /**

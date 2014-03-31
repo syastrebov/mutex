@@ -32,12 +32,10 @@ interface ProfilerStorageInterface
     /**
      * Сохранить запись
      *
-     * @param string            $requestUri
      * @param ProfileStackModel $model
-     *
      * @return bool
      */
-    public function insert($requestUri, ProfileStackModel $model);
+    public function insert(ProfileStackModel $model);
 
     /**
      * Получить список записей

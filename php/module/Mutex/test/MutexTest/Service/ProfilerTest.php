@@ -118,7 +118,9 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     {
         $profiler = new Profiler(__FUNCTION__);
         $profiler->setStorage(ProfilerStorageDummy::getInstance());
-        $profiler->map();
+
+        var_dump($profiler->map());
+
     }
 
     /**
