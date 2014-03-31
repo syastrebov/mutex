@@ -166,9 +166,9 @@ class Profiler
             throw new Exception('Не задано хранилище');
         }
 
-        $map = array();
-
+        $map  = array();
         $list = $this->_storage->getList();
+
         foreach ($list as $trace) {
             /** @var ProfileStackModel $trace */
             if (!isset($requestUri[$trace->getRequestUri()][$trace->getRequestHash()])) {
