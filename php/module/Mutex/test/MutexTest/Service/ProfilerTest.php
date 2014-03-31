@@ -28,7 +28,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     private $_mutex;
 
     /**
-     *
+     * Закрывать соединение с сервисом после каждого теста
      */
     public function tearDown()
     {
