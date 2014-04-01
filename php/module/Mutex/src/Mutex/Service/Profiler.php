@@ -55,6 +55,11 @@ class Profiler
     private $_storage;
 
     /**
+     * @var string
+     */
+    private $_mapOutputLocation;
+
+    /**
      * Constructor
      *
      * @param string $requestUri Точка входа
@@ -101,6 +106,18 @@ class Profiler
     public function setStorage(ProfilerStorageInterface $storage)
     {
         $this->_storage = $storage;
+        return $this;
+    }
+
+    /**
+     * Путь к файлам сгенерированной карты вызовов
+     *
+     * @param string $mapOutputLocation
+     * @return $this
+     */
+    public function setMapOutputLocation($mapOutputLocation)
+    {
+        $this->_mapOutputLocation = $mapOutputLocation;
         return $this;
     }
 
@@ -182,15 +199,23 @@ class Profiler
     }
 
     /**
+     * Сгенерировать карту вызовов
+     */
+    public function generateMapHtmlOutput()
+    {
+        $map = $this->map();
+    }
+
+    /**
      * Отладочное сообщение
      *
-     * @param string   $str
+     * @param string   $string
      * @param DateTime $time
      */
-    public static function debugMessage($str, DateTime $time=null)
+    public static function debugMessage($string, DateTime $time=null)
     {
         $time = $time ?: new DateTime;
-        echo sprintf("%s on %s\r\n", $str, $time->format('H:i:s'));
+        echo sprintf("%s on %s\r\n", $string, $time->format('H:i:s'));
         flush();
     }
 } 
