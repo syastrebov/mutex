@@ -1,13 +1,13 @@
 <?php
 
 /**
- * PHP-Erlang erl_mutex
+ * PHP-Erlang erl
  * Сервис блокировок для обработки критических секций
  *
- * @category erl_mutex
- * @package  erl_mutex
+ * @category erl
+ * @package  erl
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
- * @link     https://github.com/syastrebov/erl_mutex
+ * @link     https://github.com/syastrebov/erl
  */
 
 namespace ErlMutex\Service\Logger;
@@ -18,7 +18,7 @@ use ErlMutex\LoggerInterface;
  * Заглушка для логирования
  *
  * Class Logger
- * @package erl_mutex\Service
+ * @package erl\Service
  */
 class LoggerDummy implements LoggerInterface
 {

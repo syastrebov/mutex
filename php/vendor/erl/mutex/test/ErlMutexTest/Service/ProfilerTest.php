@@ -1,16 +1,16 @@
 <?php
 
 /**
- * PHP-Erlang erl_mutex
+ * PHP-Erlang erl
  * Сервис блокировок для обработки критических секций
  *
- * @category erl_mutex
- * @package  erl_mutex
+ * @category erl
+ * @package  erl
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
- * @link     https://github.com/syastrebov/erl_mutex
+ * @link     https://github.com/syastrebov/erl
  */
 
-namespace ErlMutexTest\Service;
+namespace ErlMutex\Test\Service;
 
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
