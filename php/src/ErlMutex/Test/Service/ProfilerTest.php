@@ -18,7 +18,7 @@ use ErlMutex\Service\Storage\ProfilerStorageDummy;
 
 /**
  * Class ProfilerTest
- * @package ErlMutexTest\Service
+ * @package Test\Service
  */
 class ProfilerTest extends \PHPUnit_Framework_TestCase
 {

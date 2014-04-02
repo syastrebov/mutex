@@ -17,8 +17,8 @@ use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 
 /**
- * Class ErlMutexTest
- * @package ErlMutexTest
+ * Class Test
+ * @package Test
  */
 class MutexTest extends \PHPUnit_Framework_TestCase
 {
