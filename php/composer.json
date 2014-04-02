@@ -1,6 +1,6 @@
 {
     "name": "erl/mutex",
-    "type": "component",
+    "type": "library",
     "description": "Erlang Mutex for PHP",
     "require": {
         "twig/twig": "1.*",
@@ -10,11 +10,5 @@
         "psr-0": {
             "ErlMutex\\": "src/ErlMutex"
         }
-    },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://ithub.com/syastrebov/mutex.git"
-        }
-    ]
+    }
 }
