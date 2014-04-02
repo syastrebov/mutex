@@ -1,5 +1,5 @@
 {
-    "name": "ErlMutex",
+    "name": "erl/mutex",
     "type": "component",
     "description": "Erlang Mutex for PHP",
     "require": {
@@ -10,5 +10,11 @@
         "psr-0": {
             "ErlMutex\\": "src/ErlMutex"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://ithub.com/syastrebov/mutex.git"
+        }
+    ]
 }
