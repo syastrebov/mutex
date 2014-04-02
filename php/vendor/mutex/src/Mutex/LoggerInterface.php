@@ -1,11 +1,11 @@
 <?php
 
 /**
- * PHP-Erlang Mutex
+ * PHP-Erlang mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category Mutex
- * @package  Mutex
+ * @category mutex
+ * @package  mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
  * @link     https://github.com/syastrebov/mutex
  */
@@ -16,7 +16,7 @@ namespace Mutex;
  * Логирование исключительных ситуаций вызова блокировок
  *
  * Interface LoggerInterface
- * @package Mutex
+ * @package mutex
  */
 interface LoggerInterface
 {

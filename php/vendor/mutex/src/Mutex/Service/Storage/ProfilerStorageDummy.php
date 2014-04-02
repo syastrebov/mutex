@@ -1,11 +1,11 @@
 <?php
 
 /**
- * PHP-Erlang Mutex
+ * PHP-Erlang mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category Mutex
- * @package  Mutex
+ * @category mutex
+ * @package  mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
  * @link     https://github.com/syastrebov/mutex
  */
@@ -20,7 +20,7 @@ use Mutex\Model\ProfileStack as ProfileStackModel;
  * Сделано синглтоном для unit test'ов
  *
  * Class ProfilerStorageDummy
- * @package Mutex\Service\Storage
+ * @package mutex\Service\Storage
  */
 class ProfilerStorageDummy implements ProfilerStorageInterface
 {

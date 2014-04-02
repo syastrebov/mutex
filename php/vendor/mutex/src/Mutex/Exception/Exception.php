@@ -1,11 +1,11 @@
 <?php
 
 /**
- * PHP-Erlang Mutex
+ * PHP-Erlang mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category Mutex
- * @package  Mutex
+ * @category mutex
+ * @package  mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
  * @link     https://github.com/syastrebov/mutex
  */
@@ -13,10 +13,10 @@
 namespace Mutex\Exception;
 
 /**
- * Class ProfilerException
- * @package Mutex\Exception
+ * Class Exception
+ * @package mutex
  */
-class ProfilerException extends \Exception
+class Exception extends \Exception
 {
 
 }

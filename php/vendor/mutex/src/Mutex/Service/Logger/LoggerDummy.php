@@ -1,11 +1,11 @@
 <?php
 
 /**
- * PHP-Erlang Mutex
+ * PHP-Erlang mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category Mutex
- * @package  Mutex
+ * @category mutex
+ * @package  mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
  * @link     https://github.com/syastrebov/mutex
  */
@@ -18,7 +18,7 @@ use Mutex\LoggerInterface;
  * Заглушка для логирования
  *
  * Class Logger
- * @package Mutex\Service
+ * @package mutex\Service
  */
 class LoggerDummy implements LoggerInterface
 {

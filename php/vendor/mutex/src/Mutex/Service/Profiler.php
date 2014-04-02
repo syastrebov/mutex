@@ -1,11 +1,11 @@
 <?php
 
 /**
- * PHP-Erlang Mutex
+ * PHP-Erlang mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category Mutex
- * @package  Mutex
+ * @category mutex
+ * @package  mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
  * @link     https://github.com/syastrebov/mutex
  */
@@ -22,7 +22,7 @@ use DateTime;
  * Строит карту вызова блокировок
  *
  * Class Profiler
- * @package Mutex
+ * @package mutex
  */
 class Profiler
 {
