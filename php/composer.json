@@ -1,6 +1,6 @@
 {
     "name": "erl/mutex",
-    "type": "library",
+    "type": "package",
     "description": "Erlang Mutex for PHP",
     "require": {
         "twig/twig": "1.*",
