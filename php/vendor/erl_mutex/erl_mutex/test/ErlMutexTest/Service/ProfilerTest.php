@@ -1,24 +1,24 @@
 <?php
 
 /**
- * PHP-Erlang mutex
+ * PHP-Erlang erl_mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category mutex
- * @package  mutex
+ * @category erl_mutex
+ * @package  erl_mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
- * @link     https://github.com/syastrebov/mutex
+ * @link     https://github.com/syastrebov/erl_mutex
  */
 
-namespace MutexTest\Service;
+namespace ErlMutexTest\Service;
 
-use Mutex\Service\Mutex;
-use Mutex\Service\Profiler;
-use Mutex\Service\Storage\ProfilerStorageDummy;
+use ErlMutex\Service\Mutex;
+use ErlMutex\Service\Profiler;
+use ErlMutex\Service\Storage\ProfilerStorageDummy;
 
 /**
  * Class ProfilerTest
- * @package MutexTest\Service
+ * @package ErlMutexTest\Service
  */
 class ProfilerTest extends \PHPUnit_Framework_TestCase
 {

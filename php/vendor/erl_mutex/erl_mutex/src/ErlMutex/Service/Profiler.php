@@ -1,28 +1,28 @@
 <?php
 
 /**
- * PHP-Erlang mutex
+ * PHP-Erlang erl_mutex
  * Сервис блокировок для обработки критических секций
  *
- * @category mutex
- * @package  mutex
+ * @category erl_mutex
+ * @package  erl_mutex
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
- * @link     https://github.com/syastrebov/mutex
+ * @link     https://github.com/syastrebov/erl_mutex
  */
 
-namespace Mutex\Service;
+namespace ErlMutex\Service;
 
-use Mutex\Exception\ProfilerException as Exception;
-use Mutex\Model\ProfileStack as ProfileStackModel;
-use Mutex\ProfilerStorageInterface;
+use ErlMutex\Exception\ProfilerException as Exception;
+use ErlMutex\Model\ProfileStack as ProfileStackModel;
+use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 
 /**
- * Профайлер отладчик для mutex'a
+ * Профайлер отладчик для erl_mutex'a
  * Строит карту вызова блокировок
  *
  * Class Profiler
- * @package mutex
+ * @package erl_mutex
  */
 class Profiler
 {

@@ -1,0 +1,14 @@
+{
+    "name": "ErlMutex",
+    "type": "component",
+    "description": "Erlang Mutex for PHP",
+    "require": {
+        "twig/twig": "1.*",
+        "php": ">=5.2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "ErlMutex\\": "src/"
+        }
+    },
+}
