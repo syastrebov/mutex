@@ -1,2 +1,0 @@
-#!/bin/sh
-erl +P 10000 -noshell -sname mutex -env PORT 7007 -s mutex start -init stop

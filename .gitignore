@@ -10,3 +10,4 @@ php/composer.lock
 php/test/.DS_Store
 erl/.settings
 erl/.project
+.DS_Store
