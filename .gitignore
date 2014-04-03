@@ -1,13 +1,2 @@
-erl/ebin/*.beam
-erl/ebin/*.dump
 .idea
-php/.idea
-php/test/log
-php/vendor/autoload.php
-php/vendor/composer
-php/vendor/twig
-php/composer.lock
-php/test/.DS_Store
-erl/.settings
-erl/.project
 .DS_Store
