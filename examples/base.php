@@ -1,10 +1,10 @@
 <?php
 
-include __DIR__ . '/../config/bootstrap.php';
+include __DIR__ . '/../test/bootstrap.php';
 
-use Mutex\Service\Mutex;
-use Mutex\Service\Profiler;
-use Mutex\Exception\Exception;
+use ErlMutex\Service\Mutex;
+use ErlMutex\Service\Profiler;
+use ErlMutex\Exception\Exception;
 
 try {
     $profiler = new Profiler(__FILE__);

@@ -14,10 +14,10 @@
  *
  */
 
-include __DIR__ . '/../config/bootstrap.php';
+include __DIR__ . '/../test/bootstrap.php';
 
-use Mutex\Service\Mutex;
-use Mutex\Service\Profiler;
+use ErlMutex\Service\Mutex;
+use ErlMutex\Service\Profiler;
 
 try {
     $mutex = new Mutex('127.0.0.1', 7007);
