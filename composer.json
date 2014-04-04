@@ -3,11 +3,11 @@
     "type": "package",
     "description": "Erlang Mutex for PHP",
     "require": {
-        "twig/twig": "1.*",
-        "php": ">=5.2.4"
+        "php": ">=5.2.4",
+        "twig/twig": "1.*"
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "ErlMutex\\": "src/ErlMutex"
         }
     }
