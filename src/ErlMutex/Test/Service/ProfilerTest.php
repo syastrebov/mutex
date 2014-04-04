@@ -58,7 +58,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     /**
      * Неправильно заданная точка входа
      *
-     * @expectedException \Mutex\Exception\ProfilerException
+     * @expectedException \ErlMutex\Exception\ProfilerException
      * @dataProvider providerInvalidRequestUri
      */
     public function testInvalidRequestUri($requestUri)
@@ -103,7 +103,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     /**
      * Не задано хранилище при поптыке построить карту
      * 
-     * @expectedException \Mutex\Exception\ProfilerException
+     * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testMapStorageNotSet()
     {
@@ -121,6 +121,15 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 
         var_dump($profiler->map());
 
+    }
+
+    public function testGenerateMapHtmlOutput()
+    {
+        $profiler = new Profiler(__FUNCTION__);
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . '/../../../../test/profiler_output/')
+            ->generateMapHtmlOutput();
     }
 
     /**

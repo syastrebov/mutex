@@ -43,7 +43,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     /**
      * Неправильно заданные параметры подключения
      *
-     * @expectedException \Mutex\Exception\Exception
+     * @expectedException \ErlMutex\Exception\Exception
      */
     public function testInvalidConnectionParams()
     {
@@ -74,7 +74,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     /**
      * Неправильно заданные параметры указателя блокировки
      *
-     * @expectedException \Mutex\Exception\Exception
+     * @expectedException \ErlMutex\Exception\Exception
      * @dataProvider providerInvalidPointerParams
      */
     public function testInvalidPointerParams($name, $timeout)

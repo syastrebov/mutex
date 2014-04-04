@@ -1,4 +1,6 @@
 .idea
 .DS_Store
 test/log
+test/profiler_output
 composer.phar
+vendor

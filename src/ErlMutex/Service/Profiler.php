@@ -26,6 +26,8 @@ use DateTime;
  */
 class Profiler
 {
+    const TEMPLATES_DIR = '/../../../view';
+
     /**
      * Время инициализации профайлера
      *
@@ -203,7 +205,11 @@ class Profiler
      */
     public function generateMapHtmlOutput()
     {
-        $map = $this->map();
+        $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
+        $twig   = new \Twig_Environment($loader);
+
+        $output = $twig->render('profiler_map.twig', array('map' => $this->map()));
+        file_put_contents($this->_mapOutputLocation . 'profiler_map.html', $output);
     }
 
     /**
