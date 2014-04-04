@@ -54,7 +54,7 @@ PHP-Erlang Mutex
                 "source": {
                     "url": "https://github.com/syastrebov/mutex.git",
                     "type": "git",
-                    "reference": "baa63a70a1b07eb664bf3ca3914a03d2cca45ccf"
+                    "reference": "master"
                 },
                 "autoload": {
                     "psr-0": {
