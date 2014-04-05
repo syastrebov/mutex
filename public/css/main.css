@@ -1,15 +1,24 @@
-.container {
+body {
+  font-size: 14px;
+}
+body .container {
   padding: 10px;
 }
-.container .requestUri {
+body .container .requestUri {
   padding: 10px;
 }
-.container .requestUri p {
-  color: #00ff00;
+body .container .requestUri h1 {
+  font-size: 18px;
+  font-weight: bold;
 }
-.container .requestUri .requestHash p {
+body .container .requestUri .requestHash p {
+  font-size: 10px;
   color: #cccccc;
 }
-.container .requestUri .requestHash td {
+body .container .requestUri .requestHash th,
+body .container .requestUri .requestHash td {
   padding: 10px;
+}
+body .container .requestUri .requestHash .base {
+  background-color: #eeee00;
 }

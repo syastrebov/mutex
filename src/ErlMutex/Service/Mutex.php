@@ -117,7 +117,7 @@ class Mutex
     /**
      * Подключиться к сервису блокировок
      *
-     * @throws \Mutex\Exception\Exception
+     * @throws \ErlMutex\Exception\Exception
      * @return $this
      */
     public function establishConnection()

@@ -27,7 +27,7 @@ use DateTime;
 class Profiler
 {
     const TEMPLATES_DIR = '/../../../view';
-    const PUBLIC_DIR    = '/../../../public/';
+    const PUBLIC_DIR    = '/../../../public';
 
     /**
      * Время инициализации профайлера
@@ -117,10 +117,15 @@ class Profiler
      *
      * @param string $mapOutputLocation
      * @return $this
+     * @throws Exception
      */
     public function setMapOutputLocation($mapOutputLocation)
     {
         $this->_mapOutputLocation = $mapOutputLocation;
+        if (!is_dir($mapOutputLocation)) {
+            throw new Exception('Директория для генерации карты не найдена');
+        }
+
         return $this;
     }
 
@@ -133,21 +138,42 @@ class Profiler
      */
     public function log($key, $response, array $stackTrace)
     {
-        if (is_array($stackTrace) && count($stackTrace) > 1) {
-            $entry = $stackTrace[1];
-            $model = new ProfileStackModel(
-                $this->getRequestUri(),
-                $this->getRequestHash(),
-                isset($entry['file'])     ? $entry['file']     : null,
-                isset($entry['class'])    ? $entry['class']    : null,
-                isset($entry['function']) ? $entry['function'] : null,
-                isset($entry['line'])     ? $entry['line']     : null,
-                $key,
-                $response,
-                new DateTime(),
-                $stackTrace
-            );
+        $model = null;
 
+        if (is_array($stackTrace)) {
+            if (count($stackTrace) > 1) {
+                $entry = $stackTrace[1];
+                $model = new ProfileStackModel(
+                    $this->getRequestUri(),
+                    $this->getRequestHash(),
+                    isset($entry['file'])     ? $entry['file']     : null,
+                    isset($entry['class'])    ? $entry['class']    : null,
+                    isset($entry['function']) ? $entry['function'] : null,
+                    isset($entry['line'])     ? $entry['line']     : null,
+                    $key,
+                    $response,
+                    new DateTime(),
+                    $stackTrace
+                );
+
+            } elseif (count($stackTrace) === 1) {
+                $entry = $stackTrace[0];
+                $model = new ProfileStackModel(
+                    $this->getRequestUri(),
+                    $this->getRequestHash(),
+                    isset($entry['file'])     ? $entry['file']     : null,
+                    isset($entry['class'])    ? $entry['class']    : null,
+                    isset($entry['function']) ? $entry['function'] : null,
+                    isset($entry['line'])     ? $entry['line']     : null,
+                    $key,
+                    $response,
+                    new DateTime(),
+                    $stackTrace
+                );
+            }
+        }
+
+        if ($model instanceof ProfileStackModel) {
             $this->_stack[] = $model;
             if ($this->_storage) {
                 $this->_storage->insert($model);
@@ -191,7 +217,7 @@ class Profiler
 
         foreach ($list as $trace) {
             /** @var ProfileStackModel $trace */
-            if (!isset($requestUri[$trace->getRequestUri()][$trace->getRequestHash()])) {
+            if (!isset($map[$trace->getRequestUri()][$trace->getRequestHash()])) {
                 $map[$trace->getRequestUri()][$trace->getRequestHash()] = array();
             }
 
@@ -206,6 +232,10 @@ class Profiler
      */
     public function generateHtmlMapOutput()
     {
+        if (!$this->_mapOutputLocation) {
+            throw new Exception('Не задана директория для генерации карты профайлера');
+        }
+
         $map = $this->map();
         foreach ($map as &$requests) {
             foreach ($requests as &$stack) {
@@ -221,10 +251,10 @@ class Profiler
 
         $output = $twig->render('profiler_map.twig', array(
             'map'     => $map,
-            'cssFile' => __DIR__ . self::PUBLIC_DIR  . 'css/main.less',
+            'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
         ));
 
-        file_put_contents($this->_mapOutputLocation . 'profiler_map.html', $output);
+        file_put_contents($this->_mapOutputLocation . '/profiler_map.html', $output);
     }
 
     /**

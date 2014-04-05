@@ -6,16 +6,16 @@
         <div class="container">
             {% for requestUri, requests in map %}
             <div class="requestUri">
-                <p>{{ requestUri }}</p>
+                <h1>{{ requestUri }}</h1>
                 {% for requestHash, stack in requests %}
                 <div class="requestHash">
                     <p>{{ requestHash }}</p>
                     <table>
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Key</th>
-                                <th>Response</th>
+                                <th class="num">#</th>
+                                <th class="base">Key</th>
+                                <th class="base">Response</th>
                                 <th>Filename</th>
                                 <th>Line</th>
                                 <th>Class</th>
@@ -25,9 +25,9 @@
                         </thead>
                         {% for num, info in stack %}
                         <tr>
-                            <td>{{ num }} </td>
-                            <td>{{ info.key }}</td>
-                            <td>{{ info.response }}</td>
+                            <td class="num">{{ num }} </td>
+                            <td class="base">{{ info.key }}</td>
+                            <td class="base">{{ info.response }}</td>
                             <td>{{ info.filename }}</td>
                             <td>{{ info.line }}</td>
                             <td>{{ info.class }}</td>

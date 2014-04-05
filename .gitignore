@@ -2,6 +2,7 @@
 .DS_Store
 test/log
 test/profiler_output
+examples/profiler_output
 composer.phar
 composer.lock
 vendor

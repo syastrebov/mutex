@@ -1,20 +1,29 @@
 @padding: 10px;
 
-.container {
-  padding: @padding;
+body {
+  font-size: 14px;
 
-  .requestUri {
+  .container {
     padding: @padding;
 
-    p {
-      color: #00ff00;
-    }
-    .requestHash {
-      p {
-        color: #cccccc;
+    .requestUri {
+      padding: @padding;
+
+      h1 {
+        font-size: 18px;
+        font-weight: bold;
       }
-      td {
-        padding: 10px;
+      .requestHash {
+        p {
+          font-size: 10px;
+          color: #cccccc;
+        }
+        th, td {
+          padding: 10px;
+        }
+        .base {
+          background-color: #eeee00;
+        }
       }
     }
   }

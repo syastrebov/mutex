@@ -119,10 +119,40 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler(__FUNCTION__);
         $profiler->setStorage(ProfilerStorageDummy::getInstance());
 
-        var_dump($profiler->map());
+        $this->assertGreaterThan(0, $profiler->map());
 
     }
 
+    /**
+     * Не задана директория генерации карты
+     *
+     * @expectedException \ErlMutex\Exception\ProfilerException
+     */
+    public function testGenerateMapDirectoryNotSet()
+    {
+        $profiler = new Profiler(__FUNCTION__);
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->generateHtmlMapOutput();
+    }
+
+    /**
+     * Не задана директория генерации карты
+     *
+     * @expectedException \ErlMutex\Exception\ProfilerException
+     */
+    public function testInvalidGenerateMapDirectory()
+    {
+        $profiler = new Profiler(__FUNCTION__);
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . '/../../../../test/profiler_output_not_exist/')
+            ->generateHtmlMapOutput();
+    }
+
+    /**
+     * Тестирование вывода карты в html виде
+     */
     public function testGenerateMapHtmlOutput()
     {
         $profiler = new Profiler(__FUNCTION__);
