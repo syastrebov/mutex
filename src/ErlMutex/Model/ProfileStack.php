@@ -78,9 +78,9 @@ class ProfileStack
      * @param string   $requestUri
      * @param string   $requestHash
      * @param string   $filename
+     * @param int      $line
      * @param string   $class
      * @param string   $method
-     * @param int      $line
      * @param string   $key
      * @param mixed    $response
      * @param DateTime $dateTime
@@ -90,9 +90,9 @@ class ProfileStack
         $requestUri,
         $requestHash,
         $filename,
+        $line,
         $class,
         $method,
-        $line,
         $key,
         $response,
         DateTime $dateTime,

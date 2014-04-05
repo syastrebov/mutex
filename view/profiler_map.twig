@@ -14,8 +14,8 @@
                         <thead>
                             <tr>
                                 <th class="num">#</th>
-                                <th class="base">Key</th>
-                                <th class="base">Response</th>
+                                <th>Key</th>
+                                <th>Response</th>
                                 <th>Filename</th>
                                 <th>Line</th>
                                 <th>Class</th>
@@ -30,8 +30,8 @@
                             <td class="base">{{ info.response }}</td>
                             <td>{{ info.filename }}</td>
                             <td>{{ info.line }}</td>
-                            <td>{{ info.class }}</td>
-                            <td>{{ info.method }}</td>
+                            <td>{{ info.class ? info.class : '-' }}</td>
+                            <td>{{ info.method ? info.method : '-' }}</td>
                             <td>{{ info.dateTime }}</td>
                         </tr>
                         {% endfor %}

@@ -130,7 +130,7 @@ class Profiler
     }
 
     /**
-     * Залогировать вызов метода
+     * Логировать вызов метода
      *
      * @param string $key
      * @param mixed  $response
@@ -140,37 +140,26 @@ class Profiler
     {
         $model = null;
 
-        if (is_array($stackTrace)) {
+        if (is_array($stackTrace) && !empty($stackTrace)) {
             if (count($stackTrace) > 1) {
-                $entry = $stackTrace[1];
-                $model = new ProfileStackModel(
-                    $this->getRequestUri(),
-                    $this->getRequestHash(),
-                    isset($entry['file'])     ? $entry['file']     : null,
-                    isset($entry['class'])    ? $entry['class']    : null,
-                    isset($entry['function']) ? $entry['function'] : null,
-                    isset($entry['line'])     ? $entry['line']     : null,
-                    $key,
-                    $response,
-                    new DateTime(),
-                    $stackTrace
-                );
-
-            } elseif (count($stackTrace) === 1) {
-                $entry = $stackTrace[0];
-                $model = new ProfileStackModel(
-                    $this->getRequestUri(),
-                    $this->getRequestHash(),
-                    isset($entry['file'])     ? $entry['file']     : null,
-                    isset($entry['class'])    ? $entry['class']    : null,
-                    isset($entry['function']) ? $entry['function'] : null,
-                    isset($entry['line'])     ? $entry['line']     : null,
-                    $key,
-                    $response,
-                    new DateTime(),
-                    $stackTrace
-                );
+                $entry     = $stackTrace[1];
+                $className = isset($entry['class'])    ? $entry['class']    : null;
+                $method    = isset($entry['function']) ? $entry['function'] : null;
             }
+
+            $entry = $stackTrace[0];
+            $model = new ProfileStackModel(
+                $this->getRequestUri(),
+                $this->getRequestHash(),
+                isset($entry['file']) ? $entry['file'] : null,
+                isset($entry['line']) ? $entry['line'] : null,
+                isset($className)     ? $className     : null,
+                isset($method)        ? $method        : null,
+                $key,
+                $response,
+                new DateTime(),
+                $stackTrace
+            );
         }
 
         if ($model instanceof ProfileStackModel) {
@@ -183,6 +172,7 @@ class Profiler
 
     /**
      * Отобразить очередь вызова блокировок
+     * Выводит стек вызова за текущую сессию
      */
     public function dump()
     {
@@ -205,8 +195,24 @@ class Profiler
 
     /**
      * Построить карту вызова
+     *
+     * trace может возвращаться в виде ProfileStackModel или массива
+     * Возвращает в формате:
+     * - requestUri
+     *      - requestHash 1
+     *          * trace 1
+     *          * trace 2
+     *          ...
+     *      - requestHash 2
+     *          * trace 1
+     *          * trace 2
+     *          ...
+     *
+     * @param bool $traceAsArray
+     * @return array
+     * @throws Exception
      */
-    public function map()
+    public function map($traceAsArray=false)
     {
         if (!$this->_storage) {
             throw new Exception('Не задано хранилище');
@@ -221,7 +227,7 @@ class Profiler
                 $map[$trace->getRequestUri()][$trace->getRequestHash()] = array();
             }
 
-            $map[$trace->getRequestUri()][$trace->getRequestHash()][] = $trace;
+            $map[$trace->getRequestUri()][$trace->getRequestHash()][] = $traceAsArray ? $trace->asArray() : $trace;
         }
 
         return $map;
@@ -236,16 +242,7 @@ class Profiler
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
-        $map = $this->map();
-        foreach ($map as &$requests) {
-            foreach ($requests as &$stack) {
-                foreach ($stack as &$profileModel) {
-                    /** @var ProfileStackModel $profileModel */
-                    $profileModel = $profileModel->asArray();
-                }
-            }
-        }
-
+        $map    = $this->map(true);
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
 
