@@ -1,3 +1,15 @@
-.container td {
-    padding: 10px;
+.container {
+  padding: 10px;
+}
+.container .requestUri {
+  padding: 10px;
+}
+.container .requestUri p {
+  color: #00ff00;
+}
+.container .requestUri .requestHash p {
+  color: #cccccc;
+}
+.container .requestUri .requestHash td {
+  padding: 10px;
 }

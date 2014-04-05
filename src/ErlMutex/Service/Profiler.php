@@ -221,7 +221,7 @@ class Profiler
 
         $output = $twig->render('profiler_map.twig', array(
             'map'     => $map,
-            'cssFile' => __DIR__ . self::PUBLIC_DIR  . 'css/main.css',
+            'cssFile' => __DIR__ . self::PUBLIC_DIR  . 'css/main.less',
         ));
 
         file_put_contents($this->_mapOutputLocation . 'profiler_map.html', $output);
