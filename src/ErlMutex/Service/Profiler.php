@@ -27,6 +27,7 @@ use DateTime;
 class Profiler
 {
     const TEMPLATES_DIR = '/../../../view';
+    const PUBLIC_DIR    = '/../../../public/';
 
     /**
      * Время инициализации профайлера
@@ -203,12 +204,26 @@ class Profiler
     /**
      * Сгенерировать карту вызовов
      */
-    public function generateMapHtmlOutput()
+    public function generateHtmlMapOutput()
     {
+        $map = $this->map();
+        foreach ($map as &$requests) {
+            foreach ($requests as &$stack) {
+                foreach ($stack as &$profileModel) {
+                    /** @var ProfileStackModel $profileModel */
+                    $profileModel = $profileModel->asArray();
+                }
+            }
+        }
+
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
 
-        $output = $twig->render('profiler_map.twig', array('map' => $this->map()));
+        $output = $twig->render('profiler_map.twig', array(
+            'map'     => $map,
+            'cssFile' => __DIR__ . self::PUBLIC_DIR  . 'css/main.css',
+        ));
+
         file_put_contents($this->_mapOutputLocation . 'profiler_map.html', $output);
     }
 

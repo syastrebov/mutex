@@ -205,10 +205,22 @@ class ProfileStack
     }
 
     /**
-     * @return null|string
+     * Преобразовать в массив
+     *
+     * @return array
      */
-    public function getStackTrace()
+    public function asArray()
     {
-        return $this->_stackTrace;
+        return array(
+            'requestUri'  => $this->_requestUri,
+            'requestHash' => $this->_requestHash,
+            'filename'    => $this->_filename,
+            'class'       => $this->_class,
+            'method'      => $this->_method,
+            'line'        => $this->_line,
+            'key'         => $this->_key,
+            'response'    => $this->_response,
+            'dateTime'    => $this->getDateTimeFormat(),
+        );
     }
 }

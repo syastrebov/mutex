@@ -1,3 +1,45 @@
-{% for requestUri, requests in map %}
-{{ requestUri }}
-{% endfor %}
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" media="all" href="{{ cssFile }}" />
+    </head>
+    <body>
+        <div class="container">
+            {% for requestUri, requests in map %}
+            <div>
+                {{ requestUri }}
+                {% for requestHash, stack in requests %}
+                <div class="requestHash">
+                    {{ requestHash }}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Filename</th>
+                                <th>Line</th>
+                                <th>Class</th>
+                                <th>Method</th>
+                                <th>Key</th>
+                                <th>Response</th>
+                                <th>DateTime</th>
+                            </tr>
+                        </thead>
+                        {% for num, info in stack %}
+                        <tr>
+                            <td>{{ num }} </td>
+                            <td>{{ info.filename }}</td>
+                            <td>{{ info.line }}</td>
+                            <td>{{ info.class }}</td>
+                            <td>{{ info.method }}</td>
+                            <td>{{ info.key }}</td>
+                            <td>{{ info.response }}</td>
+                            <td>{{ info.dateTime }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>

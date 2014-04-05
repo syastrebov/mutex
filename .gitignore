@@ -3,4 +3,5 @@
 test/log
 test/profiler_output
 composer.phar
+composer.lock
 vendor

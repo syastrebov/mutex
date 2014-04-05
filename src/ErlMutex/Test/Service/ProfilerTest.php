@@ -129,7 +129,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
             ->setMapOutputLocation(__DIR__ . '/../../../../test/profiler_output/')
-            ->generateMapHtmlOutput();
+            ->generateHtmlMapOutput();
     }
 
     /**
