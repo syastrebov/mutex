@@ -113,6 +113,17 @@ class Profiler
     }
 
     /**
+     * Хранилище стека вызова
+     * Для построения карты блокировок
+     *
+     * @return ProfilerStorageInterface
+     */
+    public function getStorage()
+    {
+        return $this->_storage;
+    }
+
+    /**
      * Путь к файлам сгенерированной карты вызовов
      *
      * @param string $mapOutputLocation

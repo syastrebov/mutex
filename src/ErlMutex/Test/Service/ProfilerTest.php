@@ -22,6 +22,9 @@ use ErlMutex\Service\Storage\ProfilerStorageDummy;
  */
 class ProfilerTest extends \PHPUnit_Framework_TestCase
 {
+    const OUTPUT_DIR           = '/../../../../test/profiler_output/';
+    const OUTPUT_DIR_NOT_EXIST = '/../../../../test/profiler_output_not_exist/';
+
     /**
      * @var Mutex
      */
@@ -146,7 +149,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler(__FUNCTION__);
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . '/../../../../test/profiler_output_not_exist/')
+            ->setMapOutputLocation(__DIR__ . self::OUTPUT_DIR_NOT_EXIST)
             ->generateHtmlMapOutput();
     }
 
@@ -158,7 +161,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler(__FUNCTION__);
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . '/../../../../test/profiler_output/')
+            ->setMapOutputLocation(__DIR__ . self::OUTPUT_DIR)
             ->generateHtmlMapOutput();
     }
 
@@ -177,5 +180,24 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
             array(1.2),
             array(new \stdClass())
         );
+    }
+
+    /**
+     * Создание директории для вывода карты профайлера
+     *
+     * @param string $testClassName
+     * @param string $testMethodName
+     */
+    public static function createOutputDirIfNotExist($testClassName, $testMethodName)
+    {
+        $testSuiteDir = __DIR__ . ProfilerTest::OUTPUT_DIR . $testClassName;
+        $testCaseDir  = $testSuiteDir . '/' . $testMethodName;
+
+        if (!is_dir($testSuiteDir)) {
+            @mkdir($testSuiteDir) or die('Не удалось создать директорию ' . $testSuiteDir);
+        }
+        if (!is_dir($testCaseDir)) {
+            @mkdir($testCaseDir) or die('Не удалось создать директорию ' . $testCaseDir);
+        }
     }
 }
