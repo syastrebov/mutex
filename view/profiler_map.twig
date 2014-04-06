@@ -5,7 +5,7 @@
     </head>
     <body>
         <div class="container">
-            {% if error.position == null %}
+            {% if error.position is not defined %}
                 <div class="critical">{{ error.message }}</div>
             {% endif %}
             {% for requestUri, requests in map %}
@@ -31,7 +31,7 @@
                         {% for num, info in stack %}
                         <tr>
                             <td class="num">{{ num }} </td>
-                            {% if error.position and num >= error.position %}
+                            {% if error.position is defined and num >= error.position %}
                                 <td class="warning" title="{{ error.message }}">{{ info.key ? info.key : '-' }}</td>
                                 <td class="warning" title="{{ error.message }}">{{ info.action }}</td>
                                 <td class="warning" title="{{ error.message }}">{{ info.response }}</td>

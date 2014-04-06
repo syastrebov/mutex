@@ -22,8 +22,6 @@ use ErlMutex\Service\Storage\ProfilerStorageDummy;
  */
 class OrderTest extends \PHPUnit_Framework_TestCase
 {
-    const TIMEOUT = 2;
-
     /**
      * Конкурентный вызов в правильной последовательности
      */
@@ -34,7 +32,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $mutexes = array();
         for ($i = 0; $i < 2; $i++) {
-            $mutexes[$i] = new Mutex('127.0.0.1', 7007);
+            $mutexes[$i] = new Mutex();
 
             /** @var Mutex $mutex */
             $mutex = &$mutexes[$i];
@@ -43,6 +41,9 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 ->setProfiler(new Profiler(__FUNCTION__ . '_' . $i))
                 ->getProfiler()
                 ->setStorage(ProfilerStorageDummy::getInstance());
+
+            $mutex->get('A');
+            $mutex->get('B');
 
             if ($mutex->acquire('A')) {
                 if ($mutex->acquire('B')) {
@@ -73,7 +74,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $mutexes = array();
         for ($i = 0; $i < 2; $i++) {
-            $mutexes[$i] = new Mutex('127.0.0.1', 7007);
+            $mutexes[$i] = new Mutex();
 
             /** @var Mutex $mutex */
             $mutex = &$mutexes[$i];
@@ -82,6 +83,9 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 ->setProfiler(new Profiler(__FUNCTION__ . '_' . $i))
                 ->getProfiler()
                 ->setStorage(ProfilerStorageDummy::getInstance());
+
+            $mutex->get('A');
+            $mutex->get('B');
 
             if ($i > 0) {
                 if ($mutex->acquire('A')) {
@@ -119,7 +123,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex = new Mutex();
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -153,7 +157,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex = new Mutex();
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -174,12 +178,15 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->generateHtmlMapOutput();
     }
 
+    /**
+     * Попытка заблокировать без указателя
+     */
     public function testAcquireWithoutPointer()
     {
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex = new Mutex();
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -198,12 +205,15 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->generateHtmlMapOutput();
     }
 
+    /**
+     * Попытка повторной блокировки
+     */
     public function testAlreadyAcquired()
     {
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex = new Mutex();
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -224,12 +234,15 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->generateHtmlMapOutput();
     }
 
+    /**
+     * Снять незанятую блокировку
+     */
     public function testReleaseNotAcquired()
     {
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex = new Mutex();
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))

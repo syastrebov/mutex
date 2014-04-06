@@ -284,7 +284,7 @@ class Profiler
     /**
      * Проверка карты
      *
-     * @return null|string
+     * @return null|array
      */
     private function validateMap()
     {
@@ -413,7 +413,6 @@ class Profiler
                                 $trace
                             );
                         } else {
-                            $wasGet     = false;
                             $wasAcquire = true;
                         }
                     }
@@ -426,6 +425,7 @@ class Profiler
                             $trace
                         );
                     } else {
+                        $wasGet     = false;
                         $wasAcquire = false;
                     }
 
