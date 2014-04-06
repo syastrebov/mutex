@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Test\Service;
 
+use ErlMutex\Model\ProfilerStack;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
@@ -259,5 +260,95 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->setStorage(ProfilerStorageDummy::getInstance())
             ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
             ->generateHtmlMapOutput();
+    }
+
+    /**
+     * Неправильный ключ при проверки списка по ключу и хешу
+     *
+     * @expectedException \ErlMutex\Exception\ProfilerException
+     */
+    public function testValidateKeyHashActionsOrderWrongKeyList()
+    {
+        $profiler = new Profiler(__FUNCTION__);
+        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', array(
+            new ProfilerStack(
+                __FUNCTION__,
+                md5(__FUNCTION__),
+                __LINE__,
+                __FILE__,
+                __CLASS__,
+                __FUNCTION__,
+                'A',
+                Mutex::ACTION_GET,
+                '',
+                new \DateTime()
+            ),
+            new ProfilerStack(
+                __FUNCTION__,
+                md5(__FUNCTION__),
+                __FILE__,
+                __LINE__,
+                __CLASS__,
+                __FUNCTION__,
+                'B',
+                Mutex::ACTION_GET,
+                '',
+                new \DateTime()
+            ),
+        ));
+    }
+
+    /**
+     * Неправильный хеш при проверки списка по ключу и хешу
+     *
+     * @expectedException \ErlMutex\Exception\ProfilerException
+     */
+    public function testValidateKeyHashActionsOrderWrongHashList()
+    {
+        $profiler = new Profiler(__FUNCTION__);
+        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', array(
+            new ProfilerStack(
+                __FUNCTION__,
+                md5(__FUNCTION__),
+                __LINE__,
+                __FILE__,
+                __CLASS__,
+                __FUNCTION__,
+                'A',
+                Mutex::ACTION_GET,
+                '',
+                new \DateTime()
+            ),
+            new ProfilerStack(
+                __FUNCTION__,
+                md5(__CLASS__ . __FUNCTION__),
+                __FILE__,
+                __LINE__,
+                __CLASS__,
+                __FUNCTION__,
+                'A',
+                Mutex::ACTION_ACQUIRE,
+                '',
+                new \DateTime()
+            ),
+        ));
+    }
+
+    /**
+     * Тестируем приватные методы
+     *
+     * @param string $object
+     * @param string $methodName
+     *
+     * @return mixed
+     */
+    private function callPrivateMethod($object, $methodName)
+    {
+        $reflectionClass = new \ReflectionClass($object);
+        $reflectionMethod = $reflectionClass->getMethod($methodName);
+        $reflectionMethod->setAccessible(true);
+
+        $params = array_slice(func_get_args(), 2);
+        return $reflectionMethod->invokeArgs($object, $params);
     }
 } 

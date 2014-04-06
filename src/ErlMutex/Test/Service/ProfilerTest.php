@@ -96,7 +96,8 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection()
             ->getProfiler()
-            ->setStorage(ProfilerStorageDummy::getInstance());
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->getStorage();
 
         $this->assertNotNull($this->_mutex->get('A'));
         $this->_mutex->acquire();
