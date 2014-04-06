@@ -300,7 +300,30 @@ class Profiler
             return null;
 
         } catch (Exception $e) {
-            return $e->getMessage();
+            if ($e->getProfilerStackModel()) {
+                foreach ($map as $requests) {
+                    foreach ($requests as $traceList) {
+                        foreach ($traceList as $num => $trace) {
+                            /** @var ProfilerStackModel $trace */
+                            if ($e->getProfilerStackModel() === $trace) {
+                                return array(
+                                    'requestHash' => $trace->getRequestHash(),
+                                    'type'        => 'warning',
+                                    'position'    => $num,
+                                    'message'     => $e->getMessage()
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            return array(
+                'requestHash' => null,
+                'type'        => 'critical',
+                'position'    => null,
+                'message'     => $e->getMessage()
+            );
         }
     }
 
@@ -316,7 +339,7 @@ class Profiler
      */
     private function validateTraceHashList(array $traceList)
     {
-        $this->checkHashKeysActionsOrder($traceList);
+        $this->validateHashKeysActionsOrder($traceList);
         $this->validateCrossOrder($traceList);
     }
 
@@ -326,7 +349,7 @@ class Profiler
      *
      * @param array $traceList
      */
-    private function checkHashKeysActionsOrder(array $traceList)
+    private function validateHashKeysActionsOrder(array $traceList)
     {
         $map = array();
         foreach ($traceList as $pos => $trace) {
@@ -368,10 +391,10 @@ class Profiler
             switch ($trace->getMethod()) {
                 case Mutex::ACTION_GET:
                     if ($wasGet === true) {
-                        throw new Exception(sprintf(
+                        $this->throwTraceModelException(
                             'Повторное получение указателя блокировки по ключу `%s`',
-                            $trace->getKey()
-                        ));
+                            $trace
+                        );
                     } else {
                         $wasGet = true;
                     }
@@ -379,16 +402,16 @@ class Profiler
                     break;
                 case Mutex::ACTION_ACQUIRE:
                     if ($wasGet !== true) {
-                        throw new Exception(sprintf(
+                        $this->throwTraceModelException(
                             'Не найдено получения указателя блокировки по ключу `%s`',
-                            $trace->getKey()
-                        ));
+                            $trace
+                        );
                     } else {
                         if ($wasAcquire === true) {
-                            throw new Exception(sprintf(
+                            $this->throwTraceModelException(
                                 'Повторная установка блокировки по ключу `%s`',
-                                $trace->getKey()
-                            ));
+                                $trace
+                            );
                         } else {
                             $wasGet     = false;
                             $wasAcquire = true;
@@ -398,10 +421,10 @@ class Profiler
                     break;
                 case Mutex::ACTION_RELEASE:
                     if ($wasAcquire !== true) {
-                        throw new Exception(sprintf(
+                        $this->throwTraceModelException(
                             'Не найдена установка блокировки по ключу `%s`',
-                            $trace->getKey()
-                        ));
+                            $trace
+                        );
                     } else {
                         $wasAcquire = false;
                     }
@@ -469,10 +492,10 @@ class Profiler
                     $keyCrossOrderModel->release();
 
                     if ($keyCrossOrderModel->hasContainsKeys()) {
-                        throw new Exception(sprintf(
-                            "Не возможно снять блокировку с ключа `%s`, вложенные блокировки еще заняты",
-                            $trace->getKey()
-                        ));
+                        $this->throwTraceModelException(
+                            'Не возможно снять блокировку с ключа `%s` пока вложенные блокировки еще заняты',
+                            $trace
+                        );
                     }
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
@@ -484,5 +507,21 @@ class Profiler
                     break;
             }
         }
+    }
+
+    /**
+     * Исключение с моделью стека вызова профайлера
+     *
+     * @param string             $message
+     * @param ProfilerStackModel $trace
+     *
+     * @throws \ErlMutex\Exception\ProfilerException
+     */
+    private function throwTraceModelException($message, ProfilerStackModel $trace)
+    {
+        $exception = new Exception(sprintf($message, $trace->getKey()));
+        $exception->setProfilerStackModel($trace);
+
+        throw $exception;
     }
 } 

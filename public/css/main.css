@@ -22,3 +22,6 @@ body .container .requestUri .requestHash td {
 body .container .requestUri .requestHash .base {
   background-color: #50C878;
 }
+body .container .requestUri .requestHash .warning {
+  background-color: #ffff00;
+}

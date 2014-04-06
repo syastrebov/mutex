@@ -5,7 +5,9 @@
     </head>
     <body>
 
-        {{ error }}
+        {% if error.position == null %}
+            {{ error.message }}
+        {% endif %}
 
         <div class="container">
             {% for requestUri, requests in map %}
@@ -31,9 +33,15 @@
                         {% for num, info in stack %}
                         <tr>
                             <td class="num">{{ num }} </td>
-                            <td class="base">{{ info.key }}</td>
-                            <td class="base">{{ info.action }}</td>
-                            <td class="base">{{ info.response }}</td>
+                            {% if error.position and num >= error.position %}
+                                <td class="warning" title="{{ error.message }}">{{ info.key }}</td>
+                                <td class="warning" title="{{ error.message }}">{{ info.action }}</td>
+                                <td class="warning" title="{{ error.message }}">{{ info.response }}</td>
+                            {% else %}
+                                <td class="base">{{ info.key }}</td>
+                                <td class="base">{{ info.action }}</td>
+                                <td class="base">{{ info.response }}</td>
+                            {% endif %}
                             <td>{{ info.filename }}</td>
                             <td>{{ info.line }}</td>
                             <td>{{ info.class ? info.class : '-' }}</td>
