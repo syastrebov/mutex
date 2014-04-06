@@ -255,18 +255,6 @@ class Profiler
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
-        $exception = null;
-        try {
-            $map = $this->map();
-            foreach ($map as $requests) {
-                foreach ($requests as $traceList) {
-                    $this->checkTraceHashList($traceList);
-                }
-            }
-        } catch (Exception $e) {
-            $exception = $e->getMessage();
-        }
-
         $map    = $this->map(true);
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
@@ -274,7 +262,7 @@ class Profiler
         $output = $twig->render('profiler_map.twig', array(
             'map'     => $map,
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
-            'error'   => $exception,
+            'error'   => $this->validateMap(),
         ));
 
         file_put_contents($this->_mapOutputLocation . '/profiler_map.html', $output);
@@ -294,7 +282,30 @@ class Profiler
     }
 
     /**
-     * Провекра последовательности вызова блокировок для хеша
+     * Проверка карты
+     *
+     * @return null|string
+     */
+    private function validateMap()
+    {
+        $map = $this->map();
+
+        try {
+            foreach ($map as $requests) {
+                foreach ($requests as $traceList) {
+                    $this->validateTraceHashList($traceList);
+                }
+            }
+
+            return null;
+
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * Проверка последовательности вызова блокировок для хеша
      *
      *  - Проверка последовательности вызова блокировок по ключу для хеша
      *  - Проверка перехлестных вызовов блокировок
@@ -303,15 +314,15 @@ class Profiler
      *
      * @param array $traceList
      */
-    private function checkTraceHashList(array $traceList)
+    private function validateTraceHashList(array $traceList)
     {
         $this->checkHashKeysActionsOrder($traceList);
-        $this->checkCrossOrder($traceList);
+        $this->validateCrossOrder($traceList);
     }
 
     /**
      * Проверка последовательности вызова блокировок по ключу для хеша
-     * Если хотя бы один ключ вызван с неправильной последовательностью, функция возвращает исключение
+     * Если хотя бы один ключ вызван с неправильной последовательностью, то функция возвращает исключение
      *
      * @param array $traceList
      */
@@ -320,10 +331,10 @@ class Profiler
         $map = array();
         foreach ($traceList as $pos => $trace) {
             /** @var ProfilerStackModel $trace */
-            $map[$trace->getKey()][$pos] = $trace->getMethod();
+            $map[$trace->getKey()][$pos] = $trace;
         }
-        foreach ($map as $key => $actions) {
-            $this->checkKeyActionsOrder($key, $actions);
+        foreach ($map as $actions) {
+            $this->validateKeyHashActionsOrder($actions);
         }
     }
 
@@ -336,41 +347,64 @@ class Profiler
      *  - release(Key)
      * Если последовательность не совпадает, то функция возвращает исключение
      *
-     * @param string $key
-     * @param array $actions
-     *
+     * @param array $keyTraceList
      * @throws \ErlMutex\Exception\ProfilerException
      */
-    private function checkKeyActionsOrder($key, array $actions)
+    private function validateKeyHashActionsOrder(array $keyTraceList)
     {
         $wasGet     = false;
         $wasAcquire = false;
 
-        foreach ($actions as $action) {
-            switch ($action) {
+        foreach ($keyTraceList as $trace) {
+            /** @var ProfilerStackModel $trace */
+            if (!isset($listKey) && !isset($requestHash)) {
+                $listKey     = $trace->getKey();
+                $requestHash = $trace->getRequestHash();
+            }
+            if ($listKey !== $trace->getKey() || $requestHash !== $trace->getRequestHash()) {
+                throw new Exception('Список вызова блокировок должны быть для одного ключа и хеша');
+            }
+
+            switch ($trace->getMethod()) {
                 case Mutex::ACTION_GET:
-                    if ($wasGet) {
-                        throw new Exception(sprintf('Action get was already for key `%s`', $key));
+                    if ($wasGet === true) {
+                        throw new Exception(sprintf(
+                            'Повторное получение указателя блокировки по ключу `%s`',
+                            $trace->getKey()
+                        ));
+                    } else {
+                        $wasGet = true;
                     }
-                    $wasGet = true;
 
                     break;
                 case Mutex::ACTION_ACQUIRE:
-                    if (!$wasGet) {
-                        throw new Exception(sprintf('Action get not found for key `%s`', $key));
+                    if ($wasGet !== true) {
+                        throw new Exception(sprintf(
+                            'Не найдено получения указателя блокировки по ключу `%s`',
+                            $trace->getKey()
+                        ));
+                    } else {
+                        if ($wasAcquire === true) {
+                            throw new Exception(sprintf(
+                                'Повторная установка блокировки по ключу `%s`',
+                                $trace->getKey()
+                            ));
+                        } else {
+                            $wasGet     = false;
+                            $wasAcquire = true;
+                        }
                     }
-                    if ($wasAcquire) {
-                        throw new Exception(sprintf('Action acquire was already for key `%s`', $key));
-                    }
-                    $wasGet     = false;
-                    $wasAcquire = true;
 
                     break;
                 case Mutex::ACTION_RELEASE:
-                    if (!$wasAcquire) {
-                        throw new Exception(sprintf('Action acquire not found for key `%s`', $key));
+                    if ($wasAcquire !== true) {
+                        throw new Exception(sprintf(
+                            'Не найдена установка блокировки по ключу `%s`',
+                            $trace->getKey()
+                        ));
+                    } else {
+                        $wasAcquire = false;
                     }
-                    $wasAcquire = false;
 
                     break;
                 default:
@@ -405,7 +439,7 @@ class Profiler
      * @param $mapHashList
      * @throws \ErlMutex\Exception\ProfilerException
      */
-    private function checkCrossOrder(array $mapHashList)
+    private function validateCrossOrder(array $mapHashList)
     {
         $acquired = array();
         foreach ($mapHashList as $trace) {
@@ -423,10 +457,10 @@ class Profiler
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
-                        if ($otherKeyCrossOrderModel->isAcquired()
-                            && $otherKeyCrossOrderModel->getKey() !== $trace->getKey()
-                        ) {
-                            $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
+                        if ($otherKeyCrossOrderModel->isAcquired()) {
+                            if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
+                                $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
+                            }
                         }
                     }
 
@@ -435,7 +469,10 @@ class Profiler
                     $keyCrossOrderModel->release();
 
                     if ($keyCrossOrderModel->hasContainsKeys()) {
-                        throw new Exception(sprintf("Can't release `%s` while another keys acquired", $trace->getKey()));
+                        throw new Exception(sprintf(
+                            "Не возможно снять блокировку с ключа `%s`, вложенные блокировки еще заняты",
+                            $trace->getKey()
+                        ));
                     }
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
