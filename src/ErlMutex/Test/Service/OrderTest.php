@@ -144,4 +144,107 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
             ->generateHtmlMapOutput();
     }
+
+    /**
+     * Уже был получен указатель на блокировку
+     */
+    public function testAlreadyHasPointer()
+    {
+        ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
+        ProfilerStorageDummy::getInstance()->truncate();
+
+        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex
+            ->establishConnection()
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->getProfiler()
+            ->setStorage(ProfilerStorageDummy::getInstance());
+
+        $mutex->get('A');
+        $mutex->get('A');
+        $mutex->acquire();
+        $mutex->release();
+
+        unset($mutex);
+
+        $profiler = new Profiler('');
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->generateHtmlMapOutput();
+    }
+
+    public function testAcquireWithoutPointer()
+    {
+        ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
+        ProfilerStorageDummy::getInstance()->truncate();
+
+        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex
+            ->establishConnection()
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->getProfiler()
+            ->setStorage(ProfilerStorageDummy::getInstance());
+
+        $mutex->acquire();
+        $mutex->release();
+
+        unset($mutex);
+
+        $profiler = new Profiler('');
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->generateHtmlMapOutput();
+    }
+
+    public function testAlreadyAcquired()
+    {
+        ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
+        ProfilerStorageDummy::getInstance()->truncate();
+
+        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex
+            ->establishConnection()
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->getProfiler()
+            ->setStorage(ProfilerStorageDummy::getInstance());
+
+        $mutex->get('A');
+        $mutex->acquire();
+        $mutex->acquire();
+        $mutex->release();
+
+        unset($mutex);
+
+        $profiler = new Profiler('');
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->generateHtmlMapOutput();
+    }
+
+    public function testReleaseNotAcquired()
+    {
+        ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
+        ProfilerStorageDummy::getInstance()->truncate();
+
+        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex
+            ->establishConnection()
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->getProfiler()
+            ->setStorage(ProfilerStorageDummy::getInstance());
+
+        $mutex->get('A');
+        $mutex->release();
+
+        unset($mutex);
+
+        $profiler = new Profiler('');
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->generateHtmlMapOutput();
+    }
 } 

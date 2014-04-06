@@ -496,10 +496,11 @@ class Profiler
                             'Не возможно снять блокировку с ключа `%s` пока вложенные блокировки еще заняты',
                             $trace
                         );
-                    }
-                    foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
-                        $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
+                    } else {
+                        foreach ($acquired as $otherKeyCrossOrderModel) {
+                            /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                            $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
+                        }
                     }
 
                     break;
