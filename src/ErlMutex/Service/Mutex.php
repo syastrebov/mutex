@@ -23,8 +23,12 @@ use ErlMutex\LoggerInterface;
  */
 class Mutex
 {
-    const DEFAULT_HOST = '127.0.0.1';
-    const DEFAULT_PORT = 7007;
+    const DEFAULT_HOST   = '127.0.0.1';
+    const DEFAULT_PORT   = 7007;
+
+    const ACTION_GET     = 'get';
+    const ACTION_ACQUIRE = 'acquire';
+    const ACTION_RELEASE = 'release';
 
     /**
      * @var string
@@ -168,7 +172,7 @@ class Mutex
         }
 
         $this->send(array(
-            'cmd'     => 'get',
+            'cmd'     => self::ACTION_GET,
             'name'    => $name,
             'timeout' => $timeout,
         ));
@@ -190,7 +194,7 @@ class Mutex
         $name = $name ? : $this->_name;
         if ($name) {
             while (true) {
-                $this->send(array('cmd' => 'acquire', 'name' => $name));
+                $this->send(array('cmd' => self::ACTION_ACQUIRE, 'name' => $name));
                 $response = $this->receive();
                 $this->log($name, $response, debug_backtrace());
 
@@ -220,7 +224,7 @@ class Mutex
     {
         $name = $name ? : $this->_name;
         if ($name) {
-            $this->send(array('cmd' => 'release', 'name' => $name));
+            $this->send(array('cmd' => self::ACTION_RELEASE, 'name' => $name));
             $response = $this->receive();
             $this->log($name, $response, debug_backtrace());
 

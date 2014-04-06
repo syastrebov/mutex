@@ -13,7 +13,7 @@
 namespace ErlMutex\Service\Storage;
 
 use ErlMutex\ProfilerStorageInterface;
-use ErlMutex\Model\ProfileStack as ProfileStackModel;
+use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 
 /**
  * Хранилище для отладки
@@ -76,10 +76,10 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
     /**
      * Сохранить запись
      *
-     * @param ProfileStackModel $model
+     * @param ProfilerStackModel $model
      * @return bool
      */
-    public function insert(ProfileStackModel $model)
+    public function insert(ProfilerStackModel $model)
     {
         $this->_stack[] = $model;
     }

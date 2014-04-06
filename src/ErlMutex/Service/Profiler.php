@@ -13,7 +13,8 @@
 namespace ErlMutex\Service;
 
 use ErlMutex\Exception\ProfilerException as Exception;
-use ErlMutex\Model\ProfileStack as ProfileStackModel;
+use ErlMutex\Model\ProfilerCrossOrder;
+use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 
@@ -159,7 +160,7 @@ class Profiler
             }
 
             $entry = $stackTrace[0];
-            $model = new ProfileStackModel(
+            $model = new ProfilerStackModel(
                 $this->getRequestUri(),
                 $this->getRequestHash(),
                 isset($entry['file']) ? $entry['file'] : null,
@@ -167,13 +168,14 @@ class Profiler
                 isset($className)     ? $className     : null,
                 isset($method)        ? $method        : null,
                 $key,
+                isset($entry['function']) ? $entry['function'] : null,
                 $response,
                 new DateTime(),
                 $stackTrace
             );
         }
 
-        if ($model instanceof ProfileStackModel) {
+        if ($model instanceof ProfilerStackModel) {
             $this->_stack[] = $model;
             if ($this->_storage) {
                 $this->_storage->insert($model);
@@ -188,7 +190,7 @@ class Profiler
     public function dump()
     {
         foreach ($this->_stack as $trace) {
-            /** @var ProfileStackModel $trace */
+            /** @var ProfilerStackModel $trace */
             self::debugMessage(
                 sprintf(
                     "%s::%s (%s [%d]) key = %s, response = %s",
@@ -207,7 +209,7 @@ class Profiler
     /**
      * Построить карту вызова
      *
-     * trace может возвращаться в виде ProfileStackModel или массива
+     * trace может возвращаться в виде ProfilerStackModel или массива
      * Возвращает в формате:
      * - requestUri
      *      - requestHash 1
@@ -233,7 +235,7 @@ class Profiler
         $list = $this->_storage->getList();
 
         foreach ($list as $trace) {
-            /** @var ProfileStackModel $trace */
+            /** @var ProfilerStackModel $trace */
             if (!isset($map[$trace->getRequestUri()][$trace->getRequestHash()])) {
                 $map[$trace->getRequestUri()][$trace->getRequestHash()] = array();
             }
@@ -253,6 +255,18 @@ class Profiler
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
+        $exception = null;
+        try {
+            $map = $this->map();
+            foreach ($map as $requests) {
+                foreach ($requests as $traceList) {
+                    $this->checkTraceHashList($traceList);
+                }
+            }
+        } catch (Exception $e) {
+            $exception = $e->getMessage();
+        }
+
         $map    = $this->map(true);
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
@@ -260,6 +274,7 @@ class Profiler
         $output = $twig->render('profiler_map.twig', array(
             'map'     => $map,
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
+            'error'   => $exception,
         ));
 
         file_put_contents($this->_mapOutputLocation . '/profiler_map.html', $output);
@@ -276,5 +291,161 @@ class Profiler
         $time = $time ?: new DateTime;
         echo sprintf("%s on %s\r\n", $string, $time->format('H:i:s'));
         flush();
+    }
+
+    /**
+     * Провекра последовательности вызова блокировок для хеша
+     *
+     *  - Проверка последовательности вызова блокировок по ключу для хеша
+     *  - Проверка перехлестных вызовов блокировок
+     *
+     * При возникновении ошибок возвращает исключение
+     *
+     * @param array $traceList
+     */
+    private function checkTraceHashList(array $traceList)
+    {
+        $this->checkHashKeysActionsOrder($traceList);
+        $this->checkCrossOrder($traceList);
+    }
+
+    /**
+     * Проверка последовательности вызова блокировок по ключу для хеша
+     * Если хотя бы один ключ вызван с неправильной последовательностью, функция возвращает исключение
+     *
+     * @param array $traceList
+     */
+    private function checkHashKeysActionsOrder(array $traceList)
+    {
+        $map = array();
+        foreach ($traceList as $pos => $trace) {
+            /** @var ProfilerStackModel $trace */
+            $map[$trace->getKey()][$pos] = $trace->getMethod();
+        }
+        foreach ($map as $key => $actions) {
+            $this->checkKeyActionsOrder($key, $actions);
+        }
+    }
+
+    /**
+     * Проверка последовательности вызова блокировок по ключу
+     *
+     * Правильная последовательность:
+     *  - get(Key)
+     *  - acquire(Key)
+     *  - release(Key)
+     * Если последовательность не совпадает, то функция возвращает исключение
+     *
+     * @param string $key
+     * @param array $actions
+     *
+     * @throws \ErlMutex\Exception\ProfilerException
+     */
+    private function checkKeyActionsOrder($key, array $actions)
+    {
+        $wasGet     = false;
+        $wasAcquire = false;
+
+        foreach ($actions as $action) {
+            switch ($action) {
+                case Mutex::ACTION_GET:
+                    if ($wasGet) {
+                        throw new Exception(sprintf('Action get was already for key `%s`', $key));
+                    }
+                    $wasGet = true;
+
+                    break;
+                case Mutex::ACTION_ACQUIRE:
+                    if (!$wasGet) {
+                        throw new Exception(sprintf('Action get not found for key `%s`', $key));
+                    }
+                    if ($wasAcquire) {
+                        throw new Exception(sprintf('Action acquire was already for key `%s`', $key));
+                    }
+                    $wasGet     = false;
+                    $wasAcquire = true;
+
+                    break;
+                case Mutex::ACTION_RELEASE:
+                    if (!$wasAcquire) {
+                        throw new Exception(sprintf('Action acquire not found for key `%s`', $key));
+                    }
+                    $wasAcquire = false;
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Проверка перехлестных вызовов блокировок
+     *
+     * Например:
+     *  - get A
+     *  - get B
+     *  - acquire A
+     *  - acquire B
+     *  - release A
+     *  - release B
+     *
+     * Схема вызова:
+     * <A>
+     *  <B>
+     *  </A>
+     * </B>
+     *
+     * Должно быть:
+     * <A>
+     *  <B>
+     *  </B>
+     * </A>
+     *
+     * @param $mapHashList
+     * @throws \ErlMutex\Exception\ProfilerException
+     */
+    private function checkCrossOrder(array $mapHashList)
+    {
+        $acquired = array();
+        foreach ($mapHashList as $trace) {
+            /** @var ProfilerStackModel $trace */
+            $acquired[$trace->getKey()] = new ProfilerCrossOrder($trace->getKey());
+        }
+
+        foreach ($mapHashList as $trace) {
+            /** @var ProfilerCrossOrder $keyCrossOrderModel */
+            $keyCrossOrderModel = $acquired[$trace->getKey()];
+
+            switch ($trace->getAction()) {
+                case Mutex::ACTION_ACQUIRE:
+                    $keyCrossOrderModel->acquire();
+
+                    foreach ($acquired as $otherKeyCrossOrderModel) {
+                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                        if ($otherKeyCrossOrderModel->isAcquired()
+                            && $otherKeyCrossOrderModel->getKey() !== $trace->getKey()
+                        ) {
+                            $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
+                        }
+                    }
+
+                    break;
+                case Mutex::ACTION_RELEASE:
+                    $keyCrossOrderModel->release();
+
+                    if ($keyCrossOrderModel->hasContainsKeys()) {
+                        throw new Exception(sprintf("Can't release `%s` while another keys acquired", $trace->getKey()));
+                    }
+                    foreach ($acquired as $otherKeyCrossOrderModel) {
+                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                        $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 } 

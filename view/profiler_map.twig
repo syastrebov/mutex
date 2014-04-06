@@ -3,6 +3,9 @@
         <link type="text/css" rel="stylesheet" media="all" href="{{ cssFile }}" />
     </head>
     <body>
+
+        {{ error }}
+
         <div class="container">
             {% for requestUri, requests in map %}
             <div class="requestUri">
@@ -15,6 +18,7 @@
                             <tr>
                                 <th class="num">#</th>
                                 <th>Key</th>
+                                <th>Action</th>
                                 <th>Response</th>
                                 <th>Filename</th>
                                 <th>Line</th>
@@ -27,6 +31,7 @@
                         <tr>
                             <td class="num">{{ num }} </td>
                             <td class="base">{{ info.key }}</td>
+                            <td class="base">{{ info.action }}</td>
                             <td class="base">{{ info.response }}</td>
                             <td>{{ info.filename }}</td>
                             <td>{{ info.line }}</td>

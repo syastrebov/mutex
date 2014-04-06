@@ -45,10 +45,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 ->setStorage(ProfilerStorageDummy::getInstance());
 
             if ($mutex->acquire('A')) {
-                sleep(self::TIMEOUT);
-
                 if ($mutex->acquire('B')) {
-                    sleep(self::TIMEOUT);
                     $mutex->release('B');
                 }
                 $mutex->release('A');
@@ -88,20 +85,14 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             if ($i > 0) {
                 if ($mutex->acquire('A')) {
-                    sleep(self::TIMEOUT);
-
                     if ($mutex->acquire('B')) {
-                        sleep(self::TIMEOUT);
                         $mutex->release('B');
                     }
                     $mutex->release('A');
                 }
             } else {
                 if ($mutex->acquire('B')) {
-                    sleep(self::TIMEOUT);
-
                     if ($mutex->acquire('A')) {
-                        sleep(self::TIMEOUT);
                         $mutex->release('A');
                     }
                     $mutex->release('B');
@@ -112,6 +103,40 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         for ($i = 0; $i < 2; $i++) {
             unset($mutexes[$i]);
         }
+
+        $profiler = new Profiler('');
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->generateHtmlMapOutput();
+    }
+
+    /**
+     * Перехлестный вызов
+     */
+    public function testCrossOrder()
+    {
+        ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
+        ProfilerStorageDummy::getInstance()->truncate();
+
+        $mutex = new Mutex('127.0.0.1', 7007);
+        $mutex
+            ->establishConnection()
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->getProfiler()
+            ->setStorage(ProfilerStorageDummy::getInstance());
+
+        $mutex->get('A');
+        $mutex->get('B');
+
+        if ($mutex->acquire('A')) {
+            if ($mutex->acquire('B')) {
+                $mutex->release('A');
+            }
+            $mutex->release('B');
+        }
+
+        unset($mutex);
 
         $profiler = new Profiler('');
         $profiler

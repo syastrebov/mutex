@@ -17,52 +17,77 @@ use DateTime;
 /**
  * Модель лога профайлера
  *
- * Class ProfileStack
+ * Class ProfilerStack
  * @package erl\Model
  */
-class ProfileStack
+class ProfilerStack
 {
     /**
+     * Запрашиваемый адрес (точка входа)
+     *
      * @var string
      */
     private $_requestUri;
 
     /**
+     * Уникальный хеш запроса
+     *
      * @var string
      */
     private $_requestHash;
 
     /**
+     * Файл, в котором был вызван мьютекс
+     *
      * @var string
      */
     private $_filename;
 
     /**
-     * @var string
-     */
-    private $_class;
-
-    /**
-     * @var string
-     */
-    private $_method;
-
-    /**
+     * Строка, на которой вызван мьютекс
+     *
      * @var int
      */
     private $_line;
 
     /**
+     * Класс вызова
+     *
+     * @var string
+     */
+    private $_class;
+
+    /**
+     * Метод класса вызова
+     *
+     * @var string
+     */
+    private $_method;
+
+    /**
+     * Запрашиваемая команда
+     *
+     * @var string
+     */
+    private $_action;
+
+    /**
+     * Имя указателя блокировки
+     *
      * @var string
      */
     private $_key;
 
     /**
+     * Возвращенный сервисом ответ
+     *
      * @var mixed
      */
     private $_response;
 
     /**
+     * Время вызова
+     *
      * @var DateTime
      */
     private $_dateTime;
@@ -82,6 +107,7 @@ class ProfileStack
      * @param string   $class
      * @param string   $method
      * @param string   $key
+     * @param string   $action
      * @param mixed    $response
      * @param DateTime $dateTime
      * @param string   $stackTrace
@@ -94,6 +120,7 @@ class ProfileStack
         $class,
         $method,
         $key,
+        $action,
         $response,
         DateTime $dateTime,
         $stackTrace=null
@@ -105,6 +132,7 @@ class ProfileStack
         $this->_method      = $method;
         $this->_line        = $line;
         $this->_key         = $key;
+        $this->_action      = $action;
         $this->_response    = $response;
         $this->_dateTime    = $dateTime;
         $this->_stackTrace  = $stackTrace;
@@ -121,6 +149,8 @@ class ProfileStack
     }
 
     /**
+     * Уникальный хеш запроса
+     *
      * @return string
      */
     public function getRequestHash()
@@ -179,6 +209,16 @@ class ProfileStack
     }
 
     /**
+     * Запрашиваемая команда
+     *
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->_action;
+    }
+
+    /**
      * Сервис вернул ответ
      *
      * @return mixed
@@ -189,6 +229,8 @@ class ProfileStack
     }
 
     /**
+     * Время вызова в виде объекта
+     *
      * @return DateTime
      */
     public function getDateTime()
@@ -197,6 +239,8 @@ class ProfileStack
     }
 
     /**
+     * Время вызова в формате Y.m.d H:i:s
+     *
      * @return string
      */
     public function getDateTimeFormat()
@@ -219,6 +263,7 @@ class ProfileStack
             'method'      => $this->_method,
             'line'        => $this->_line,
             'key'         => $this->_key,
+            'action'      => $this->_action,
             'response'    => $this->_response,
             'dateTime'    => $this->getDateTimeFormat(),
         );

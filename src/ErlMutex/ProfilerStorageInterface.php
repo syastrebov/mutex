@@ -12,7 +12,7 @@
 
 namespace ErlMutex;
 
-use ErlMutex\Model\ProfileStack as ProfileStackModel;
+use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 
 /**
  * Хранилище карты вызова блокировок
@@ -32,10 +32,10 @@ interface ProfilerStorageInterface
     /**
      * Сохранить запись
      *
-     * @param ProfileStackModel $model
+     * @param ProfilerStackModel $model
      * @return bool
      */
-    public function insert(ProfileStackModel $model);
+    public function insert(ProfilerStackModel $model);
 
     /**
      * Получить список записей
