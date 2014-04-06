@@ -388,7 +388,7 @@ class Profiler
                 throw new Exception('Список вызова блокировок должны быть для одного ключа и хеша');
             }
 
-            switch ($trace->getMethod()) {
+            switch ($trace->getAction()) {
                 case Mutex::ACTION_GET:
                     if ($wasGet === true) {
                         $this->throwTraceModelException(

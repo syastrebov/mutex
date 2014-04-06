@@ -4,12 +4,10 @@
         <link type="text/css" rel="stylesheet" media="all" href="{{ cssFile }}" />
     </head>
     <body>
-
-        {% if error.position == null %}
-            {{ error.message }}
-        {% endif %}
-
         <div class="container">
+            {% if error.position == null %}
+                <div class="critical">{{ error.message }}</div>
+            {% endif %}
             {% for requestUri, requests in map %}
             <div class="requestUri">
                 <h1>{{ requestUri }}</h1>
@@ -34,11 +32,11 @@
                         <tr>
                             <td class="num">{{ num }} </td>
                             {% if error.position and num >= error.position %}
-                                <td class="warning" title="{{ error.message }}">{{ info.key }}</td>
+                                <td class="warning" title="{{ error.message }}">{{ info.key ? info.key : '-' }}</td>
                                 <td class="warning" title="{{ error.message }}">{{ info.action }}</td>
                                 <td class="warning" title="{{ error.message }}">{{ info.response }}</td>
                             {% else %}
-                                <td class="base">{{ info.key }}</td>
+                                <td class="base">{{ info.key ? info.key : '-' }}</td>
                                 <td class="base">{{ info.action }}</td>
                                 <td class="base">{{ info.response }}</td>
                             {% endif %}

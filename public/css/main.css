@@ -4,6 +4,10 @@ body {
 body .container {
   padding: 10px;
 }
+body .container .critical {
+  padding: 10px;
+  color: #ff0000;
+}
 body .container .requestUri {
   padding: 10px;
 }

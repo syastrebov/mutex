@@ -1,6 +1,7 @@
 @padding: 10px;
 @yellow: #ffff00;
 @green: #50C878;
+@red: #ff0000;
 
 body {
   font-size: 14px;
@@ -8,6 +9,10 @@ body {
   .container {
     padding: @padding;
 
+    .critical {
+      padding: @padding;
+      color: @red;
+    }
     .requestUri {
       padding: @padding;
 
