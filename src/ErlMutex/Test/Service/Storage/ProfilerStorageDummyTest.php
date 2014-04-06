@@ -36,17 +36,6 @@ class ProfilerStorageDummyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Запрещаем unserialize
-     *
-     * @expectedException \PHPUnit_Framework_Error
-     */
-    public function testUnserialize()
-    {
-        $storage = ProfilerStorageDummy::getInstance();
-        unserialize(serialize($storage));
-    }
-
-    /**
      * Очистка хранилища
      */
     public function testTruncate()

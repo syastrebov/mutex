@@ -40,14 +40,12 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
     private function __construct() {}
 
     /**
-     * Запрещаем unserialize
+     * Для реализации синглтона еще нужно запретить клонирование и unserialize
+     * Но здесь это не нужно
+     *
+     * private function __wakeup() {}
+     * private function __clone() {}
      */
-    private function __wakeup() {}
-
-    /**
-     * Запрещаем клонирование
-     */
-    private function __clone() {}
 
     /**
      * Получить эклемпляр хранилища
