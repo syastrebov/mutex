@@ -337,7 +337,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     /**
      * Тестируем приватные методы
      *
-     * @param string $object
+     * @param object $object
      * @param string $methodName
      *
      * @return mixed
