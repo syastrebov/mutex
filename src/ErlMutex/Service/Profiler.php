@@ -15,6 +15,7 @@ namespace ErlMutex\Service;
 use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerCrossOrder;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Model\ProfilerStack;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 
@@ -292,21 +293,23 @@ class Profiler
 
         try {
             foreach ($map as $requests) {
-                foreach ($requests as $traceList) {
-                    $this->validateTraceHashList($traceList);
+                foreach ($requests as $traceHashList) {
+                    $this->validateTraceHashList($traceHashList);
                 }
             }
 
             return null;
 
         } catch (Exception $e) {
+            $exception = null;
+
             if ($e->getProfilerStackModel()) {
                 foreach ($map as $requests) {
-                    foreach ($requests as $traceList) {
-                        foreach ($traceList as $num => $trace) {
+                    foreach ($requests as $traceHashList) {
+                        foreach ($traceHashList as $num => $trace) {
                             /** @var ProfilerStackModel $trace */
                             if ($e->getProfilerStackModel() === $trace) {
-                                return array(
+                                $exception = array(
                                     'requestHash' => $trace->getRequestHash(),
                                     'type'        => 'warning',
                                     'position'    => $num,
@@ -318,12 +321,7 @@ class Profiler
                 }
             }
 
-            return array(
-                'requestHash' => null,
-                'type'        => 'critical',
-                'position'    => null,
-                'message'     => $e->getMessage()
-            );
+            return $exception;
         }
     }
 
@@ -371,7 +369,7 @@ class Profiler
      * Если последовательность не совпадает, то функция возвращает исключение
      *
      * @param array $keyTraceList
-     * @throws \ErlMutex\Exception\ProfilerException
+     * @throws Exception
      */
     private function validateKeyHashActionsOrder(array $keyTraceList)
     {
@@ -458,17 +456,14 @@ class Profiler
      * </A>
      *
      * @param $mapHashList
-     * @throws \ErlMutex\Exception\ProfilerException
+     * @throws Exception
      */
     private function validateCrossOrder(array $mapHashList)
     {
-        $acquired = array();
-        foreach ($mapHashList as $trace) {
-            /** @var ProfilerStackModel $trace */
-            $acquired[$trace->getKey()] = new ProfilerCrossOrder($trace->getKey());
-        }
-
+        $acquired  = $this->getHashCrossOrderMap($mapHashList);
         $exception = null;
+
+        /** @var ProfilerStack $trace */
         foreach ($mapHashList as $trace) {
             /** @var ProfilerCrossOrder $keyCrossOrderModel */
             $keyCrossOrderModel = $acquired[$trace->getKey()];
@@ -510,12 +505,30 @@ class Profiler
     }
 
     /**
+     * Карта перекрестных связей для хеша вызовов
+     *
+     * @param array $mapHashList
+     * @return array
+     */
+    private function getHashCrossOrderMap(array $mapHashList)
+    {
+        $acquired = array();
+        foreach ($mapHashList as $trace) {
+            /** @var ProfilerStackModel $trace */
+            $acquired[$trace->getKey()] = new ProfilerCrossOrder($trace->getKey());
+        }
+
+        return $acquired;
+    }
+
+
+    /**
      * Исключение с моделью стека вызова профайлера
      *
      * @param string             $message
      * @param ProfilerStackModel $trace
      *
-     * @return \ErlMutex\Exception\ProfilerException
+     * @return Exception
      */
     private function getTraceModelException($message, ProfilerStackModel $trace)
     {
