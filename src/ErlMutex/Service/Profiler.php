@@ -15,7 +15,7 @@ namespace ErlMutex\Service;
 use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerCrossOrder;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerStack;
+use ErlMutex\Model\ProfilerWrongOrder;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 
@@ -290,13 +290,17 @@ class Profiler
     private function validateMap()
     {
         $map = $this->map();
+        $hashWrongList = array();
 
         try {
             foreach ($map as $requests) {
-                foreach ($requests as $traceHashList) {
+                foreach ($requests as $hash => $traceHashList) {
                     $this->validateTraceHashList($traceHashList);
+                    $hashWrongList[$hash] = $this->validateWrongOrder($traceHashList);
                 }
             }
+
+            $this->validateWrongKeysOrder($hashWrongList);
 
             return null;
 
@@ -463,7 +467,7 @@ class Profiler
         $acquired  = $this->getHashCrossOrderMap($mapHashList);
         $exception = null;
 
-        /** @var ProfilerStack $trace */
+        /** @var ProfilerStackModel $trace */
         foreach ($mapHashList as $trace) {
             /** @var ProfilerCrossOrder $keyCrossOrderModel */
             $keyCrossOrderModel = $acquired[$trace->getKey()];
@@ -505,6 +509,138 @@ class Profiler
     }
 
     /**
+     * Проверка правильной вложенности между хэшами
+     *
+     * @param array $mapHashList
+     * @return array
+     */
+    private function validateWrongOrder(array $mapHashList)
+    {
+        $acquired  = $this->getHashWrongOrderMap($mapHashList);
+        $exception = null;
+
+        /** @var ProfilerStackModel $trace */
+        foreach ($mapHashList as $trace) {
+            /** @var ProfilerCrossOrder $keyCrossOrderModel */
+            $keyCrossOrderModel = $acquired[$trace->getKey()];
+
+            switch ($trace->getAction()) {
+                case Mutex::ACTION_ACQUIRE:
+                    $keyCrossOrderModel->acquire();
+
+                    foreach ($acquired as $otherKeyCrossOrderModel) {
+                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                        if ($otherKeyCrossOrderModel->isAcquired()) {
+                            if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
+                                $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
+                            }
+                        }
+                    }
+
+                    break;
+                case Mutex::ACTION_RELEASE:
+                    $keyCrossOrderModel->release();
+
+                    foreach ($acquired as $otherKeyCrossOrderModel) {
+                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                        $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $acquired;
+    }
+
+    /**
+     * Проверка правильного вызова ключей
+     *
+     * @param array $hashWrongList
+     * @throws Exception
+     */
+    private function validateWrongKeysOrder(array $hashWrongList)
+    {
+        $keys = array();
+        foreach ($hashWrongList as $wrongOrderHash) {
+            foreach ($wrongOrderHash as $wrongOrderModel) {
+                /** @var ProfilerWrongOrder $wrongOrderModel */
+                $keys[$wrongOrderModel->getKey()][] = $wrongOrderModel;
+            }
+        }
+
+        foreach ($keys as $keysHashList) {
+            $containsTemplate = null;
+
+            /** @var ProfilerWrongOrder $hashKey */
+            foreach ($keysHashList as $hashKey) {
+                if (!isset($containsTemplate)) {
+                    $canContains = $hashKey->getCanContains();
+                    if (!empty($canContains)) {
+                        $containsTemplate = $canContains;
+                    }
+                }
+            }
+            if (isset($containsTemplate) && is_array($containsTemplate)) {
+                foreach ($keysHashList as $hashKey) {
+                    if (!$this->validateWrongKeyOrder($hashKey, $containsTemplate)) {
+                        throw $this->getTraceModelException(
+                            'Не возможно снять блокировку с ключа `%s` пока вложенные блокировки еще заняты',
+                            $hashKey->getTrace()
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Сравнение вложенности ключа хеша с шаблоном
+     *
+     * @param ProfilerWrongOrder $hashKey
+     * @param array              $containsTemplate
+     *
+     * @return bool
+     */
+    private function validateWrongKeyOrder(ProfilerWrongOrder $hashKey, array $containsTemplate)
+    {
+        if (!empty($containsTemplate)) {
+            if (count($containsTemplate) >= count($hashKey->getCanContains())) {
+                return $this->validateContainsTemplate($containsTemplate, $hashKey->getCanContains());
+            } else {
+                return $this->validateContainsTemplate($hashKey->getCanContains(), $containsTemplate);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Сравнение входил ли один массив в другой
+     *
+     * @param array $template
+     * @param array $contains
+     *
+     * @return bool
+     */
+    private function validateContainsTemplate(array $template, array $contains)
+    {
+        for ($i = 0; $i < count($template); $i++) {
+            if (($i + count($contains)) < count($template)) {
+                $needle = array_slice($template, $i, count($contains));
+
+                if ($needle === $contains) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Карта перекрестных связей для хеша вызовов
      *
      * @param array $mapHashList
@@ -521,6 +657,24 @@ class Profiler
         return $acquired;
     }
 
+    /**
+     * Карта неправильной последовательности для хеша вызовов
+     *
+     * @param array $mapHashList
+     * @return array
+     */
+    private function getHashWrongOrderMap(array $mapHashList)
+    {
+        $acquired = array();
+        foreach ($mapHashList as $trace) {
+            /** @var ProfilerStackModel $trace */
+            if (!isset($acquired[$trace->getKey()])) {
+                $acquired[$trace->getKey()] = new ProfilerWrongOrder($trace);
+            }
+        }
+
+        return $acquired;
+    }
 
     /**
      * Исключение с моделью стека вызова профайлера

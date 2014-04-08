@@ -70,7 +70,7 @@ class ProfilerCrossOrder
     /**
      * Заблокировать модель
      *
-     * @throws \ErlMutex\Exception\ProfilerException
+     * @throws ProfilerException
      */
     public function acquire()
     {
@@ -84,7 +84,7 @@ class ProfilerCrossOrder
     /**
      * Снять блокировку
      *
-     * @throws \ErlMutex\Exception\ProfilerException
+     * @throws ProfilerException
      */
     public function release()
     {
@@ -120,7 +120,7 @@ class ProfilerCrossOrder
      * Добавить вложенный ключ
      *
      * @param string $key
-     * @throws \ErlMutex\Exception\ProfilerException
+     * @throws ProfilerException
      */
     public function addContainsKey($key)
     {

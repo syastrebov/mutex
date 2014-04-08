@@ -66,6 +66,40 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Без вложенности
+     */
+    public function testEmptyContains()
+    {
+        ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
+        ProfilerStorageDummy::getInstance()->truncate();
+
+        $mutex = new Mutex();
+        $mutex
+            ->establishConnection()
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->getProfiler()
+            ->setStorage(ProfilerStorageDummy::getInstance());
+
+        $mutex->get('A');
+        $mutex->get('B');
+
+        if ($mutex->acquire('A')) {
+            $mutex->release('A');
+        }
+        if ($mutex->acquire('B')) {
+            $mutex->release('B');
+        }
+
+        unset($mutex);
+
+        $profiler = new Profiler('');
+        $profiler
+            ->setStorage(ProfilerStorageDummy::getInstance())
+            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->generateHtmlMapOutput();
+    }
+
+    /**
      * Конкурентный вызов в неправильной последовательности
      */
     public function testWrongOrder()
