@@ -570,7 +570,6 @@ class Profiler
                 $keys[$wrongOrderModel->getKey()][] = $wrongOrderModel;
             }
         }
-
         foreach ($keys as $keysHashList) {
             $containsTemplate = null;
 
@@ -607,11 +606,16 @@ class Profiler
     private function validateWrongKeyOrder(ProfilerWrongOrder $hashKey, array $containsTemplate)
     {
         if (!empty($containsTemplate)) {
-            if (count($containsTemplate) >= count($hashKey->getCanContains())) {
-                return $this->validateContainsTemplate($containsTemplate, $hashKey->getCanContains());
-            } else {
-                return $this->validateContainsTemplate($hashKey->getCanContains(), $containsTemplate);
+            $canContains = $hashKey->getCanContains();
+            if (!empty($canContains)) {
+                if (count($containsTemplate) >= count($hashKey->getCanContains())) {
+                    return $this->validateContainsTemplate($containsTemplate, $hashKey->getCanContains());
+                } else {
+                    return $this->validateContainsTemplate($hashKey->getCanContains(), $containsTemplate);
+                }
             }
+
+            return false;
         }
 
         return true;
@@ -628,7 +632,7 @@ class Profiler
     private function validateContainsTemplate(array $template, array $contains)
     {
         for ($i = 0; $i < count($template); $i++) {
-            if (($i + count($contains)) < count($template)) {
+            if (($i + count($contains)) <= count($template)) {
                 $needle = array_slice($template, $i, count($contains));
 
                 if ($needle === $contains) {

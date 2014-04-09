@@ -45,12 +45,25 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             $mutex->get('A');
             $mutex->get('B');
+            $mutex->get('C');
 
-            if ($mutex->acquire('A')) {
-                if ($mutex->acquire('B')) {
-                    $mutex->release('B');
+            if ($i > 0) {
+                if ($mutex->acquire('A')) {
+                    if ($mutex->acquire('B')) {
+                        if ($mutex->acquire('C')) {
+                            $mutex->release('C');
+                        }
+                        $mutex->release('B');
+                    }
+                    $mutex->release('A');
                 }
-                $mutex->release('A');
+            } else {
+                if ($mutex->acquire('A')) {
+                    if ($mutex->acquire('B')) {
+                        $mutex->release('B');
+                    }
+                    $mutex->release('A');
+                }
             }
         }
 
