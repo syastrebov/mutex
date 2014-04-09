@@ -265,7 +265,7 @@ class Mutex
      * @param array $data отправляемый запрос на сервис
      * @return bool
      */
-    protected function send(array $data)
+    private function send(array $data)
     {
         if ($this->isAlive()) {
             @fwrite($this->_socket, json_encode($data));
@@ -280,7 +280,7 @@ class Mutex
      *
      * @return string
      */
-    protected function receive()
+    private function receive()
     {
         $input = '';
         while (false !== ($char = @fgetc($this->_socket))) {
