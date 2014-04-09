@@ -521,7 +521,7 @@ class Profiler
 
         /** @var ProfilerStackModel $trace */
         foreach ($mapHashList as $trace) {
-            /** @var ProfilerCrossOrder $keyCrossOrderModel */
+            /** @var ProfilerWrongOrder $keyCrossOrderModel */
             $keyCrossOrderModel = $acquired[$trace->getKey()];
 
             switch ($trace->getAction()) {
@@ -529,7 +529,7 @@ class Profiler
                     $keyCrossOrderModel->acquire();
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                        /** @var ProfilerWrongOrder $otherKeyCrossOrderModel */
                         if ($otherKeyCrossOrderModel->isAcquired()) {
                             if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
                                 $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
@@ -542,7 +542,7 @@ class Profiler
                     $keyCrossOrderModel->release();
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
+                        /** @var ProfilerWrongOrder $otherKeyCrossOrderModel */
                         $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
                     }
 
@@ -587,7 +587,7 @@ class Profiler
                 foreach ($keysHashList as $hashKey) {
                     if (!$this->validateWrongKeyOrder($hashKey, $containsTemplate)) {
                         throw $this->getTraceModelException(
-                            'Не возможно снять блокировку с ключа `%s` пока вложенные блокировки еще заняты',
+                            'Неправильная последовательность вызовов с ключем `%s`',
                             $hashKey->getTrace()
                         );
                     }
