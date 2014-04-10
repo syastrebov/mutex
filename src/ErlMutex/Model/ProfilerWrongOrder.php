@@ -52,9 +52,9 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      * @param string $key
      * @throws ProfilerException
      */
-    public function addContainsKey($key)
+    public function addContainKey($key)
     {
-        parent::addContainsKey($key);
+        parent::addContainKey($key);
 
         if (!in_array($key, $this->_canContains)) {
             $this->_canContains[] = $key;
@@ -66,7 +66,7 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      *
      * @return array
      */
-    public function getCanContains()
+    public function getCanContainKeys()
     {
         return $this->_canContains;
     }
@@ -77,7 +77,7 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      * @param string $key
      * @return bool
      */
-    public function hasCanContainsKey($key)
+    public function сanContainKey($key)
     {
         return in_array($key, $this->_canContains);
     }

@@ -480,7 +480,7 @@ class Profiler
                         /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
                         if ($otherKeyCrossOrderModel->isAcquired()) {
                             if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
-                                $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
+                                $otherKeyCrossOrderModel->addContainKey($trace->getKey());
                             }
                         }
                     }
@@ -489,7 +489,7 @@ class Profiler
                 case Mutex::ACTION_RELEASE:
                     $keyCrossOrderModel->release();
 
-                    if ($keyCrossOrderModel->hasContainsKeys()) {
+                    if ($keyCrossOrderModel->hasContainKeys()) {
                         throw $this->getTraceModelException(
                             'Не возможно снять блокировку с ключа `%s` пока вложенные блокировки еще заняты',
                             $trace
@@ -498,7 +498,7 @@ class Profiler
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerCrossOrder $otherKeyCrossOrderModel */
-                        $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
+                        $otherKeyCrossOrderModel->removeContainKey($trace->getKey());
                     }
 
                     break;
@@ -539,11 +539,11 @@ class Profiler
         }
         foreach ($keys as $hashKey) {
             /** @var ProfilerWrongOrder $hashKey */
-            foreach ($hashKey->getCanContains() as $containsKeyName) {
+            foreach ($hashKey->getCanContainKeys() as $containsKeyName) {
                 foreach ($keys as $compareHashKey) {
                     /** @var ProfilerWrongOrder $compareHashKey */
                     if ($compareHashKey->getKey() === $containsKeyName) {
-                        if ($compareHashKey->hasCanContainsKey($hashKey->getKey())) {
+                        if ($compareHashKey->сanContainKey($hashKey->getKey())) {
                             throw $this->getTraceModelException(
                                 'Неправильная последовательность вызовов с ключем `%s`',
                                 $hashKey->getTrace()
@@ -579,7 +579,7 @@ class Profiler
                         /** @var ProfilerWrongOrder $otherKeyCrossOrderModel */
                         if ($otherKeyCrossOrderModel->isAcquired()) {
                             if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
-                                $otherKeyCrossOrderModel->addContainsKey($trace->getKey());
+                                $otherKeyCrossOrderModel->addContainKey($trace->getKey());
                             }
                         }
                     }
@@ -590,7 +590,7 @@ class Profiler
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerWrongOrder $otherKeyCrossOrderModel */
-                        $otherKeyCrossOrderModel->removeContainsKey($trace->getKey());
+                        $otherKeyCrossOrderModel->removeContainKey($trace->getKey());
                     }
 
                     break;

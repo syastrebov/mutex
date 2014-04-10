@@ -68,7 +68,7 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testContainsKeyAlreadyExists()
     {
-        $this->_profilerCrossOrderModel->addContainsKey('A');
-        $this->_profilerCrossOrderModel->addContainsKey('A');
+        $this->_profilerCrossOrderModel->addContainKey('A');
+        $this->_profilerCrossOrderModel->addContainKey('A');
     }
 }

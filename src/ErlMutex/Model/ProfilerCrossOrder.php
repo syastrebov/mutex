@@ -101,7 +101,7 @@ class ProfilerCrossOrder
      * @param string $key
      * @return bool
      */
-    public function containKeys($key)
+    public function hasContainKey($key)
     {
         return in_array($key, $this->_containKeys);
     }
@@ -111,7 +111,7 @@ class ProfilerCrossOrder
      *
      * @return bool
      */
-    public function hasContainsKeys()
+    public function hasContainKeys()
     {
         return !empty($this->_containKeys);
     }
@@ -122,9 +122,9 @@ class ProfilerCrossOrder
      * @param string $key
      * @throws ProfilerException
      */
-    public function addContainsKey($key)
+    public function addContainKey($key)
     {
-        if ($this->containKeys($key)) {
+        if ($this->hasContainKey($key)) {
             throw new ProfilerException(sprintf('Модель уже содержит ключ `%s`', $key));
         }
 
@@ -136,7 +136,7 @@ class ProfilerCrossOrder
      *
      * @param string $key
      */
-    public function removeContainsKey($key)
+    public function removeContainKey($key)
     {
         foreach ($this->_containKeys as $num => $containsKey) {
             if ($key === $containsKey) {
