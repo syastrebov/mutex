@@ -543,7 +543,7 @@ class Profiler
                 foreach ($keys as $compareHashKey) {
                     /** @var ProfilerWrongOrder $compareHashKey */
                     if ($compareHashKey->getKey() === $containsKeyName) {
-                        if ($compareHashKey->сanContainKey($hashKey->getKey())) {
+                        if ($compareHashKey->canContainKey($hashKey->getKey())) {
                             throw $this->getTraceModelException(
                                 'Неправильная последовательность вызовов с ключем `%s`',
                                 $hashKey->getTrace()

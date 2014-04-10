@@ -77,7 +77,7 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      * @param string $key
      * @return bool
      */
-    public function сanContainKey($key)
+    public function canContainKey($key)
     {
         return in_array($key, $this->_canContains);
     }
