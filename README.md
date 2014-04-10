@@ -44,6 +44,7 @@ PHP-Erlang Mutex
         "require": {
             "php": ">=5.2.4",
             "twig/twig": "1.*",
+            "leafo/lessphp": "0.4.0",
             "erl/mutex": "0.1.0"
         },
         "repositories": [{
@@ -58,7 +59,7 @@ PHP-Erlang Mutex
                 },
                 "autoload": {
                     "psr-0": {
-                        "ErlMutex\\": "src/ErlMutex"
+                        "ErlMutex\\": "src"
                     }
                 }
             }

@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-0": {
-            "ErlMutex\\": "src/ErlMutex"
+            "ErlMutex\\": "src"
         }
     }
 }
