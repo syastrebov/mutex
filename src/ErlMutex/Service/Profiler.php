@@ -539,7 +539,7 @@ class Profiler
         }
         foreach ($keys as $hashKey) {
             /** @var ProfilerWrongOrder $hashKey */
-            foreach ($hashKey->getCanContainKeys() as $containsKeyName) {
+            foreach ($hashKey->canContainKeys() as $containsKeyName) {
                 foreach ($keys as $compareHashKey) {
                     /** @var ProfilerWrongOrder $compareHashKey */
                     if ($compareHashKey->getKey() === $containsKeyName) {
