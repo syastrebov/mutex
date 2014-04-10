@@ -439,7 +439,7 @@ class Profiler
     /**
      * Проверка перехлестных вызовов блокировок
      *
-     * Например:
+     * Исключение ситуаций типа:
      *  - get A
      *  - get B
      *  - acquire A
@@ -509,6 +509,51 @@ class Profiler
     }
 
     /**
+     * Проверка правильного вызова ключей
+     *
+     * Исключение ситуаций типа:
+     *
+     * <A>
+     *  <B>
+     *  <B>
+     * </A>
+     *
+     * <B>
+     *  <A>
+     *  </A>
+     * </B>
+     *
+     * @param array $hashWrongList
+     * @throws Exception
+     */
+    private function validateWrongKeysOrder(array $hashWrongList)
+    {
+        $keys = array();
+        foreach ($hashWrongList as $wrongOrderHash) {
+            foreach ($wrongOrderHash as $wrongOrderModel) {
+                /** @var ProfilerWrongOrder $wrongOrderModel */
+                $keys[] = $wrongOrderModel;
+            }
+        }
+        foreach ($keys as $hashKey) {
+            /** @var ProfilerWrongOrder $hashKey */
+            foreach ($hashKey->getCanContains() as $containsKeyName) {
+                foreach ($keys as $compareHashKey) {
+                    /** @var ProfilerWrongOrder $compareHashKey */
+                    if ($compareHashKey->getKey() === $containsKeyName) {
+                        if ($compareHashKey->hasCanContainsKey($hashKey->getKey())) {
+                            throw $this->getTraceModelException(
+                                'Неправильная последовательность вызовов с ключем `%s`',
+                                $hashKey->getTrace()
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Возвращает какие вложенные ключи может хранить в себе ключ
      *
      * @param array $mapHashList
@@ -553,39 +598,6 @@ class Profiler
         }
 
         return $acquired;
-    }
-
-    /**
-     * Проверка правильного вызова ключей
-     *
-     * @param array $hashWrongList
-     * @throws Exception
-     */
-    private function validateWrongKeysOrder(array $hashWrongList)
-    {
-        $keys = array();
-        foreach ($hashWrongList as $wrongOrderHash) {
-            foreach ($wrongOrderHash as $wrongOrderModel) {
-                /** @var ProfilerWrongOrder $wrongOrderModel */
-                $keys[] = $wrongOrderModel;
-            }
-        }
-        foreach ($keys as $hashKey) {
-            /** @var ProfilerWrongOrder $hashKey */
-            foreach ($hashKey->getCanContains() as $containsKeyName) {
-                foreach ($keys as $compareHashKey) {
-                    /** @var ProfilerWrongOrder $compareHashKey */
-                    if ($compareHashKey->getKey() === $containsKeyName) {
-                        if ($compareHashKey->hasCanContainsKey($hashKey->getKey())) {
-                            throw $this->getTraceModelException(
-                                'Неправильная последовательность вызовов с ключем `%s`',
-                                $hashKey->getTrace()
-                            );
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
