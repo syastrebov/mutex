@@ -269,8 +269,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->setStorage(ProfilerStorageDummy::getInstance());
 
         $mutex->get('A');
-        $mutex->acquire();
-        $mutex->acquire();
+        $mutex->acquire('A');
+        $mutex->acquire('A');
         $mutex->release();
 
         unset($mutex);
