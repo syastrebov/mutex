@@ -296,7 +296,7 @@ class Profiler
             foreach ($map as $requests) {
                 foreach ($requests as $hash => $traceHashList) {
                     $this->validateTraceHashList($traceHashList);
-                    $hashWrongList[$hash] = $this->validateWrongOrder($traceHashList);
+                    $hashWrongList[$hash] = $this->getWrongOrderCanContainsMap($traceHashList);
                 }
             }
 
@@ -509,12 +509,12 @@ class Profiler
     }
 
     /**
-     * Проверка правильной вложенности между хэшами
+     * Возвращает какие вложенные ключи может хранить в себе ключ
      *
      * @param array $mapHashList
      * @return array
      */
-    private function validateWrongOrder(array $mapHashList)
+    private function getWrongOrderCanContainsMap(array $mapHashList)
     {
         $acquired  = $this->getHashWrongOrderMap($mapHashList);
         $exception = null;
@@ -567,81 +567,25 @@ class Profiler
         foreach ($hashWrongList as $wrongOrderHash) {
             foreach ($wrongOrderHash as $wrongOrderModel) {
                 /** @var ProfilerWrongOrder $wrongOrderModel */
-                $keys[$wrongOrderModel->getKey()][] = $wrongOrderModel;
+                $keys[] = $wrongOrderModel;
             }
         }
-        foreach ($keys as $keysHashList) {
-            $containsTemplate = null;
-
+        foreach ($keys as $hashKey) {
             /** @var ProfilerWrongOrder $hashKey */
-            foreach ($keysHashList as $hashKey) {
-                if (!isset($containsTemplate)) {
-                    $canContains = $hashKey->getCanContains();
-                    if (!empty($canContains)) {
-                        $containsTemplate = $canContains;
-                    }
-                }
-            }
-            if (isset($containsTemplate) && is_array($containsTemplate)) {
-                foreach ($keysHashList as $hashKey) {
-                    if (!$this->validateWrongKeyOrder($hashKey, $containsTemplate)) {
-                        throw $this->getTraceModelException(
-                            'Неправильная последовательность вызовов с ключем `%s`',
-                            $hashKey->getTrace()
-                        );
+            foreach ($hashKey->getCanContains() as $containsKeyName) {
+                foreach ($keys as $compareHashKey) {
+                    /** @var ProfilerWrongOrder $compareHashKey */
+                    if ($compareHashKey->getKey() === $containsKeyName) {
+                        if ($compareHashKey->hasCanContainsKey($hashKey->getKey())) {
+                            throw $this->getTraceModelException(
+                                'Неправильная последовательность вызовов с ключем `%s`',
+                                $hashKey->getTrace()
+                            );
+                        }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Сравнение вложенности ключа хеша с шаблоном
-     *
-     * @param ProfilerWrongOrder $hashKey
-     * @param array              $containsTemplate
-     *
-     * @return bool
-     */
-    private function validateWrongKeyOrder(ProfilerWrongOrder $hashKey, array $containsTemplate)
-    {
-        if (!empty($containsTemplate)) {
-            $canContains = $hashKey->getCanContains();
-            if (!empty($canContains)) {
-                if (count($containsTemplate) >= count($hashKey->getCanContains())) {
-                    return $this->validateContainsTemplate($containsTemplate, $hashKey->getCanContains());
-                } else {
-                    return $this->validateContainsTemplate($hashKey->getCanContains(), $containsTemplate);
-                }
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Сравнение входил ли один массив в другой
-     *
-     * @param array $template
-     * @param array $contains
-     *
-     * @return bool
-     */
-    private function validateContainsTemplate(array $template, array $contains)
-    {
-        for ($i = 0; $i < count($template); $i++) {
-            if (($i + count($contains)) <= count($template)) {
-                $needle = array_slice($template, $i, count($contains));
-
-                if ($needle === $contains) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

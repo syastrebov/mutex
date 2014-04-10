@@ -72,6 +72,17 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
     }
 
     /**
+     * Этот ключ может быть вложенным
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function hasCanContainsKey($key)
+    {
+        return in_array($key, $this->_canContains);
+    }
+
+    /**
      * Связанная модель лога
      *
      * @return ProfilerStackModel
