@@ -23,7 +23,7 @@ class ProfilerException extends \Exception
     /**
      * @var ProfilerStackModel
      */
-    private $_profilerStackModel;
+    private $profilerStackModel;
 
     /**
      * @param ProfilerStackModel $profilerStackModel
@@ -31,7 +31,7 @@ class ProfilerException extends \Exception
      */
     public function setProfilerStackModel(ProfilerStackModel $profilerStackModel)
     {
-        $this->_profilerStackModel = $profilerStackModel;
+        $this->profilerStackModel = $profilerStackModel;
         return $this;
     }
 
@@ -40,6 +40,6 @@ class ProfilerException extends \Exception
      */
     public function getProfilerStackModel()
     {
-        return $this->_profilerStackModel;
+        return $this->profilerStackModel;
     }
 }

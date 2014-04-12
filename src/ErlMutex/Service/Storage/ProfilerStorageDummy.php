@@ -27,12 +27,12 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
     /**
      * @var ProfilerStorageDummy
      */
-    private static $_instance = null;
+    private static $instance = null;
 
     /**
      * @var array
      */
-    private $_stack = array();
+    private $stack = array();
 
     /**
      * Constructor
@@ -54,11 +54,11 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
      */
     public static function getInstance()
     {
-        if (!self::$_instance) {
-            self::$_instance = new ProfilerStorageDummy();
+        if (!self::$instance) {
+            self::$instance = new ProfilerStorageDummy();
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
@@ -68,7 +68,7 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
      */
     public function truncate()
     {
-        $this->_stack = array();
+        $this->stack = array();
     }
 
     /**
@@ -79,7 +79,7 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
      */
     public function insert(ProfilerStackModel $model)
     {
-        $this->_stack[] = $model;
+        $this->stack[] = $model;
     }
 
     /**
@@ -89,6 +89,6 @@ class ProfilerStorageDummy implements ProfilerStorageInterface
      */
     public function getList()
     {
-        return $this->_stack;
+        return $this->stack;
     }
 } 

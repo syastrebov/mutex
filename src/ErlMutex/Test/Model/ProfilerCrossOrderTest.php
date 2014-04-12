@@ -22,14 +22,14 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ProfilerCrossOrder
      */
-    private $_profilerCrossOrderModel;
+    private $profilerCrossOrderModel;
 
     /**
      *
      */
     public function setUp()
     {
-        $this->_profilerCrossOrderModel = new ProfilerCrossOrder(__CLASS__);
+        $this->profilerCrossOrderModel = new ProfilerCrossOrder(__CLASS__);
     }
 
     /**
@@ -37,7 +37,7 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        $this->_profilerCrossOrderModel = null;
+        $this->profilerCrossOrderModel = null;
     }
 
     /**
@@ -47,8 +47,8 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAlreadyAcquired()
     {
-        $this->_profilerCrossOrderModel->acquire();
-        $this->_profilerCrossOrderModel->acquire();
+        $this->profilerCrossOrderModel->acquire();
+        $this->profilerCrossOrderModel->acquire();
     }
 
     /**
@@ -58,7 +58,7 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReleaseNotAcquired()
     {
-        $this->_profilerCrossOrderModel->release();
+        $this->profilerCrossOrderModel->release();
     }
 
     /**
@@ -68,7 +68,7 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testContainsKeyAlreadyExists()
     {
-        $this->_profilerCrossOrderModel->addContainKey('A');
-        $this->_profilerCrossOrderModel->addContainKey('A');
+        $this->profilerCrossOrderModel->addContainKey('A');
+        $this->profilerCrossOrderModel->addContainKey('A');
     }
 }

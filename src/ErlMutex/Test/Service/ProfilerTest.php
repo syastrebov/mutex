@@ -28,14 +28,14 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Mutex
      */
-    private $_mutex;
+    private $mutex;
 
     /**
      * Закрывать соединение с сервисом после каждого теста
      */
     public function tearDown()
     {
-        $this->_mutex = null;
+        $this->mutex = null;
     }
 
     /**
@@ -43,15 +43,15 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetProfiler()
     {
-        $this->_mutex = new Mutex();
-        $this->_mutex->establishConnection();
+        $this->mutex = new Mutex();
+        $this->mutex->establishConnection();
 
-        $this->assertNotNull($this->_mutex->get('A'));
-        $this->_mutex->acquire();
-        $this->_mutex->release();
+        $this->assertNotNull($this->mutex->get('A'));
+        $this->mutex->acquire();
+        $this->mutex->release();
 
         $this->assertTrue(
-            $this->_mutex
+            $this->mutex
                 ->setProfiler(new Profiler(__FUNCTION__))
                 ->getProfiler()
             instanceof Profiler
@@ -74,16 +74,16 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDump()
     {
-        $this->_mutex = new Mutex();
-        $this->_mutex
+        $this->mutex = new Mutex();
+        $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
-        $this->assertNotNull($this->_mutex->get('A'));
-        $this->_mutex->acquire();
-        $this->_mutex->release();
+        $this->assertNotNull($this->mutex->get('A'));
+        $this->mutex->acquire();
+        $this->mutex->release();
 
-        $this->_mutex->getProfiler()->dump();
+        $this->mutex->getProfiler()->dump();
     }
 
     /**
@@ -91,17 +91,17 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSave()
     {
-        $this->_mutex = new Mutex();
-        $this->_mutex
+        $this->mutex = new Mutex();
+        $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection()
             ->getProfiler()
             ->setStorage(ProfilerStorageDummy::getInstance())
             ->getStorage();
 
-        $this->assertNotNull($this->_mutex->get('A'));
-        $this->_mutex->acquire();
-        $this->_mutex->release();
+        $this->assertNotNull($this->mutex->get('A'));
+        $this->mutex->acquire();
+        $this->mutex->release();
     }
 
     /**

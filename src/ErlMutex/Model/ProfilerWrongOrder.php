@@ -26,14 +26,14 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
     /**
      * @var ProfilerStackModel
      */
-    private $_trace;
+    private $trace;
 
     /**
      * Доступные вложенные ключи
      *
      * @var array
      */
-    private $_canContains = array();
+    private $canContains = array();
 
     /**
      * Constructor
@@ -43,7 +43,7 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
     public function __construct(ProfilerStackModel $trace)
     {
         parent::__construct($trace->getKey());
-        $this->_trace = $trace;
+        $this->trace = $trace;
     }
 
     /**
@@ -56,8 +56,8 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
     {
         parent::addContainKey($key);
 
-        if (!in_array($key, $this->_canContains)) {
-            $this->_canContains[] = $key;
+        if (!in_array($key, $this->canContains)) {
+            $this->canContains[] = $key;
         }
     }
 
@@ -68,7 +68,7 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      */
     public function canContainKeys()
     {
-        return $this->_canContains;
+        return $this->canContains;
     }
 
     /**
@@ -79,7 +79,7 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      */
     public function canContainKey($key)
     {
-        return in_array($key, $this->_canContains);
+        return in_array($key, $this->canContains);
     }
 
     /**
@@ -89,6 +89,6 @@ class ProfilerWrongOrder extends ProfilerCrossOrder
      */
     public function getTrace()
     {
-        return $this->_trace;
+        return $this->trace;
     }
 }

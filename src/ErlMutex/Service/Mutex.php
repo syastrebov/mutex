@@ -33,32 +33,32 @@ class Mutex
     /**
      * @var string
      */
-    private $_hostname;
+    private $hostname;
 
     /**
      * @var int
      */
-    private $_port;
+    private $port;
 
     /**
      * @var resource
      */
-    private $_socket;
+    private $socket;
 
     /**
      * @var string
      */
-    private $_name;
+    private $name;
 
     /**
      * @var Profiler
      */
-    private $_profiler;
+    private $profiler;
 
     /**
      * @var LoggerInterface
      */
-    private $_logger;
+    private $logger;
 
     /**
      * Constructor
@@ -70,8 +70,8 @@ class Mutex
      */
     public function __construct($hostname=self::DEFAULT_HOST, $port=self::DEFAULT_PORT)
     {
-        $this->_hostname = $hostname;
-        $this->_port     = $port;
+        $this->hostname = $hostname;
+        $this->port     = $port;
     }
 
     /**
@@ -82,7 +82,7 @@ class Mutex
      */
     public function setProfiler(Profiler $profiler)
     {
-        $this->_profiler = $profiler;
+        $this->profiler = $profiler;
         return $this;
     }
 
@@ -93,7 +93,7 @@ class Mutex
      */
     public function getProfiler()
     {
-        return $this->_profiler;
+        return $this->profiler;
     }
 
     /**
@@ -104,7 +104,7 @@ class Mutex
      */
     public function setLogger(LoggerInterface $logger)
     {
-        $this->_logger = $logger;
+        $this->logger = $logger;
         return $this;
     }
 
@@ -115,7 +115,7 @@ class Mutex
      */
     public function isAlive()
     {
-        return $this->_socket && !feof($this->_socket);
+        return $this->socket && !feof($this->socket);
     }
 
     /**
@@ -126,13 +126,13 @@ class Mutex
      */
     public function establishConnection()
     {
-        $this->_socket = @fsockopen($this->_hostname, $this->_port, $errno, $errstr);
-        if (!$this->_socket) {
+        $this->socket = @fsockopen($this->hostname, $this->port, $errno, $errstr);
+        if (!$this->socket) {
             if ($errno === 0) {
                 throw new Exception(sprintf('%s', $errstr));
             }
-            if ($this->_logger) {
-                $this->_logger->insert(sprintf('%s (%s)', $errstr, $errno));
+            if ($this->logger) {
+                $this->logger->insert(sprintf('%s (%s)', $errstr, $errno));
             }
         }
 
@@ -144,11 +144,11 @@ class Mutex
      */
     public function closeConnection()
     {
-        if ($this->_socket) {
-            @fclose($this->_socket);
+        if ($this->socket) {
+            @fclose($this->socket);
         }
 
-        $this->_socket = null;
+        $this->socket = null;
     }
 
     /**
@@ -162,7 +162,7 @@ class Mutex
      */
     public function get($name, $timeout=false)
     {
-        $this->_name = null;
+        $this->name = null;
 
         if ((!is_int($name) && !is_string($name)) || strlen($name) == 0 || $name === null) {
             throw new Exception('Недопустимое имя блокировки.');
@@ -177,10 +177,10 @@ class Mutex
             'timeout' => $timeout,
         ));
 
-        $this->_name = $this->receive();
-        $this->log($name, $this->_name, debug_backtrace());
+        $this->name = $this->receive();
+        $this->log($name, $this->name, debug_backtrace());
 
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -191,7 +191,7 @@ class Mutex
      */
     public function acquire($name=null)
     {
-        $name = $name ? : $this->_name;
+        $name = $name ? : $this->name;
         if ($name) {
             while (true) {
                 $this->send(array('cmd' => self::ACTION_ACQUIRE, 'name' => $name));
@@ -222,7 +222,7 @@ class Mutex
      */
     public function release($name=null)
     {
-        $name = $name ? : $this->_name;
+        $name = $name ? : $this->name;
         if ($name) {
             $this->send(array('cmd' => self::ACTION_RELEASE, 'name' => $name));
             $response = $this->receive();
@@ -246,8 +246,8 @@ class Mutex
      */
     public function log($key, $response, $stackTrace)
     {
-        if ($this->_profiler) {
-            $this->_profiler->log($key, $response, $stackTrace);
+        if ($this->profiler) {
+            $this->profiler->log($key, $response, $stackTrace);
         }
     }
 
@@ -268,7 +268,7 @@ class Mutex
     private function send(array $data)
     {
         if ($this->isAlive()) {
-            @fwrite($this->_socket, json_encode($data));
+            @fwrite($this->socket, json_encode($data));
             return true;
         }
 
@@ -283,7 +283,7 @@ class Mutex
     private function receive()
     {
         $input = '';
-        while (false !== ($char = @fgetc($this->_socket))) {
+        while (false !== ($char = @fgetc($this->socket))) {
             if ($char === "\000") {
                 return $input;
             } else {

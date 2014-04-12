@@ -25,14 +25,14 @@ class ProfilerStorageDummyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Mutex
      */
-    private $_mutex;
+    private $mutex;
 
     /**
      * Закрывать соединение с сервисом после каждого теста
      */
     public function tearDown()
     {
-        $this->_mutex = null;
+        $this->mutex = null;
     }
 
     /**
@@ -40,15 +40,15 @@ class ProfilerStorageDummyTest extends \PHPUnit_Framework_TestCase
      */
     public function testTruncate()
     {
-        $this->_mutex = new Mutex();
-        $this->_mutex
+        $this->mutex = new Mutex();
+        $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->getProfiler()
             ->setStorage(ProfilerStorageDummy::getInstance());
 
-        $this->_mutex->get('A');
-        $this->_mutex->acquire();
-        $this->_mutex->release();
+        $this->mutex->get('A');
+        $this->mutex->acquire();
+        $this->mutex->release();
 
         $storage = ProfilerStorageDummy::getInstance();
         $this->assertGreaterThan(0, count($storage->getList()));

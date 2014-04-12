@@ -25,17 +25,17 @@ class ProfilerCrossOrder
     /**
      * @var string
      */
-    private $_key;
+    private $key;
 
     /**
      * @var bool
      */
-    private $_acquired = false;
+    private $acquired = false;
 
     /**
      * @var array
      */
-    private $_containKeys = array();
+    private $containKeys = array();
 
     /**
      * Constructor
@@ -44,7 +44,7 @@ class ProfilerCrossOrder
      */
     public function __construct($key)
     {
-        $this->_key = $key;
+        $this->key = $key;
     }
 
     /**
@@ -54,7 +54,7 @@ class ProfilerCrossOrder
      */
     public function getKey()
     {
-        return $this->_key;
+        return $this->key;
     }
 
     /**
@@ -64,7 +64,7 @@ class ProfilerCrossOrder
      */
     public function isAcquired()
     {
-        return $this->_acquired;
+        return $this->acquired;
     }
 
     /**
@@ -74,11 +74,11 @@ class ProfilerCrossOrder
      */
     public function acquire()
     {
-        if ($this->_acquired) {
-            throw new ProfilerException(sprintf('Модель `%s` уже заблокирована', $this->_key));
+        if ($this->acquired) {
+            throw new ProfilerException(sprintf('Модель `%s` уже заблокирована', $this->key));
         }
 
-        $this->_acquired = true;
+        $this->acquired = true;
     }
 
     /**
@@ -88,11 +88,11 @@ class ProfilerCrossOrder
      */
     public function release()
     {
-        if (!$this->_acquired) {
-            throw new ProfilerException(sprintf('Модель `%s` не была заблокирована', $this->_key));
+        if (!$this->acquired) {
+            throw new ProfilerException(sprintf('Модель `%s` не была заблокирована', $this->key));
         }
 
-        $this->_acquired = false;
+        $this->acquired = false;
     }
 
     /**
@@ -103,7 +103,7 @@ class ProfilerCrossOrder
      */
     public function hasContainKey($key)
     {
-        return in_array($key, $this->_containKeys);
+        return in_array($key, $this->containKeys);
     }
 
     /**
@@ -113,7 +113,7 @@ class ProfilerCrossOrder
      */
     public function hasContainKeys()
     {
-        return !empty($this->_containKeys);
+        return !empty($this->containKeys);
     }
 
     /**
@@ -128,7 +128,7 @@ class ProfilerCrossOrder
             throw new ProfilerException(sprintf('Модель уже содержит ключ `%s`', $key));
         }
 
-        $this->_containKeys[] = $key;
+        $this->containKeys[] = $key;
     }
 
     /**
@@ -138,9 +138,9 @@ class ProfilerCrossOrder
      */
     public function removeContainKey($key)
     {
-        foreach ($this->_containKeys as $num => $containsKey) {
+        foreach ($this->containKeys as $num => $containsKey) {
             if ($key === $containsKey) {
-                unset($this->_containKeys[$num]);
+                unset($this->containKeys[$num]);
             }
         }
     }

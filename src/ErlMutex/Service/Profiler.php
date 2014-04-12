@@ -36,33 +36,33 @@ class Profiler
      *
      * @var DateTime
      */
-    private $_initDateTime;
+    private $initDateTime;
 
     /**
      * Запрашиваемый адрес (точка входа)
      *
      * @var string
      */
-    private $_requestUri;
+    private $requestUri;
 
     /**
      * Стек вызова блокировок
      *
      * @var array
      */
-    private $_stack = array();
+    private $stack = array();
 
     /**
      * Хранилище истории блокировок
      *
      * @var ProfilerStorageInterface
      */
-    private $_storage;
+    private $storage;
 
     /**
      * @var string
      */
-    private $_mapOutputLocation;
+    private $mapOutputLocation;
 
     /**
      * Constructor
@@ -76,8 +76,8 @@ class Profiler
             throw new Exception('Недопустимый request uri');
         }
 
-        $this->_requestUri   = $requestUri;
-        $this->_initDateTime = new DateTime();
+        $this->requestUri   = $requestUri;
+        $this->initDateTime = new DateTime();
     }
 
     /**
@@ -87,7 +87,7 @@ class Profiler
      */
     public function getRequestUri()
     {
-        return $this->_requestUri;
+        return $this->requestUri;
     }
 
     /**
@@ -98,7 +98,7 @@ class Profiler
      */
     public function getRequestHash()
     {
-        return md5($this->getRequestUri() . $this->_initDateTime->format('Y.m.d H:i:s'));
+        return md5($this->getRequestUri() . $this->initDateTime->format('Y.m.d H:i:s'));
     }
 
     /**
@@ -110,7 +110,7 @@ class Profiler
      */
     public function setStorage(ProfilerStorageInterface $storage)
     {
-        $this->_storage = $storage;
+        $this->storage = $storage;
         return $this;
     }
 
@@ -122,7 +122,7 @@ class Profiler
      */
     public function getStorage()
     {
-        return $this->_storage;
+        return $this->storage;
     }
 
     /**
@@ -134,7 +134,7 @@ class Profiler
      */
     public function setMapOutputLocation($mapOutputLocation)
     {
-        $this->_mapOutputLocation = $mapOutputLocation;
+        $this->mapOutputLocation = $mapOutputLocation;
         if (!is_dir($mapOutputLocation)) {
             throw new Exception('Директория для генерации карты не найдена');
         }
@@ -177,9 +177,9 @@ class Profiler
         }
 
         if ($model instanceof ProfilerStackModel) {
-            $this->_stack[] = $model;
-            if ($this->_storage) {
-                $this->_storage->insert($model);
+            $this->stack[] = $model;
+            if ($this->storage) {
+                $this->storage->insert($model);
             }
         }
     }
@@ -190,7 +190,7 @@ class Profiler
      */
     public function dump()
     {
-        foreach ($this->_stack as $trace) {
+        foreach ($this->stack as $trace) {
             /** @var ProfilerStackModel $trace */
             self::debugMessage(
                 sprintf(
@@ -228,12 +228,12 @@ class Profiler
      */
     public function map($traceAsArray=false)
     {
-        if (!$this->_storage) {
+        if (!$this->storage) {
             throw new Exception('Не задано хранилище');
         }
 
         $map  = array();
-        $list = $this->_storage->getList();
+        $list = $this->storage->getList();
 
         foreach ($list as $trace) {
             /** @var ProfilerStackModel $trace */
@@ -252,7 +252,7 @@ class Profiler
      */
     public function generateHtmlMapOutput()
     {
-        if (!$this->_mapOutputLocation) {
+        if (!$this->mapOutputLocation) {
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
@@ -266,7 +266,7 @@ class Profiler
             'error'   => $this->validateMap(),
         ));
 
-        file_put_contents($this->_mapOutputLocation . '/profiler_map.html', $output);
+        file_put_contents($this->mapOutputLocation . '/profiler_map.html', $output);
     }
 
     /**

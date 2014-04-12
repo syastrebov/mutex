@@ -27,75 +27,75 @@ class ProfilerStack
      *
      * @var string
      */
-    private $_requestUri;
+    private $requestUri;
 
     /**
      * Уникальный хеш запроса
      *
      * @var string
      */
-    private $_requestHash;
+    private $requestHash;
 
     /**
      * Файл, в котором был вызван мьютекс
      *
      * @var string
      */
-    private $_filename;
+    private $filename;
 
     /**
      * Строка, на которой вызван мьютекс
      *
      * @var int
      */
-    private $_line;
+    private $line;
 
     /**
      * Класс вызова
      *
      * @var string
      */
-    private $_class;
+    private $class;
 
     /**
      * Метод класса вызова
      *
      * @var string
      */
-    private $_method;
+    private $method;
 
     /**
      * Запрашиваемая команда
      *
      * @var string
      */
-    private $_action;
+    private $action;
 
     /**
      * Имя указателя блокировки
      *
      * @var string
      */
-    private $_key;
+    private $key;
 
     /**
      * Возвращенный сервисом ответ
      *
      * @var mixed
      */
-    private $_response;
+    private $response;
 
     /**
      * Время вызова
      *
      * @var DateTime
      */
-    private $_dateTime;
+    private $dateTime;
 
     /**
      * @var null|string
      */
-    private $_stackTrace;
+    private $stackTrace;
 
     /**
      * Constructor
@@ -125,17 +125,17 @@ class ProfilerStack
         DateTime $dateTime,
         $stackTrace=null
     ) {
-        $this->_requestUri  = $requestUri;
-        $this->_requestHash = $requestHash;
-        $this->_filename    = $filename;
-        $this->_class       = $class;
-        $this->_method      = $method;
-        $this->_line        = $line;
-        $this->_key         = $key;
-        $this->_action      = $action;
-        $this->_response    = $response;
-        $this->_dateTime    = $dateTime;
-        $this->_stackTrace  = $stackTrace;
+        $this->requestUri  = $requestUri;
+        $this->requestHash = $requestHash;
+        $this->filename    = $filename;
+        $this->class       = $class;
+        $this->method      = $method;
+        $this->line        = $line;
+        $this->key         = $key;
+        $this->action      = $action;
+        $this->response    = $response;
+        $this->dateTime    = $dateTime;
+        $this->stackTrace  = $stackTrace;
     }
 
     /**
@@ -145,7 +145,7 @@ class ProfilerStack
      */
     public function getRequestUri()
     {
-        return $this->_requestUri;
+        return $this->requestUri;
     }
 
     /**
@@ -155,7 +155,7 @@ class ProfilerStack
      */
     public function getRequestHash()
     {
-        return $this->_requestHash;
+        return $this->requestHash;
     }
 
     /**
@@ -165,7 +165,7 @@ class ProfilerStack
      */
     public function getFile()
     {
-        return $this->_filename;
+        return $this->filename;
     }
 
     /**
@@ -175,7 +175,7 @@ class ProfilerStack
      */
     public function getLine()
     {
-        return $this->_line;
+        return $this->line;
     }
 
     /**
@@ -185,7 +185,7 @@ class ProfilerStack
      */
     public function getClass()
     {
-        return $this->_class;
+        return $this->class;
     }
 
     /**
@@ -195,7 +195,7 @@ class ProfilerStack
      */
     public function getMethod()
     {
-        return $this->_method;
+        return $this->method;
     }
 
     /**
@@ -205,7 +205,7 @@ class ProfilerStack
      */
     public function getKey()
     {
-        return $this->_key;
+        return $this->key;
     }
 
     /**
@@ -215,7 +215,7 @@ class ProfilerStack
      */
     public function getAction()
     {
-        return $this->_action;
+        return $this->action;
     }
 
     /**
@@ -225,7 +225,7 @@ class ProfilerStack
      */
     public function getResponse()
     {
-        return $this->_response;
+        return $this->response;
     }
 
     /**
@@ -235,7 +235,7 @@ class ProfilerStack
      */
     public function getDateTime()
     {
-        return clone $this->_dateTime;
+        return clone $this->dateTime;
     }
 
     /**
@@ -245,7 +245,7 @@ class ProfilerStack
      */
     public function getDateTimeFormat()
     {
-        return $this->_dateTime->format('Y.m.d H:i:s');
+        return $this->dateTime->format('Y.m.d H:i:s');
     }
 
     /**
@@ -256,15 +256,15 @@ class ProfilerStack
     public function asArray()
     {
         return array(
-            'requestUri'  => $this->_requestUri,
-            'requestHash' => $this->_requestHash,
-            'filename'    => $this->_filename,
-            'class'       => $this->_class,
-            'method'      => $this->_method,
-            'line'        => $this->_line,
-            'key'         => $this->_key,
-            'action'      => $this->_action,
-            'response'    => $this->_response,
+            'requestUri'  => $this->requestUri,
+            'requestHash' => $this->requestHash,
+            'filename'    => $this->filename,
+            'class'       => $this->class,
+            'method'      => $this->method,
+            'line'        => $this->line,
+            'key'         => $this->key,
+            'action'      => $this->action,
+            'response'    => $this->response,
             'dateTime'    => $this->getDateTimeFormat(),
         );
     }
