@@ -193,11 +193,10 @@ class Mutex
     {
         $name = $name ? : $this->name;
         if ($name) {
+            $response = null;
             while (true) {
                 $this->send(array('cmd' => self::ACTION_ACQUIRE, 'name' => $name));
                 $response = $this->receive();
-                $this->log($name, $response, debug_backtrace());
-
                 if ($response == 'busy') {
                     usleep(10000);
                 } else {
@@ -205,6 +204,7 @@ class Mutex
                 }
             }
 
+            $this->log($name, $response, debug_backtrace());
             return true;
 
         } else {
