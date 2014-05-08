@@ -191,7 +191,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public static function createOutputDirIfNotExist($testClassName, $testMethodName)
     {
-        $testSuiteDir = __DIR__ . ProfilerTest::OUTPUT_DIR . $testClassName;
+        $testSuiteDir = __DIR__ . ProfilerTest::OUTPUT_DIR . str_replace('\\', '', $testClassName);
         $testCaseDir  = $testSuiteDir . '/' . $testMethodName;
 
         if (!is_dir($testSuiteDir)) {
