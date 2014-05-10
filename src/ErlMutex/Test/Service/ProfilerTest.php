@@ -237,6 +237,6 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     public static function getMapOutputLocationPath($testClassName, $testMethodName)
     {
         $testSuiteDir = self::getTestSuiteOutputDirPath($testClassName);
-        return __DIR__ . self::OUTPUT_DIR . self::getTestCaseOutputDirPath($testSuiteDir, $testMethodName);
+        return self::getTestCaseOutputDirPath($testSuiteDir, $testMethodName);
     }
 }
