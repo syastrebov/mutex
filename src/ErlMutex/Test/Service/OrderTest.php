@@ -74,7 +74,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -108,7 +108,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -159,7 +159,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -193,7 +193,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -222,7 +222,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -249,7 +249,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -278,7 +278,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 
@@ -305,7 +305,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler('');
         $profiler
             ->setStorage(ProfilerStorageDummy::getInstance())
-            ->setMapOutputLocation(__DIR__ . ProfilerTest::OUTPUT_DIR . __CLASS__ . '/' . __FUNCTION__)
+            ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
     }
 

@@ -191,8 +191,8 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public static function createOutputDirIfNotExist($testClassName, $testMethodName)
     {
-        $testSuiteDir = __DIR__ . ProfilerTest::OUTPUT_DIR . str_replace('\\', '', $testClassName);
-        $testCaseDir  = $testSuiteDir . '/' . $testMethodName;
+        $testSuiteDir = self::getTestSuiteOutputDirPath($testClassName);
+        $testCaseDir  = self::getTestCaseOutputDirPath($testSuiteDir, $testMethodName);
 
         if (!is_dir($testSuiteDir)) {
             @mkdir($testSuiteDir) or die('Не удалось создать директорию ' . $testSuiteDir);
@@ -200,5 +200,43 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         if (!is_dir($testCaseDir)) {
             @mkdir($testCaseDir) or die('Не удалось создать директорию ' . $testCaseDir);
         }
+    }
+
+    /**
+     * Путь к директории для для вывода карты профайлера для testSuite
+     *
+     * @param string $testClassName
+     * @return string
+     */
+    public static function getTestSuiteOutputDirPath($testClassName)
+    {
+        return __DIR__ . ProfilerTest::OUTPUT_DIR . str_replace('\\', '', $testClassName);
+    }
+
+    /**
+     * Путь к директории для для вывода карты профайлера для testCase
+     *
+     * @param string $testSuiteDirPath
+     * @param string $testMethodName
+     *
+     * @return string
+     */
+    public static function getTestCaseOutputDirPath($testSuiteDirPath, $testMethodName)
+    {
+        return $testSuiteDirPath . '/' . $testMethodName;
+    }
+
+    /**
+     * Путь к директории вывода карты профайлера
+     *
+     * @param string $testClassName
+     * @param string $testMethodName
+     *
+     * @return string
+     */
+    public static function getMapOutputLocationPath($testClassName, $testMethodName)
+    {
+        $testSuiteDir = self::getTestSuiteOutputDirPath($testClassName);
+        return __DIR__ . self::OUTPUT_DIR . self::getTestCaseOutputDirPath($testSuiteDir, $testMethodName);
     }
 }
