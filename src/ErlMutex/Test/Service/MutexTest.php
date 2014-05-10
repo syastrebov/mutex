@@ -132,7 +132,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->mutex = new Mutex();
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
-        $this->assertNull($this->mutex->get('A'));
+        $this->assertEquals('A', $this->mutex->get('A'));
         $this->assertTrue($this->mutex->release('A'));
 
         if (self::PROFILER_DUMP_ENABLED) {
@@ -167,13 +167,13 @@ class MutexTest extends \PHPUnit_Framework_TestCase
         $this->mutex = new Mutex();
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
-        $this->assertNull($this->mutex->get('A'));
-        $this->assertFalse($this->mutex->acquire());
-        $this->assertFalse($this->mutex->release());
+        $this->assertEquals('A', $this->mutex->get('A'));
+        $this->assertTrue($this->mutex->acquire());
+        $this->assertTrue($this->mutex->release());
 
-        $this->assertNull($this->mutex->get('A'));
-        $this->assertFalse($this->mutex->acquire());
-        $this->assertFalse($this->mutex->release());
+        $this->assertEquals('A', $this->mutex->get('A'));
+        $this->assertTrue($this->mutex->acquire());
+        $this->assertTrue($this->mutex->release());
 
         if (self::PROFILER_DUMP_ENABLED) {
             $this->mutex->getProfiler()->dump();

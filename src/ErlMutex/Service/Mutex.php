@@ -177,9 +177,10 @@ class Mutex
             'timeout' => $timeout,
         ));
 
-        $this->name = $this->receive();
-        $this->log($name, $this->name, debug_backtrace());
+        $response   = $this->receive();
+        $this->name = $name;
 
+        $this->log($name, $response, debug_backtrace());
         return $this->name;
     }
 
