@@ -60,6 +60,11 @@ class Profiler
     private $storage;
 
     /**
+     * @var Map
+     */
+    private $map;
+
+    /**
      * @var string
      */
     private $mapOutputLocation;
@@ -78,6 +83,7 @@ class Profiler
 
         $this->requestUri   = $requestUri;
         $this->initDateTime = new DateTime();
+        $this->map          = new Map();
     }
 
     /**
@@ -111,6 +117,8 @@ class Profiler
     public function setStorage(ProfilerStorageInterface $storage)
     {
         $this->storage = $storage;
+        $this->map->setStorage($storage);
+
         return $this;
     }
 
@@ -222,29 +230,12 @@ class Profiler
      *          * trace 2
      *          ...
      *
-     * @param bool $traceAsArray
      * @return array
      * @throws Exception
      */
-    public function map($traceAsArray=false)
+    public function map()
     {
-        if (!$this->storage) {
-            throw new Exception('Не задано хранилище');
-        }
-
-        $map  = array();
-        $list = $this->storage->getList();
-
-        foreach ($list as $trace) {
-            /** @var ProfilerStackModel $trace */
-            if (!isset($map[$trace->getRequestUri()][$trace->getRequestHash()])) {
-                $map[$trace->getRequestUri()][$trace->getRequestHash()] = array();
-            }
-
-            $map[$trace->getRequestUri()][$trace->getRequestHash()][] = $traceAsArray ? $trace->asArray() : $trace;
-        }
-
-        return $map;
+        return $this->map->getList();
     }
 
     /**
@@ -256,14 +247,14 @@ class Profiler
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
-        $map    = $this->map(true);
+        $map    = Map::unique($this->map->getList());
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
 
         $output = $twig->render('profiler_map.twig', array(
-            'map'     => $map,
+            'map'     => Map::toArray($map),
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
-            'error'   => $this->validateMap(),
+            'error'   => $this->validateMap($map),
         ));
 
         file_put_contents($this->mapOutputLocation . '/profiler_map.html', $output);
@@ -285,11 +276,11 @@ class Profiler
     /**
      * Проверка карты
      *
+     * @param array $map
      * @return null|array
      */
-    private function validateMap()
+    private function validateMap(array $map)
     {
-        $map = $this->map();
         $hashWrongList = array();
 
         try {
