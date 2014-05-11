@@ -232,6 +232,8 @@ class Profiler
      *
      * @return array
      * @throws Exception
+     *
+     * @todo Функция должна возвращать MapModel, MapService переделать в MapModel
      */
     public function map()
     {
