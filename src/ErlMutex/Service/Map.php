@@ -105,7 +105,7 @@ class Map
                 $traceListHash = md5(serialize(
                     self::traceHashListArrayUnsetDateTime(self::traceHashListToArray($traceHashList))
                 ));
-                
+
                 if (!in_array($traceListHash, $uniqueTraceHashList)) {
                     $uniqueTraceHashList[] = $traceListHash;
                 } else {
