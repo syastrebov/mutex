@@ -102,7 +102,10 @@ class Map
             $uniqueTraceHashList = array();
 
             foreach ($requests as $requestHash => &$traceHashList) {
-                $traceListHash = md5(serialize(self::traceHashListToArray($traceHashList)));
+                $traceListHash = md5(serialize(
+                    self::traceHashListArrayUnsetDateTime(self::traceHashListToArray($traceHashList))
+                ));
+                
                 if (!in_array($traceListHash, $uniqueTraceHashList)) {
                     $uniqueTraceHashList[] = $traceListHash;
                 } else {
@@ -129,6 +132,26 @@ class Map
             }
 
             $trace = $trace->asArray();
+        }
+
+        return $traceHashList;
+    }
+
+    /**
+     * Обнулить дату вызова блокировки (для проверки уникальности)
+     *
+     * @param array $traceHashList
+     * @return array
+     * @throws \ErlMutex\Exception\ProfilerException
+     */
+    private static function traceHashListArrayUnsetDateTime(array $traceHashList)
+    {
+        foreach ($traceHashList as &$trace) {
+            if (!is_array($trace)) {
+                throw new Exception('Передана неправильная карта блокировок');
+            }
+
+            $trace['dateTime'] = null;
         }
 
         return $traceHashList;
