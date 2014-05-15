@@ -14,6 +14,7 @@ namespace ErlMutex\Service;
 
 use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerCrossOrder;
+use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 use ErlMutex\Model\ProfilerWrongOrder;
 use ErlMutex\ProfilerStorageInterface;
@@ -60,11 +61,6 @@ class Profiler
     private $storage;
 
     /**
-     * @var Map
-     */
-    private $map;
-
-    /**
      * @var string
      */
     private $mapOutputLocation;
@@ -83,7 +79,6 @@ class Profiler
 
         $this->requestUri   = $requestUri;
         $this->initDateTime = new DateTime();
-        $this->map          = new Map();
     }
 
     /**
@@ -117,8 +112,6 @@ class Profiler
     public function setStorage(ProfilerStorageInterface $storage)
     {
         $this->storage = $storage;
-        $this->map->setStorage($storage);
-
         return $this;
     }
 
@@ -230,14 +223,23 @@ class Profiler
      *          * trace 2
      *          ...
      *
-     * @return array
+     * @return ProfilerMapCollection
      * @throws Exception
-     *
-     * @todo Функция должна возвращать MapModel, MapService переделать в MapModel
      */
     public function map()
     {
-        return $this->map->getList();
+        if (!$this->storage) {
+            throw new Exception('Не задано хранилище');
+        }
+
+        $map  = new ProfilerMapCollection();
+        $list = $this->storage->getList();
+        foreach ($list as $trace) {
+            /** @var ProfilerStackModel $trace */
+            $map->append($trace);
+        }
+
+        return $map;
     }
 
     /**

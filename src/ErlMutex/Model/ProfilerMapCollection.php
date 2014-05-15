@@ -13,8 +13,11 @@
 namespace ErlMutex\Model;
 
 use ErlMutex\Exception\ProfilerException as Exception;
+use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 
 /**
+ * Карта коллекций запросов профайлера
+ *
  * Class ProfilerMapCollection
  * @package ErlMutex\Model
  */
@@ -23,29 +26,30 @@ class ProfilerMapCollection extends AbstractCollection
     /**
      * Добавить запрос в коллекцию
      *
-     * @param ProfilerStackCollection $stackCollection
+     * @param ProfilerStackModel $trace
      * @return $this
      */
-    public function ignoreAppend(ProfilerStackCollection $stackCollection)
+    public function append(ProfilerStackModel $trace)
     {
-        if (!$this->hasCollection($stackCollection)) {
-            $this->collection[] = $stackCollection;
+        if (!$this->hasCollection($trace->getRequestHash())) {
+            $this->collection[] = new ProfilerStackCollection($trace->getRequestHash());
         }
 
+        $this->getCollectionByRequestHash($trace->getRequestHash())->append($trace);
         return $this;
     }
 
     /**
      * Есть ли уже такая коллекция
      *
-     * @param ProfilerStackCollection $stackCollection
+     * @param string $requestHash
      * @return bool
      */
-    public function hasCollection(ProfilerStackCollection $stackCollection)
+    public function hasCollection($requestHash)
     {
         foreach ($this->collection as $existStackCollection) {
             /** @var ProfilerStackCollection $existStackCollection */
-            if ($existStackCollection->getRequestHash() === $stackCollection->getRequestHash()) {
+            if ($existStackCollection->getRequestHash() === $requestHash) {
                 return true;
             }
         }
@@ -82,4 +86,20 @@ class ProfilerMapCollection extends AbstractCollection
     {
         return new ProfilerMapCollection();
     }
-} 
+
+    /**
+     * Преобразовать коллекцию в массив
+     *
+     * @return array
+     */
+    public function asArray()
+    {
+        $result = array();
+        foreach ($this->collection as $existStackCollection) {
+            /** @var ProfilerStackCollection $existStackCollection */
+            $result[$existStackCollection->getRequestHash()][] = $existStackCollection->asArray();
+        }
+
+        return $result;
+    }
+}

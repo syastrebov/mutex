@@ -82,4 +82,20 @@ class ProfilerStackCollection extends AbstractCollection
 
         return md5($hash);
     }
+
+    /**
+     * Преобразовать коллекцию в массив
+     *
+     * @return array
+     */
+    public function asArray()
+    {
+        $result = array();
+        foreach ($this->collection as $trace) {
+            /** @var ProfilerStackModel $trace */
+            $result[] = $trace->asArray();
+        }
+
+        return $result;
+    }
 } 
