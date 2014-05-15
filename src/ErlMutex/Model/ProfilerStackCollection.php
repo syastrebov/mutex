@@ -130,7 +130,7 @@ class ProfilerStackCollection implements Iterator, Countable
      */
     public function valid()
     {
-
+        return current($this->collection);
     }
 
     /**
