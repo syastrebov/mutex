@@ -112,7 +112,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     public function testMapStorageNotSet()
     {
         $profiler = new Profiler(__FUNCTION__);
-        $profiler->map();
+        $profiler->getMap();
     }
 
     /**
@@ -123,7 +123,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler(__FUNCTION__);
         $profiler->setStorage(ProfilerStorageDummy::getInstance());
 
-        $this->assertGreaterThan(0, $profiler->map());
+        $this->assertGreaterThan(0, $profiler->getMap());
 
     }
 

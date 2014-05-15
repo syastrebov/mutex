@@ -226,7 +226,7 @@ class Profiler
      * @return ProfilerMapCollection
      * @throws Exception
      */
-    public function map()
+    public function getMap()
     {
         if (!$this->storage) {
             throw new Exception('Не задано хранилище');
@@ -251,12 +251,12 @@ class Profiler
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
-        $map    = Map::unique($this->map->getList());
+        $map    = $this->getMap();
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
 
         $output = $twig->render('profiler_map.twig', array(
-            'map'     => Map::toArray($map),
+            'map'     => $map->asArray(),
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
             'error'   => $this->validateMap($map),
         ));
@@ -280,12 +280,12 @@ class Profiler
     /**
      * Проверка карты
      *
-     * @param array $map
+     * @param ProfilerMapCollection $map
      * @return null|array
      *
      * @todo $exception переделать на исключение
      */
-    private function validateMap(array $map)
+    private function validateMap(ProfilerMapCollection $map)
     {
         $hashWrongList = array();
 
