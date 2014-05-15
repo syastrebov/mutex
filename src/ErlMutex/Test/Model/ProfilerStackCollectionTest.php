@@ -174,12 +174,20 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
             new DateTime()
         ));
 
+        $counter = 0;
         foreach ($this->collection as $trace) {
-            var_dump($trace);
+            $counter++;
+            $this->assertInstanceOf('\ErlMutex\Model\ProfilerStack', $trace);
         }
 
+        $this->assertEquals(2, $counter);
+
+        $counter = 0;
         foreach ($this->collection as $trace) {
-            var_dump($trace);
+            $counter++;
+            $this->assertInstanceOf('\ErlMutex\Model\ProfilerStack', $trace);
         }
+
+        $this->assertEquals(2, $counter);
     }
 }
