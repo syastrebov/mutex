@@ -280,6 +280,8 @@ class Profiler
      *
      * @param array $map
      * @return null|array
+     *
+     * @todo $exception переделать на исключение
      */
     private function validateMap(array $map)
     {

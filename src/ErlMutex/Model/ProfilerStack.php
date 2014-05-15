@@ -268,4 +268,25 @@ class ProfilerStack
             'dateTime'    => $this->getDateTimeFormat(),
         );
     }
+
+    /**
+     * Уникальный хеш модели
+     * Для сравнения моделей при выборки в профайлере
+     *
+     * @return string
+     */
+    public function getModelHash()
+    {
+        return md5(serialize(array(
+            'requestUri'  => $this->requestUri,
+            'requestHash' => $this->requestHash,
+            'filename'    => $this->filename,
+            'class'       => $this->class,
+            'method'      => $this->method,
+            'line'        => $this->line,
+            'key'         => $this->key,
+            'action'      => $this->action,
+            'response'    => $this->response,
+        )));
+    }
 }

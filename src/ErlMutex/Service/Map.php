@@ -136,24 +136,4 @@ class Map
 
         return $traceHashList;
     }
-
-    /**
-     * Обнулить дату вызова блокировки (для проверки уникальности)
-     *
-     * @param array $traceHashList
-     * @return array
-     * @throws \ErlMutex\Exception\ProfilerException
-     */
-    private static function traceHashListArrayUnsetDateTime(array $traceHashList)
-    {
-        foreach ($traceHashList as &$trace) {
-            if (!is_array($trace)) {
-                throw new Exception('Передана неправильная карта блокировок');
-            }
-
-            $trace['dateTime'] = null;
-        }
-
-        return $traceHashList;
-    }
 }
