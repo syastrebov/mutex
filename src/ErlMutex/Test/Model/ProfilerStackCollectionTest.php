@@ -177,5 +177,9 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
         foreach ($this->collection as $trace) {
             var_dump($trace);
         }
+
+        foreach ($this->collection as $trace) {
+            var_dump($trace);
+        }
     }
 }
