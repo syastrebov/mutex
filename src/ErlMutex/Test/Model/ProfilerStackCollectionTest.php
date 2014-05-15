@@ -96,12 +96,25 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Получить хеш коллекции
-     *
-     * @after testSuccessAppend
      */
     public function testGetModelHash()
     {
-        $this->assertEquals('d41d8cd98f00b204e9800998ecf8427e', $this->collection->getModelHash());
+        $this->assertEquals('bcf420b0d01778240f825edfdf197d43', $this->collection->getModelHash());
+
+        $this->collection->append(new ProfilerStackModel(
+            self::REQUEST_1,
+            md5(self::REQUEST_1),
+            'file_1',
+            1,
+            'class_1',
+            'method_1',
+            'key_1',
+            'action_1',
+            'response_1',
+            new DateTime()
+        ));
+
+        $this->assertEquals('b659c8d5ceddfb655d85a1f3109a1767', $this->collection->getModelHash());
     }
 
     /**
@@ -112,13 +125,55 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetCount()
+    {
+        $this->collection->append(new ProfilerStackModel(
+            self::REQUEST_1,
+            md5(self::REQUEST_1),
+            'file_1',
+            1,
+            'class_1',
+            'method_1',
+            'key_1',
+            'action_1',
+            'response_1',
+            new DateTime()
+        ));
+
+        $this->assertEquals(1, count($this->collection));
+    }
+
     /**
      * Тестирование чтения коллекции через foreach()
-     *
-     * @after testSuccessAppend
      */
     public function testIterate()
     {
+        $this->collection->append(new ProfilerStackModel(
+            self::REQUEST_1,
+            md5(self::REQUEST_1),
+            'file_1',
+            1,
+            'class_1',
+            'method_1',
+            'key_1',
+            'action_1',
+            'response_1',
+            new DateTime()
+        ));
+
+        $this->collection->append(new ProfilerStackModel(
+            self::REQUEST_1,
+            md5(self::REQUEST_1),
+            'file_1',
+            1,
+            'class_1',
+            'method_1',
+            'key_1',
+            'action_2',
+            'response_2',
+            new DateTime()
+        ));
+
         foreach ($this->collection as $trace) {
             var_dump($trace);
         }

@@ -15,6 +15,7 @@ namespace ErlMutex\Model;
 use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 use Iterator;
+use Countable;
 
 /**
  * Коллекция моделей лога профайлера
@@ -22,7 +23,7 @@ use Iterator;
  * Class ProfilerStackCollection
  * @package ErlMutex\Model
  */
-class ProfilerStackCollection implements Iterator
+class ProfilerStackCollection implements Iterator, Countable
 {
     /**
      * Уникальный хеш запроса
@@ -82,7 +83,7 @@ class ProfilerStackCollection implements Iterator
      */
     public function getModelHash()
     {
-        $hash = '';
+        $hash = $this->requestHash;
         foreach ($this->collection as $trace) {
             /** @var ProfilerStackModel $trace */
             $hash .= $trace->getModelHash();
@@ -140,5 +141,15 @@ class ProfilerStackCollection implements Iterator
     public function rewind()
     {
         reset($this->collection);
+    }
+
+    /**
+     * Count elements of an object
+     *
+     * @return int The custom count as an integer.
+     */
+    public function count()
+    {
+        return count($this->collection);
     }
 } 
