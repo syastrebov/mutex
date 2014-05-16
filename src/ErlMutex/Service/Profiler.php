@@ -16,6 +16,7 @@ use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerCrossOrder;
 use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Model\ProfilerStackCollection;
 use ErlMutex\Model\ProfilerWrongOrder;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
@@ -290,11 +291,10 @@ class Profiler
         $hashWrongList = array();
 
         try {
-            foreach ($map as $requests) {
-                foreach ($requests as $hash => $traceHashList) {
-                    $this->validateTraceHashList($traceHashList);
-                    $hashWrongList[$hash] = $this->getWrongOrderCanContainsMap($traceHashList);
-                }
+            foreach ($map as $requestCollection) {
+                /** @var ProfilerStackCollection $requestCollection */
+                $this->validateTraceHashList($requestCollection);
+                $hashWrongList[$requestCollection->getRequestHash()] = $this->getWrongOrderCanContainsMap($requestCollection);
             }
 
             $this->validateWrongKeysOrder($hashWrongList);
@@ -334,9 +334,9 @@ class Profiler
      *
      * При возникновении ошибок возвращает исключение
      *
-     * @param array $traceList
+     * @param ProfilerStackCollection $traceList
      */
-    private function validateTraceHashList(array $traceList)
+    private function validateTraceHashList(ProfilerStackCollection $traceList)
     {
         $this->validateHashKeysActionsOrder($traceList);
         $this->validateCrossOrder($traceList);
@@ -346,9 +346,9 @@ class Profiler
      * Проверка последовательности вызова блокировок по ключу для хеша
      * Если хотя бы один ключ вызван с неправильной последовательностью, то функция возвращает исключение
      *
-     * @param array $traceList
+     * @param ProfilerStackCollection $traceList
      */
-    private function validateHashKeysActionsOrder(array $traceList)
+    private function validateHashKeysActionsOrder(ProfilerStackCollection $traceList)
     {
         $map = array();
         foreach ($traceList as $pos => $trace) {
@@ -369,10 +369,10 @@ class Profiler
      *  - release(Key)
      * Если последовательность не совпадает, то функция возвращает исключение
      *
-     * @param array $keyTraceList
+     * @param ProfilerStackCollection $keyTraceList
      * @throws Exception
      */
-    private function validateKeyHashActionsOrder(array $keyTraceList)
+    private function validateKeyHashActionsOrder(ProfilerStackCollection $keyTraceList)
     {
         $wasGet     = false;
         $wasAcquire = false;
@@ -458,10 +458,10 @@ class Profiler
      *  </B>
      * </A>
      *
-     * @param $mapHashList
+     * @param ProfilerStackCollection $mapHashList
      * @throws Exception
      */
-    private function validateCrossOrder(array $mapHashList)
+    private function validateCrossOrder(ProfilerStackCollection $mapHashList)
     {
         $acquired  = $this->getHashCrossOrderMap($mapHashList);
         $exception = null;
@@ -557,10 +557,10 @@ class Profiler
     /**
      * Возвращает какие вложенные ключи может хранить в себе ключ
      *
-     * @param array $mapHashList
+     * @param ProfilerStackCollection $mapHashList
      * @return array
      */
-    private function getWrongOrderCanContainsMap(array $mapHashList)
+    private function getWrongOrderCanContainsMap(ProfilerStackCollection $mapHashList)
     {
         $acquired  = $this->getHashWrongOrderMap($mapHashList);
         $exception = null;
@@ -604,10 +604,10 @@ class Profiler
     /**
      * Карта перекрестных связей для хеша вызовов
      *
-     * @param array $mapHashList
+     * @param ProfilerStackCollection $mapHashList
      * @return array
      */
-    private function getHashCrossOrderMap(array $mapHashList)
+    private function getHashCrossOrderMap(ProfilerStackCollection $mapHashList)
     {
         $acquired = array();
         foreach ($mapHashList as $trace) {
@@ -621,10 +621,10 @@ class Profiler
     /**
      * Карта неправильной последовательности для хеша вызовов
      *
-     * @param array $mapHashList
+     * @param ProfilerStackCollection $mapHashList
      * @return array
      */
-    private function getHashWrongOrderMap(array $mapHashList)
+    private function getHashWrongOrderMap(ProfilerStackCollection $mapHashList)
     {
         $acquired = array();
         foreach ($mapHashList as $trace) {
