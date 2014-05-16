@@ -293,7 +293,8 @@ class Profiler
         try {
             foreach ($map as $requestCollection) {
                 /** @var ProfilerStackCollection $requestCollection */
-                $this->validateTraceHashList($requestCollection);
+                $this->validateKeyHashActionsOrder($requestCollection);
+                $this->validateCrossOrder($requestCollection);
                 $hashWrongList[$requestCollection->getRequestHash()] = $this->getWrongOrderCanContainsMap($requestCollection);
             }
 
@@ -323,40 +324,6 @@ class Profiler
             }
 
             return $exception;
-        }
-    }
-
-    /**
-     * Проверка последовательности вызова блокировок для хеша
-     *
-     *  - Проверка последовательности вызова блокировок по ключу для хеша
-     *  - Проверка перехлестных вызовов блокировок
-     *
-     * При возникновении ошибок возвращает исключение
-     *
-     * @param ProfilerStackCollection $traceList
-     */
-    private function validateTraceHashList(ProfilerStackCollection $traceList)
-    {
-        $this->validateHashKeysActionsOrder($traceList);
-        $this->validateCrossOrder($traceList);
-    }
-
-    /**
-     * Проверка последовательности вызова блокировок по ключу для хеша
-     * Если хотя бы один ключ вызван с неправильной последовательностью, то функция возвращает исключение
-     *
-     * @param ProfilerStackCollection $traceList
-     */
-    private function validateHashKeysActionsOrder(ProfilerStackCollection $traceList)
-    {
-        $map = array();
-        foreach ($traceList as $pos => $trace) {
-            /** @var ProfilerStackModel $trace */
-            $map[$trace->getKey()][$pos] = $trace;
-        }
-        foreach ($map as $actions) {
-            $this->validateKeyHashActionsOrder($actions);
         }
     }
 

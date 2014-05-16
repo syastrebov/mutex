@@ -97,7 +97,7 @@ class ProfilerMapCollection extends AbstractCollection
         $result = array();
         foreach ($this->collection as $existStackCollection) {
             /** @var ProfilerStackCollection $existStackCollection */
-            $result[] = $existStackCollection->asArray();
+            $result[$existStackCollection->getRequestUri()][] = $existStackCollection->asArray();
         }
 
         return $result;

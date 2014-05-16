@@ -13,6 +13,7 @@
 namespace ErlMutex\Test\Service;
 
 use ErlMutex\Model\ProfilerStack;
+use ErlMutex\Model\ProfilerStackCollection;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
@@ -316,9 +317,9 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateKeyHashActionsOrderWrongKeyList()
     {
-        $profiler = new Profiler(__FUNCTION__);
-        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', array(
-            new ProfilerStack(
+        $collection = new ProfilerStackCollection(md5(__FUNCTION__));
+        $collection
+            ->append(new ProfilerStack(
                 __FUNCTION__,
                 md5(__FUNCTION__),
                 __LINE__,
@@ -329,8 +330,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 Mutex::ACTION_GET,
                 '',
                 new \DateTime()
-            ),
-            new ProfilerStack(
+            ))
+            ->append(new ProfilerStack(
                 __FUNCTION__,
                 md5(__FUNCTION__),
                 __FILE__,
@@ -341,8 +342,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 Mutex::ACTION_GET,
                 '',
                 new \DateTime()
-            ),
-        ));
+            ));
+
+        $profiler = new Profiler(__FUNCTION__);
+        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', $collection);
     }
 
     /**
@@ -352,9 +355,9 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateKeyHashActionsOrderWrongHashList()
     {
-        $profiler = new Profiler(__FUNCTION__);
-        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', array(
-            new ProfilerStack(
+        $collection = new ProfilerStackCollection(md5(__FUNCTION__));
+        $collection
+            ->append(new ProfilerStack(
                 __FUNCTION__,
                 md5(__FUNCTION__),
                 __LINE__,
@@ -365,8 +368,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 Mutex::ACTION_GET,
                 '',
                 new \DateTime()
-            ),
-            new ProfilerStack(
+            ))
+            ->append(new ProfilerStack(
                 __FUNCTION__,
                 md5(__CLASS__ . __FUNCTION__),
                 __FILE__,
@@ -377,8 +380,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 Mutex::ACTION_ACQUIRE,
                 '',
                 new \DateTime()
-            ),
-        ));
+            ));
+
+        $profiler = new Profiler(__FUNCTION__);
+        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', $collection);
     }
 
     /**

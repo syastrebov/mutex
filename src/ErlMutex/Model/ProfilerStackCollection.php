@@ -68,6 +68,23 @@ class ProfilerStackCollection extends AbstractCollection
     }
 
     /**
+     * Запрашиваемый адрес (точка входа)
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getRequestUri()
+    {
+        if (!empty($this->collection)) {
+            /** @var ProfilerStackModel $trace */
+            $trace = $this->collection[0];
+            return $trace->getRequestUri();
+        }
+
+        throw new Exception('Коллекция пуста');
+    }
+
+    /**
      * Уникальный хеш модели
      *
      * @return string
