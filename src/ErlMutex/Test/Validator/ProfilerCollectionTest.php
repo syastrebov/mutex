@@ -27,7 +27,7 @@ class ProfilerCollectionTest extends \PHPUnit_Framework_TestCase
     private $collection;
 
     /**
-     * 
+     *
      */
     public function setUp()
     {

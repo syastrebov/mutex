@@ -73,9 +73,6 @@ class ProfilerActionsOrder extends ProfilerAbstract
                 $listKey     = $trace->getKey();
                 $requestHash = $trace->getRequestHash();
             }
-            if ($listKey !== $trace->getKey() || $requestHash !== $trace->getRequestHash()) {
-                throw new Exception('Список вызова блокировок должны быть для одного ключа и хеша');
-            }
 
             switch ($trace->getAction()) {
                 case Mutex::ACTION_GET:
