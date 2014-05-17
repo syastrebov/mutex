@@ -166,6 +166,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Перехлестный вызов
+     *
+     * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testCrossOrder()
     {
@@ -200,7 +202,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $map = $profiler->getMap();
 
         $this->assertEquals(1, count($map));
-        $this->assertNotNull($profiler->validate($map));
+        $profiler->validate($map);
     }
 
     /**
@@ -317,6 +319,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Неправильный хеш при проверки списка по ключу и хешу
+     *
+     * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testValidateKeyHashActionsOrderWrongHashList()
     {
@@ -348,6 +352,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ));
 
         $profiler = new Profiler(__FUNCTION__);
-        $this->assertNotNull($profiler->validate($collection));
+        $profiler->validate($collection);
     }
 } 

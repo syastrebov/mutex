@@ -260,11 +260,18 @@ class Profiler
         $map    = $this->getMap();
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
+        $error  = null;
+
+        try {
+            $this->validate($map);
+        } catch (Exception $e) {
+            $error = $e->getDescription();
+        }
 
         $output = $twig->render('profiler_map.twig', array(
             'map'     => $map->asArrayByRequestUri(),
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
-            'error'   => $this->validate($map),
+            'error'   => $error,
         ));
 
         file_put_contents($this->mapOutputLocation . '/profiler_map.html', $output);
@@ -287,10 +294,7 @@ class Profiler
      * Проверка карты
      *
      * @param ProfilerMapCollection $map
-     * @return null|array
      * @throws Exception
-     *
-     * @todo $exception переделать на исключение
      */
     public function validate(ProfilerMapCollection $map)
     {
@@ -300,30 +304,24 @@ class Profiler
                 $validator->validate($map);
             }
 
-            return null;
-
         } catch (Exception $e) {
-            $exception = null;
-
             if ($e->getProfilerStackModel()) {
                 foreach ($map as $requestCollection) {
                     foreach ($requestCollection as $num => $trace) {
                         /** @var ProfilerStackModel $trace */
                         if ($e->getProfilerStackModel() === $trace) {
-                            $exception = array(
+                            $e->setDescription(array(
                                 'requestHash' => $trace->getRequestHash(),
                                 'type'        => 'warning',
                                 'position'    => $num,
                                 'message'     => $e->getMessage()
-                            );
+                            ));
                         }
                     }
                 }
-            } else {
-                throw $e;
             }
 
-            return $exception;
+            throw $e;
         }
     }
 } 
