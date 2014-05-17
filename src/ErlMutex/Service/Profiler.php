@@ -218,18 +218,16 @@ class Profiler
 
     /**
      * Построить карту вызова
+     * Возвращается в формате:
      *
-     * trace может возвращаться в виде ProfilerStackModel или массива
-     * Возвращает в формате:
-     * - requestUri
-     *      - requestHash 1
-     *          * trace 1
-     *          * trace 2
-     *          ...
-     *      - requestHash 2
-     *          * trace 1
-     *          * trace 2
-     *          ...
+     * - requestHash 1
+     *      * trace 1
+     *      * trace 2
+     *      ...
+     * - requestHash 2
+     *      * trace 1
+     *      * trace 2
+     *      ...
      *
      * @return ProfilerMapCollection
      * @throws Exception
