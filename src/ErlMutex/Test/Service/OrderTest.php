@@ -12,8 +12,8 @@
 
 namespace ErlMutex\Test\Service;
 
+use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerStack;
-use ErlMutex\Model\ProfilerStackCollection;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
@@ -200,7 +200,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $map = $profiler->getMap();
 
         $this->assertEquals(1, count($map));
-        $this->assertNotNull($profiler->validateMap($map));
+        $this->assertNotNull($profiler->validate($map));
     }
 
     /**
@@ -317,12 +317,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Неправильный ключ при проверки списка по ключу и хешу
-     *
-     * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testValidateKeyHashActionsOrderWrongKeyList()
     {
-        $collection = new ProfilerStackCollection(md5(__FUNCTION__));
+        $collection = new ProfilerMapCollection(md5(__FUNCTION__));
         $collection
             ->append(new ProfilerStack(
                 __FUNCTION__,
@@ -350,17 +348,15 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ));
 
         $profiler = new Profiler(__FUNCTION__);
-        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', $collection);
+        $this->assertNotNull($profiler->validate($collection));
     }
 
     /**
      * Неправильный хеш при проверки списка по ключу и хешу
-     *
-     * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testValidateKeyHashActionsOrderWrongHashList()
     {
-        $collection = new ProfilerStackCollection(md5(__FUNCTION__));
+        $collection = new ProfilerMapCollection(md5(__FUNCTION__));
         $collection
             ->append(new ProfilerStack(
                 __FUNCTION__,
@@ -388,24 +384,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ));
 
         $profiler = new Profiler(__FUNCTION__);
-        $this->callPrivateMethod($profiler, 'validateKeyHashActionsOrder', $collection);
-    }
-
-    /**
-     * Тестируем приватные методы
-     *
-     * @param object $object
-     * @param string $methodName
-     *
-     * @return mixed
-     */
-    private function callPrivateMethod($object, $methodName)
-    {
-        $reflectionClass = new \ReflectionClass($object);
-        $reflectionMethod = $reflectionClass->getMethod($methodName);
-        $reflectionMethod->setAccessible(true);
-
-        $params = array_slice(func_get_args(), 2);
-        return $reflectionMethod->invokeArgs($object, $params);
+        $this->assertNotNull($profiler->validate($collection));
     }
 } 

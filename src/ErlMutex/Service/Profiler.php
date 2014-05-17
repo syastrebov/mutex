@@ -264,7 +264,7 @@ class Profiler
         $output = $twig->render('profiler_map.twig', array(
             'map'     => $map->asArrayByRequestUri(),
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
-            'error'   => $this->validateMap($map),
+            'error'   => $this->validate($map),
         ));
 
         file_put_contents($this->mapOutputLocation . '/profiler_map.html', $output);
@@ -292,7 +292,7 @@ class Profiler
      *
      * @todo $exception переделать на исключение
      */
-    public function validateMap(ProfilerMapCollection $map)
+    public function validate(ProfilerMapCollection $map)
     {
         try {
             foreach ($this->validators as $validator) {
