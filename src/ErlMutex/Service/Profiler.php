@@ -68,6 +68,11 @@ class Profiler
      */
     private $mapOutputLocation;
 
+    /**
+     * Валидаторы для проверки запросов
+     *
+     * @var array
+     */
     private $validators = array();
 
     /**

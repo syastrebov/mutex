@@ -57,8 +57,8 @@ class ProfilerCrossOrder extends ProfilerAbstract
      */
     public function validate(ProfilerMapCollection $mapCollection)
     {
+        /** @var ProfilerStackCollection $requestCollection */
         foreach ($mapCollection as $requestCollection) {
-            /** @var ProfilerStackCollection $requestCollection */
             $this->validateCrossOrder($requestCollection);
         }
     }
@@ -66,38 +66,16 @@ class ProfilerCrossOrder extends ProfilerAbstract
     /**
      * Проверка перехлестных вызовов блокировок
      *
-     * Исключение ситуаций типа:
-     *  - get A
-     *  - get B
-     *  - acquire A
-     *  - acquire B
-     *  - release A
-     *  - release B
-     *
-     * Схема вызова:
-     *
-     * <A>
-     *  <B>
-     *  </A>
-     * </B>
-     *
-     * Должно быть:
-     *
-     * <A>
-     *  <B>
-     *  </B>
-     * </A>
-     *
-     * @param ProfilerStackCollection $mapHashList
+     * @param ProfilerStackCollection $requestCollection
      * @throws Exception
      */
-    private function validateCrossOrder(ProfilerStackCollection $mapHashList)
+    private function validateCrossOrder(ProfilerStackCollection $requestCollection)
     {
-        $acquired  = $this->getHashCrossOrderMap($mapHashList);
+        $acquired  = $this->getHashCrossOrderMap($requestCollection);
         $exception = null;
 
         /** @var ProfilerStackModel $trace */
-        foreach ($mapHashList as $trace) {
+        foreach ($requestCollection as $trace) {
             /** @var ProfilerCrossOrderModel $keyCrossOrderModel */
             $keyCrossOrderModel = $acquired[$trace->getKey()];
 
@@ -148,7 +126,7 @@ class ProfilerCrossOrder extends ProfilerAbstract
         $acquired = array();
         foreach ($mapHashList as $trace) {
             /** @var ProfilerStackModel $trace */
-            $acquired[$trace->getKey()] = new ProfilerCrossOrder($trace->getKey());
+            $acquired[$trace->getKey()] = new ProfilerCrossOrderModel($trace->getKey());
         }
 
         return $acquired;
