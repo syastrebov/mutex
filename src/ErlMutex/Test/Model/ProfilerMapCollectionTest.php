@@ -13,6 +13,8 @@
 namespace ErlMutex\Test\Model;
 
 use ErlMutex\Model\ProfilerMapCollection;
+use ErlMutex\Model\ProfilerStack;
+use ErlMutex\Service\Mutex;
 
 /**
  * Class ProfilerMapCollectionTest
@@ -68,6 +70,33 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUniqueCollections()
     {
+        $this->collection
+            ->append(new ProfilerStack(
+                __FUNCTION__,
+                md5(__FUNCTION__ . 1),
+                __LINE__,
+                __FILE__,
+                __CLASS__,
+                __FUNCTION__,
+                'A',
+                Mutex::ACTION_GET,
+                '',
+                new \DateTime()
+            ))
+            ->append(new ProfilerStack(
+                __FUNCTION__,
+                md5(__FUNCTION__ . 2),
+                __LINE__,
+                __FILE__,
+                __CLASS__,
+                __FUNCTION__,
+                'A',
+                Mutex::ACTION_GET,
+                '',
+                new \DateTime()
+            ));
 
+        $this->assertEquals(2, count($this->collection));
+        $this->assertEquals(1, count($this->collection->getUniqueCollections()));
     }
 }

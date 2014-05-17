@@ -91,7 +91,7 @@ class ProfilerStackCollection extends AbstractCollection
      */
     public function getModelHash()
     {
-        $hash = $this->requestHash;
+        $hash = '';
         foreach ($this->collection as $trace) {
             /** @var ProfilerStackModel $trace */
             $hash .= $trace->getModelHash();
