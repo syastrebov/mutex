@@ -279,7 +279,6 @@ class ProfilerStack
     {
         return md5(serialize(array(
             'requestUri'  => $this->requestUri,
-            'requestHash' => $this->requestHash,
             'filename'    => $this->filename,
             'class'       => $this->class,
             'method'      => $this->method,

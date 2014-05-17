@@ -99,7 +99,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetModelHash()
     {
-        $this->assertEquals('bcf420b0d01778240f825edfdf197d43', $this->collection->getModelHash());
+        $this->assertEquals('d41d8cd98f00b204e9800998ecf8427e', $this->collection->getModelHash());
 
         $this->collection->append(new ProfilerStackModel(
             self::REQUEST_1,
@@ -114,7 +114,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
             new DateTime()
         ));
 
-        $this->assertEquals('b659c8d5ceddfb655d85a1f3109a1767', $this->collection->getModelHash());
+        $this->assertEquals('e4307a64ba75a29b0774c378e1260be4', $this->collection->getModelHash());
     }
 
     /**
