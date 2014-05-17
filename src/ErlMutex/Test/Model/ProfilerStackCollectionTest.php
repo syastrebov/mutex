@@ -190,4 +190,12 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, $counter);
     }
+
+    /**
+     * @expectedException \ErlMutex\Exception\ProfilerException
+     */
+    public function testGetRequestUriFromEmptyCollection()
+    {
+        $this->collection->getRequestUri();
+    }
 }
