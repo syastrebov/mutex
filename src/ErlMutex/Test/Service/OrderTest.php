@@ -316,42 +316,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Неправильный ключ при проверки списка по ключу и хешу
-     */
-    public function testValidateKeyHashActionsOrderWrongKeyList()
-    {
-        $collection = new ProfilerMapCollection(md5(__FUNCTION__));
-        $collection
-            ->append(new ProfilerStack(
-                __FUNCTION__,
-                md5(__FUNCTION__),
-                __LINE__,
-                __FILE__,
-                __CLASS__,
-                __FUNCTION__,
-                'A',
-                Mutex::ACTION_GET,
-                '',
-                new \DateTime()
-            ))
-            ->append(new ProfilerStack(
-                __FUNCTION__,
-                md5(__FUNCTION__),
-                __FILE__,
-                __LINE__,
-                __CLASS__,
-                __FUNCTION__,
-                'B',
-                Mutex::ACTION_GET,
-                '',
-                new \DateTime()
-            ));
-
-        $profiler = new Profiler(__FUNCTION__);
-        $this->assertNotNull($profiler->validate($collection));
-    }
-
-    /**
      * Неправильный хеш при проверки списка по ключу и хешу
      */
     public function testValidateKeyHashActionsOrderWrongHashList()
