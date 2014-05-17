@@ -306,18 +306,16 @@ class Profiler
             $exception = null;
 
             if ($e->getProfilerStackModel()) {
-                foreach ($map as $requests) {
-                    foreach ($requests as $traceHashList) {
-                        foreach ($traceHashList as $num => $trace) {
-                            /** @var ProfilerStackModel $trace */
-                            if ($e->getProfilerStackModel() === $trace) {
-                                $exception = array(
-                                    'requestHash' => $trace->getRequestHash(),
-                                    'type'        => 'warning',
-                                    'position'    => $num,
-                                    'message'     => $e->getMessage()
-                                );
-                            }
+                foreach ($map as $requestCollection) {
+                    foreach ($requestCollection as $num => $trace) {
+                        /** @var ProfilerStackModel $trace */
+                        if ($e->getProfilerStackModel() === $trace) {
+                            $exception = array(
+                                'requestHash' => $trace->getRequestHash(),
+                                'type'        => 'warning',
+                                'position'    => $num,
+                                'message'     => $e->getMessage()
+                            );
                         }
                     }
                 }
