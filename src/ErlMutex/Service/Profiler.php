@@ -257,7 +257,7 @@ class Profiler
         $twig   = new \Twig_Environment($loader);
 
         $output = $twig->render('profiler_map.twig', array(
-            'map'     => $map->asArray(),
+            'map'     => $map->asArrayByRequestUri(),
             'cssFile' => __DIR__ . self::PUBLIC_DIR  . '/css/main.css',
             'error'   => $this->validateMap($map),
         ));

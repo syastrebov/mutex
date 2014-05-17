@@ -18,5 +18,23 @@ namespace ErlMutex\Test\Model;
  */
 class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
 {
+    public function testAppend()
+    {
 
+    }
+
+    public function testHasCollection()
+    {
+
+    }
+
+    public function testGetCollectionByRequestHash()
+    {
+
+    }
+
+    public function testGetUniqueCollections()
+    {
+
+    }
 }

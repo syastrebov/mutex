@@ -83,7 +83,12 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $this->mutex->acquire();
         $this->mutex->release();
 
+        ob_start();
+        $this->assertEmpty(ob_get_clean());
+
+        ob_start();
         $this->mutex->getProfiler()->dump();
+        $this->assertNotEmpty(ob_get_clean());
     }
 
     /**

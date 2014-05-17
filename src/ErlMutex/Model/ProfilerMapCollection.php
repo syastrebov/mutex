@@ -89,10 +89,11 @@ class ProfilerMapCollection extends AbstractCollection
 
     /**
      * Преобразовать коллекцию в массив
+     * Выполнить сортировку по урлу запроса
      *
      * @return array
      */
-    public function asArray()
+    public function asArrayByRequestUri()
     {
         $result = array();
         foreach ($this->collection as $existStackCollection) {

@@ -2,7 +2,15 @@
 
 <phpunit bootstrap="bootstrap.php">
     <testsuites>
-        <testsuite name="unit">
+        <testsuite name="mutex">
+            <directory>../src/ErlMutex/Test/</directory>
+        </testsuite>
+        <testsuite name="profiler">
+            <directory>../src/ErlMutex/Test/Model/</directory>
+            <directory>../src/ErlMutex/Test/Service/ProfilerTest.php</directory>
+            <directory>../src/ErlMutex/Test/Service/OrderTest.php</directory>
+        </testsuite>
+        <testsuite name="all">
             <directory>../</directory>
         </testsuite>
     </testsuites>
