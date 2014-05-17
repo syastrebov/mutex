@@ -196,6 +196,11 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->setStorage(ProfilerStorageDummy::getInstance())
             ->setMapOutputLocation(ProfilerTest::getMapOutputLocationPath(__CLASS__, __FUNCTION__))
             ->generateHtmlMapOutput();
+
+        $map = $profiler->getMap();
+
+        $this->assertEquals(1, count($map));
+        $this->assertNotNull($profiler->validateMap($map));
     }
 
     /**

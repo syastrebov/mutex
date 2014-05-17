@@ -20,6 +20,8 @@ use ErlMutex\Model\ProfilerStackCollection;
 use ErlMutex\Model\ProfilerWrongOrder;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
+use ErlMutex\ProfilerValidatorInterface;
+use ErlMutex\Validator\ProfilerActionsOrder;
 
 /**
  * Профайлер отладчик для erl'a
@@ -66,6 +68,8 @@ class Profiler
      */
     private $mapOutputLocation;
 
+    private $validators = array();
+
     /**
      * Constructor
      *
@@ -80,6 +84,7 @@ class Profiler
 
         $this->requestUri   = $requestUri;
         $this->initDateTime = new DateTime();
+        $this->validators[] = new ProfilerActionsOrder();
     }
 
     /**
@@ -283,17 +288,21 @@ class Profiler
      *
      * @param ProfilerMapCollection $map
      * @return null|array
+     * @throws Exception
      *
      * @todo $exception переделать на исключение
      */
-    private function validateMap(ProfilerMapCollection $map)
+    public function validateMap(ProfilerMapCollection $map)
     {
         $hashWrongList = array();
 
         try {
+            foreach ($this->validators as $validator) {
+                /** @var ProfilerValidatorInterface $validator */
+                $validator->validate($map);
+            }
             foreach ($map as $requestCollection) {
                 /** @var ProfilerStackCollection $requestCollection */
-                $this->validateKeyHashActionsOrder($requestCollection);
                 $this->validateCrossOrder($requestCollection);
                 $hashWrongList[$requestCollection->getRequestHash()] = $this->getWrongOrderCanContainsMap($requestCollection);
             }
@@ -319,82 +328,11 @@ class Profiler
                         }
                     }
                 }
+            } else {
+                throw $e;
             }
 
             return $exception;
-        }
-    }
-
-    /**
-     * Проверка последовательности вызова блокировок по ключу
-     *
-     * Правильная последовательность:
-     *  - get(Key)
-     *  - acquire(Key)
-     *  - release(Key)
-     * Если последовательность не совпадает, то функция возвращает исключение
-     *
-     * @param ProfilerStackCollection $keyTraceList
-     * @throws Exception
-     */
-    private function validateKeyHashActionsOrder(ProfilerStackCollection $keyTraceList)
-    {
-        $wasGet     = false;
-        $wasAcquire = false;
-
-        foreach ($keyTraceList as $trace) {
-            /** @var ProfilerStackModel $trace */
-            if (!isset($listKey) && !isset($requestHash)) {
-                $listKey     = $trace->getKey();
-                $requestHash = $trace->getRequestHash();
-            }
-            if ($listKey !== $trace->getKey() || $requestHash !== $trace->getRequestHash()) {
-                throw new Exception('Список вызова блокировок должны быть для одного ключа и хеша');
-            }
-
-            switch ($trace->getAction()) {
-                case Mutex::ACTION_GET:
-                    if ($wasGet === true) {
-                        throw $this->getTraceModelException(
-                            'Повторное получение указателя блокировки по ключу `%s`',
-                            $trace
-                        );
-                    } else {
-                        $wasGet = true;
-                    }
-
-                    break;
-                case Mutex::ACTION_ACQUIRE:
-                    if ($wasGet !== true) {
-                        throw $this->getTraceModelException(
-                            'Не найдено получения указателя блокировки по ключу `%s`',
-                            $trace
-                        );
-                    } else {
-                        if ($wasAcquire === true) {
-                            throw $this->getTraceModelException(
-                                'Повторная установка блокировки по ключу `%s`',
-                                $trace
-                            );
-                        } else {
-                            $wasAcquire = true;
-                        }
-                    }
-
-                    break;
-                case Mutex::ACTION_RELEASE:
-                    if ($wasAcquire !== true) {
-                        throw $this->getTraceModelException(
-                            'Не найдена установка блокировки по ключу `%s`',
-                            $trace
-                        );
-                    } else {
-                        $wasGet     = false;
-                        $wasAcquire = false;
-                    }
-
-                    break;
-            }
         }
     }
 

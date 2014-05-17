@@ -101,6 +101,24 @@ class ProfilerStackCollection extends AbstractCollection
     }
 
     /**
+     * Получить все ключи хранимые в коллекции
+     *
+     * @return array
+     */
+    public function getKeys()
+    {
+        $keys = array();
+        foreach ($this->collection as $request) {
+            /** @var ProfilerStackModel $request */
+            if (!in_array($request->getKey(), $keys, true)) {
+                $keys[] = $request->getKey();
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
      * Преобразовать коллекцию в массив
      *
      * @return array
