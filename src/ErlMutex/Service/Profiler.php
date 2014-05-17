@@ -15,13 +15,12 @@ namespace ErlMutex\Service;
 use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerStackCollection;
-use ErlMutex\Model\ProfilerWrongOrder;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 use ErlMutex\ProfilerValidatorInterface;
 use ErlMutex\Validator\ProfilerActionsOrder;
 use ErlMutex\Validator\ProfilerCrossOrder;
+use ErlMutex\Validator\ProfilerKeysOrder;
 
 /**
  * Профайлер отладчик для erl'a
@@ -92,6 +91,7 @@ class Profiler
 
         $this->validators[] = new ProfilerActionsOrder();
         $this->validators[] = new ProfilerCrossOrder();
+        $this->validators[] = new ProfilerKeysOrder();
     }
 
     /**
@@ -301,19 +301,11 @@ class Profiler
      */
     public function validateMap(ProfilerMapCollection $map)
     {
-        $hashWrongList = array();
-
         try {
             foreach ($this->validators as $validator) {
                 /** @var ProfilerValidatorInterface $validator */
                 $validator->validate($map);
             }
-            foreach ($map as $requestCollection) {
-                /** @var ProfilerStackCollection $requestCollection */
-                $hashWrongList[$requestCollection->getRequestHash()] = $this->getWrongOrderCanContainsMap($requestCollection);
-            }
-
-            $this->validateWrongKeysOrder($hashWrongList);
 
             return null;
 
@@ -340,134 +332,5 @@ class Profiler
 
             return $exception;
         }
-    }
-
-    /**
-     * Проверка правильного вызова ключей
-     *
-     * Исключение ситуаций типа (схема вызова):
-     *
-     * <A>
-     *  <B>
-     *  <B>
-     * </A>
-     *
-     * Должно быть:
-     *
-     * <B>
-     *  <A>
-     *  </A>
-     * </B>
-     *
-     * @param array $hashWrongList
-     * @throws Exception
-     */
-    private function validateWrongKeysOrder(array $hashWrongList)
-    {
-        $keys = array();
-        foreach ($hashWrongList as $wrongOrderHash) {
-            foreach ($wrongOrderHash as $wrongOrderModel) {
-                /** @var ProfilerWrongOrder $wrongOrderModel */
-                $keys[] = $wrongOrderModel;
-            }
-        }
-        foreach ($keys as $hashKey) {
-            /** @var ProfilerWrongOrder $hashKey */
-            foreach ($hashKey->canContainKeys() as $containsKeyName) {
-                foreach ($keys as $compareHashKey) {
-                    /** @var ProfilerWrongOrder $compareHashKey */
-                    if ($compareHashKey->getKey() === $containsKeyName) {
-                        if ($compareHashKey->canContainKey($hashKey->getKey())) {
-                            throw $this->getTraceModelException(
-                                'Неправильная последовательность вызовов с ключем `%s`',
-                                $hashKey->getTrace()
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Возвращает какие вложенные ключи может хранить в себе ключ
-     *
-     * @param ProfilerStackCollection $mapHashList
-     * @return array
-     */
-    private function getWrongOrderCanContainsMap(ProfilerStackCollection $mapHashList)
-    {
-        $acquired  = $this->getHashWrongOrderMap($mapHashList);
-        $exception = null;
-
-        /** @var ProfilerStackModel $trace */
-        foreach ($mapHashList as $trace) {
-            /** @var ProfilerWrongOrder $keyCrossOrderModel */
-            $keyCrossOrderModel = $acquired[$trace->getKey()];
-
-            switch ($trace->getAction()) {
-                case Mutex::ACTION_ACQUIRE:
-                    $keyCrossOrderModel->acquire();
-
-                    foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerWrongOrder $otherKeyCrossOrderModel */
-                        if ($otherKeyCrossOrderModel->isAcquired()) {
-                            if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
-                                $otherKeyCrossOrderModel->addContainKey($trace->getKey());
-                            }
-                        }
-                    }
-
-                    break;
-                case Mutex::ACTION_RELEASE:
-                    $keyCrossOrderModel->release();
-
-                    foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerWrongOrder $otherKeyCrossOrderModel */
-                        $otherKeyCrossOrderModel->removeContainKey($trace->getKey());
-                    }
-
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return $acquired;
-    }
-
-    /**
-     * Карта неправильной последовательности для хеша вызовов
-     *
-     * @param ProfilerStackCollection $mapHashList
-     * @return array
-     */
-    private function getHashWrongOrderMap(ProfilerStackCollection $mapHashList)
-    {
-        $acquired = array();
-        foreach ($mapHashList as $trace) {
-            /** @var ProfilerStackModel $trace */
-            if (!isset($acquired[$trace->getKey()])) {
-                $acquired[$trace->getKey()] = new ProfilerWrongOrder($trace);
-            }
-        }
-
-        return $acquired;
-    }
-
-    /**
-     * Исключение с моделью стека вызова профайлера
-     *
-     * @param string             $message
-     * @param ProfilerStackModel $trace
-     *
-     * @return Exception
-     */
-    private function getTraceModelException($message, ProfilerStackModel $trace)
-    {
-        $exception = new Exception(sprintf($message, $trace->getKey()));
-        $exception->setProfilerStackModel($trace);
-
-        return $exception;
     }
 } 
