@@ -80,11 +80,29 @@ class ProfilerMapCollection extends AbstractCollection
      * Получить уникальные коллекции
      *
      * @return ProfilerMapCollection
-     * @todo Реализовать метод
      */
     public function getUniqueCollections()
     {
-        return new ProfilerMapCollection();
+        $uniqueCollection = new ProfilerMapCollection();
+        /** @var ProfilerStackCollection $requestCollection */
+        foreach ($this->collection as $requestCollection) {
+            $exist = false;
+            /** @var ProfilerStackCollection $existRequestCollection */
+            foreach ($uniqueCollection as $existRequestCollection) {
+                if ($requestCollection->getModelHash() === $existRequestCollection->getModelHash()) {
+                    $exist = true;
+                }
+            }
+            if (!$exist) {
+                /** @var ProfilerStackModel $trace */
+                foreach ($requestCollection as $trace) {
+                    $uniqueCollection->append($trace);
+                }
+            }
+
+        }
+
+        return $uniqueCollection;
     }
 
     /**

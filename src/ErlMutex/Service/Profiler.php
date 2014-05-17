@@ -257,7 +257,7 @@ class Profiler
             throw new Exception('Не задана директория для генерации карты профайлера');
         }
 
-        $map    = $this->getMap();
+        $map    = $this->getMap()->getUniqueCollections();
         $loader = new \Twig_Loader_Filesystem(__DIR__ . self::TEMPLATES_DIR);
         $twig   = new \Twig_Environment($loader);
         $error  = null;
