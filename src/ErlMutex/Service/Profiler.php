@@ -18,9 +18,7 @@ use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 use ErlMutex\ProfilerValidatorInterface;
-use ErlMutex\Validator\ProfilerActionsOrder;
-use ErlMutex\Validator\ProfilerCrossOrder;
-use ErlMutex\Validator\ProfilerKeysOrder;
+use ErlMutex\Validator\ProfilerCollection as ProfilerValidatorCollection;
 
 /**
  * Профайлер отладчик для erl'a
@@ -70,9 +68,9 @@ class Profiler
     /**
      * Валидаторы для проверки запросов
      *
-     * @var array
+     * @var ProfilerValidatorCollection
      */
-    private $validators = array();
+    private $validators;
 
     /**
      * Constructor
@@ -88,10 +86,7 @@ class Profiler
 
         $this->requestUri   = $requestUri;
         $this->initDateTime = new DateTime();
-
-        $this->validators[] = new ProfilerActionsOrder();
-        $this->validators[] = new ProfilerCrossOrder();
-        $this->validators[] = new ProfilerKeysOrder();
+        $this->validators   = ProfilerValidatorCollection::getInstance();
     }
 
     /**
