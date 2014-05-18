@@ -50,29 +50,25 @@ class ProfilerKeysOrder extends ProfilerAbstract
      */
     public function validate(ProfilerMapCollection $mapCollection)
     {
-        $hashWrongList = array();
+        $keysOrderMap = array();
         /** @var ProfilerStackCollection $requestCollection */
         foreach ($mapCollection as $requestCollection) {
-            $hashWrongList[$requestCollection->getRequestHash()] = $this->getWrongOrderCanContainsMap($requestCollection);
-        }
-
-        $keys = array();
-        foreach ($hashWrongList as $wrongOrderHash) {
-            foreach ($wrongOrderHash as $wrongOrderModel) {
+            $requestKeysOrderMap = $this->getWrongOrderCanContainsMap($requestCollection);
+            foreach ($requestKeysOrderMap as $wrongOrderModel) {
                 /** @var ProfilerWrongOrderModel $wrongOrderModel */
-                $keys[] = $wrongOrderModel;
+                $keysOrderMap[] = $wrongOrderModel;
             }
         }
-        foreach ($keys as $hashKey) {
-            /** @var ProfilerWrongOrderModel $hashKey */
-            foreach ($hashKey->canContainKeys() as $containsKeyName) {
-                foreach ($keys as $compareHashKey) {
-                    /** @var ProfilerWrongOrderModel $compareHashKey */
-                    if ($compareHashKey->getKey() === $containsKeyName) {
-                        if ($compareHashKey->canContainKey($hashKey->getKey())) {
+        foreach ($keysOrderMap as $keyWrongOrderModel) {
+            /** @var ProfilerWrongOrderModel $keyWrongOrderModel */
+            foreach ($keyWrongOrderModel->canContainKeys() as $containsKeyName) {
+                foreach ($keysOrderMap as $compareKeyWrongOrderModel) {
+                    /** @var ProfilerWrongOrderModel $compareKeyWrongOrderModel */
+                    if ($compareKeyWrongOrderModel->getKey() === $containsKeyName) {
+                        if ($compareKeyWrongOrderModel->canContainKey($keyWrongOrderModel->getKey())) {
                             throw $this->getTraceModelException(
                                 'Неправильная последовательность вызовов с ключем `%s`',
-                                $hashKey->getTrace()
+                                $keyWrongOrderModel->getTrace()
                             );
                         }
                     }
@@ -93,11 +89,11 @@ class ProfilerKeysOrder extends ProfilerAbstract
 
         /** @var ProfilerStackModel $trace */
         foreach ($requestCollection as $trace) {
-            $keyCrossOrderModel = $acquired->getModelByTrace($trace);
+            $keyWrongOrderModel = $acquired->getModelByTrace($trace);
 
             switch ($trace->getAction()) {
                 case Mutex::ACTION_ACQUIRE:
-                    $keyCrossOrderModel->acquire();
+                    $keyWrongOrderModel->acquire();
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerWrongOrderModel $otherKeyCrossOrderModel */
@@ -110,7 +106,7 @@ class ProfilerKeysOrder extends ProfilerAbstract
 
                     break;
                 case Mutex::ACTION_RELEASE:
-                    $keyCrossOrderModel->release();
+                    $keyWrongOrderModel->release();
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
                         /** @var ProfilerWrongOrderModel $otherKeyCrossOrderModel */
