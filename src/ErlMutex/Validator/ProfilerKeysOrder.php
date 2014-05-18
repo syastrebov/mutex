@@ -16,6 +16,7 @@ use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerWrongOrder as ProfilerWrongOrderModel;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 use ErlMutex\Model\ProfilerStackCollection;
+use ErlMutex\Model\ProfilerWrongOrderCollection;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Exception\ProfilerException as Exception;
 
@@ -99,13 +100,12 @@ class ProfilerKeysOrder extends ProfilerAbstract
      */
     private function getWrongOrderCanContainsMap(ProfilerStackCollection $mapHashList)
     {
-        $acquired  = $this->getHashWrongOrderMap($mapHashList);
-        $exception = null;
+        $acquired = $this->getHashWrongOrderMap($mapHashList);
 
         /** @var ProfilerStackModel $trace */
         foreach ($mapHashList as $trace) {
             /** @var ProfilerWrongOrderModel $keyCrossOrderModel */
-            $keyCrossOrderModel = $acquired[$trace->getKey()];
+            $keyCrossOrderModel = $acquired->getModelByTrace($trace);
 
             switch ($trace->getAction()) {
                 case Mutex::ACTION_ACQUIRE:
@@ -141,19 +141,17 @@ class ProfilerKeysOrder extends ProfilerAbstract
     /**
      * Карта неправильной последовательности для хеша вызовов
      *
-     * @param ProfilerStackCollection $mapHashList
-     * @return array
+     * @param ProfilerStackCollection $requestCollection
+     * @return ProfilerWrongOrderCollection
      */
-    private function getHashWrongOrderMap(ProfilerStackCollection $mapHashList)
+    private function getHashWrongOrderMap(ProfilerStackCollection $requestCollection)
     {
-        $acquired = array();
-        foreach ($mapHashList as $trace) {
+        $collection = new ProfilerWrongOrderCollection();
+        foreach ($requestCollection as $trace) {
             /** @var ProfilerStackModel $trace */
-            if (!isset($acquired[$trace->getKey()])) {
-                $acquired[$trace->getKey()] = new ProfilerWrongOrderModel($trace);
-            }
+            $collection->append($trace);
         }
 
-        return $acquired;
+        return $collection;
     }
 }

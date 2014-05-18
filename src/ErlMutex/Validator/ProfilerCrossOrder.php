@@ -118,13 +118,13 @@ class ProfilerCrossOrder extends ProfilerAbstract
     /**
      * Карта перекрестных связей для хеша вызовов
      *
-     * @param ProfilerStackCollection $mapHashList
+     * @param ProfilerStackCollection $requestCollection
      * @return ProfilerCrossOrderCollection
      */
-    private function getHashCrossOrderMap(ProfilerStackCollection $mapHashList)
+    private function getHashCrossOrderMap(ProfilerStackCollection $requestCollection)
     {
         $collection = new ProfilerCrossOrderCollection();
-        foreach ($mapHashList as $trace) {
+        foreach ($requestCollection as $trace) {
             /** @var ProfilerStackModel $trace */
             $collection->append($trace);
         }

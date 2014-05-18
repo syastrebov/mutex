@@ -61,6 +61,8 @@ class Profiler
     private $storage;
 
     /**
+     * Путь к директории сохранения карты
+     *
      * @var string
      */
     private $mapOutputLocation;

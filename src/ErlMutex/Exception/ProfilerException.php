@@ -15,7 +15,7 @@ namespace ErlMutex\Exception;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 
 /**
- * Исключение профайлера
+ * Исключение для профайлера
  *
  * Class ProfilerException
  * @package erl\Exception
@@ -60,10 +60,12 @@ class ProfilerException extends \Exception
      * Описание исключения
      *
      * @param array $description
+     * @return $this
      */
     public function setDescription(array $description)
     {
         $this->description = $description;
+        return $this;
     }
 
     /**
