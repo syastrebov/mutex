@@ -23,16 +23,22 @@ use ErlMutex\Exception\ProfilerException;
 class ProfilerCrossOrder
 {
     /**
+     * Ключ блокировки
+     *
      * @var string
      */
     private $key;
 
     /**
+     * Заблокирована ли модель
+     *
      * @var bool
      */
     private $acquired = false;
 
     /**
+     * Содержит ключи
+     *
      * @var array
      */
     private $containKeys = array();

@@ -93,6 +93,8 @@ class ProfilerStack
     private $dateTime;
 
     /**
+     * Стек вызова
+     *
      * @var null|string
      */
     private $stackTrace;

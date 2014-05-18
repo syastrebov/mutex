@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Validator;
 
+use ErlMutex\Model\ProfilerCrossOrderCollection;
 use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerCrossOrder as ProfilerCrossOrderModel;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
@@ -71,13 +72,12 @@ class ProfilerCrossOrder extends ProfilerAbstract
      */
     private function validateCrossOrder(ProfilerStackCollection $requestCollection)
     {
-        $acquired  = $this->getHashCrossOrderMap($requestCollection);
-        $exception = null;
+        $acquired = $this->getHashCrossOrderMap($requestCollection);
 
         /** @var ProfilerStackModel $trace */
         foreach ($requestCollection as $trace) {
             /** @var ProfilerCrossOrderModel $keyCrossOrderModel */
-            $keyCrossOrderModel = $acquired[$trace->getKey()];
+            $keyCrossOrderModel = $acquired->getModelByTrace($trace);
 
             switch ($trace->getAction()) {
                 case Mutex::ACTION_ACQUIRE:
@@ -119,16 +119,16 @@ class ProfilerCrossOrder extends ProfilerAbstract
      * Карта перекрестных связей для хеша вызовов
      *
      * @param ProfilerStackCollection $mapHashList
-     * @return array
+     * @return ProfilerCrossOrderCollection
      */
     private function getHashCrossOrderMap(ProfilerStackCollection $mapHashList)
     {
-        $acquired = array();
+        $collection = new ProfilerCrossOrderCollection();
         foreach ($mapHashList as $trace) {
             /** @var ProfilerStackModel $trace */
-            $acquired[$trace->getKey()] = new ProfilerCrossOrderModel($trace->getKey());
+            $collection->append($trace);
         }
 
-        return $acquired;
+        return $collection;
     }
 }
