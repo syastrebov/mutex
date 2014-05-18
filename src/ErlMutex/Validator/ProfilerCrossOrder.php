@@ -54,6 +54,7 @@ class ProfilerCrossOrder extends ProfilerAbstract
      * Анализировать карту вызова блокировок
      *
      * @param ProfilerMapCollection $mapCollection
+     * @throws Exception
      */
     public function validate(ProfilerMapCollection $mapCollection)
     {

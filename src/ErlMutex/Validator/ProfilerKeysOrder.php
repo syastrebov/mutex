@@ -84,15 +84,15 @@ class ProfilerKeysOrder extends ProfilerAbstract
     /**
      * Возвращает какие вложенные ключи может хранить в себе ключ
      *
-     * @param ProfilerStackCollection $mapHashList
-     * @return array
+     * @param ProfilerStackCollection $requestCollection
+     * @return ProfilerWrongOrderCollection
      */
-    private function getWrongOrderCanContainsMap(ProfilerStackCollection $mapHashList)
+    private function getWrongOrderCanContainsMap(ProfilerStackCollection $requestCollection)
     {
-        $acquired = $this->getHashWrongOrderMap($mapHashList);
+        $acquired = $this->getWrongOrderCollection($requestCollection);
 
         /** @var ProfilerStackModel $trace */
-        foreach ($mapHashList as $trace) {
+        foreach ($requestCollection as $trace) {
             $keyCrossOrderModel = $acquired->getModelByTrace($trace);
 
             switch ($trace->getAction()) {
@@ -132,7 +132,7 @@ class ProfilerKeysOrder extends ProfilerAbstract
      * @param ProfilerStackCollection $requestCollection
      * @return ProfilerWrongOrderCollection
      */
-    private function getHashWrongOrderMap(ProfilerStackCollection $requestCollection)
+    private function getWrongOrderCollection(ProfilerStackCollection $requestCollection)
     {
         $collection = new ProfilerWrongOrderCollection();
         foreach ($requestCollection as $trace) {
