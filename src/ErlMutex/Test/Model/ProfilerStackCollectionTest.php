@@ -17,6 +17,8 @@ use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
 use DateTime;
 
 /**
+ * Тестирование коллекции запросов в пределах одной сессии
+ *
  * Class ProfilerStackCollectionTest
  * @package ErlMutex\Test\Model
  */
@@ -26,12 +28,14 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
     const REQUEST_2 = 'request_2';
 
     /**
+     * Коллекция запросов в пределах одной сессии
+     *
      * @var ProfilerStackCollection
      */
     private $collection;
 
     /**
-     *
+     * Задаем новую коллекцию для каждого теста
      */
     public function setUp()
     {
@@ -39,7 +43,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Удаляем коллекцию после каждого теста
      */
     public function tearDown()
     {
@@ -118,13 +122,8 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Сравнение двух коллекций
+     * Получение количества моделей в коллекции
      */
-    public function testCompareCollections()
-    {
-
-    }
-
     public function testGetCount()
     {
         $this->collection->append(new ProfilerStackModel(
@@ -192,6 +191,8 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Попытка получения uri запроса из пустой коллекции
+     *
      * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testGetRequestUriFromEmptyCollection()

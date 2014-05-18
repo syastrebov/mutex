@@ -17,18 +17,22 @@ use ErlMutex\Model\ProfilerWrongOrderCollection;
 use ErlMutex\Service\Mutex;
 
 /**
+ * Тестирование коллекции правильной последовательности вызова ключей
+ *
  * Class ProfilerWrongOrderCollectionTest
  * @package ErlMutex\Test\Model
  */
 class ProfilerWrongOrderCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Коллекция правильной последовательности вызова ключей
+     *
      * @var ProfilerWrongOrderCollection
      */
     private $collection;
 
     /**
-     *
+     * Задаем новую коллекцию для каждого теста
      */
     public function setUp()
     {
@@ -36,7 +40,7 @@ class ProfilerWrongOrderCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Удаляем коллекцию после каждого теста
      */
     public function tearDown()
     {
