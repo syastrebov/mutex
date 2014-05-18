@@ -17,6 +17,8 @@ use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
 
 /**
+ * Тестирование профайлера
+ *
  * Class ProfilerTest
  * @package Test\Service
  */
@@ -26,6 +28,8 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     const OUTPUT_DIR_NOT_EXIST = '/../../../../test/profiler_output_not_exist/';
 
     /**
+     * Мьютекс
+     *
      * @var Mutex
      */
     private $mutex;

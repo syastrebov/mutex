@@ -17,6 +17,8 @@ use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 
 /**
+ * Тестирование мьютекса
+ *
  * Class Test
  * @package Test
  */
@@ -28,6 +30,8 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     const PROFILER_DUMP_ENABLED = false;
 
     /**
+     * Мьютекс
+     *
      * @var Mutex
      */
     private $mutex;

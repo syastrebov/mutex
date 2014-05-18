@@ -17,12 +17,16 @@ use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
 
 /**
+ * Тестирование хранилища для отладки
+ *
  * Class ProfilerStorageDummyTest
  * @package Test\Service\Storage
  */
 class ProfilerStorageDummyTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Мьютекс
+     *
      * @var Mutex
      */
     private $mutex;

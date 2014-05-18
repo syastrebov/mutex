@@ -16,18 +16,22 @@ use ErlMutex\Validator\ProfilerActionsOrder;
 use ErlMutex\Validator\ProfilerCollection;
 
 /**
+ * Тестирование коллекции валидаторов
+ *
  * Class ProfilerCollectionTest
  * @package ErlMutex\Test\Validator
  */
 class ProfilerCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Колекция валидаторов
+     *
      * @var ProfilerCollection
      */
     private $collection;
 
     /**
-     *
+     * Задаем новую коллекцию для каждого теста
      */
     public function setUp()
     {
@@ -35,7 +39,7 @@ class ProfilerCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Удаляем коллекцию после каждого теста
      */
     public function tearDown()
     {

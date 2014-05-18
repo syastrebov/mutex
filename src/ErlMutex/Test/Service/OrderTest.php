@@ -19,6 +19,8 @@ use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
 
 /**
+ * Тестирование профайлера (очередь вызова блокировок)
+ *
  * Class DeadLockTest
  * @package ErlMutex\Test\Service
  */
