@@ -17,18 +17,22 @@ use ErlMutex\Model\ProfilerStack;
 use ErlMutex\Service\Mutex;
 
 /**
+ * Тестирование коллекции перехлестных вызовов
+ *
  * Class ProfilerCrossOrderCollectionTest
  * @package ErlMutex\Test\Model
  */
 class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Коллекция перехлестных вызовов
+     *
      * @var ProfilerCrossOrderCollection
      */
     private $collection;
 
     /**
-     *
+     * Задаем новую коллекцию для каждого теста
      */
     public function setUp()
     {
@@ -36,7 +40,7 @@ class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Удаляем коллекцию после каждого теста
      */
     public function tearDown()
     {
@@ -44,6 +48,8 @@ class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Получение несуществующей блокировки
+     *
      * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testGetModelByTraceNotFound()

@@ -14,18 +14,22 @@ namespace ErlMutex\Test\Model;
 use ErlMutex\Model\ProfilerCrossOrder;
 
 /**
+ * Тестирование модели перехлестных вызовов
+ *
  * Class ProfilerCrossOrderTest
  * @package ErlMutex\Test\Model
  */
 class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Модель перехлестных вызовов
+     *
      * @var ProfilerCrossOrder
      */
     private $profilerCrossOrderModel;
 
     /**
-     *
+     * Задаем новую модель для каждого теста
      */
     public function setUp()
     {
@@ -33,7 +37,7 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Удаляем модель после каждого теста
      */
     public function tearDown()
     {
