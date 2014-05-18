@@ -36,7 +36,6 @@ class ProfilerActionsOrder extends ProfilerAbstract
      * Анализировать карту вызова блокировок
      *
      * @param ProfilerMapCollection $mapCollection
-     * @return mixed
      */
     public function validate(ProfilerMapCollection $mapCollection)
     {

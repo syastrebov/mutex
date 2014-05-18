@@ -46,7 +46,7 @@ class ProfilerKeysOrder extends ProfilerAbstract
      * Анализировать карту вызова блокировок
      *
      * @param ProfilerMapCollection $mapCollection
-     * @return mixed
+     * @throws Exception
      */
     public function validate(ProfilerMapCollection $mapCollection)
     {
@@ -56,17 +56,6 @@ class ProfilerKeysOrder extends ProfilerAbstract
             $hashWrongList[$requestCollection->getRequestHash()] = $this->getWrongOrderCanContainsMap($requestCollection);
         }
 
-        $this->validateWrongKeysOrder($hashWrongList);
-    }
-
-    /**
-     * Проверка правильного вызова ключей
-     *
-     * @param array $hashWrongList
-     * @throws Exception
-     */
-    private function validateWrongKeysOrder(array $hashWrongList)
-    {
         $keys = array();
         foreach ($hashWrongList as $wrongOrderHash) {
             foreach ($wrongOrderHash as $wrongOrderModel) {
@@ -104,7 +93,6 @@ class ProfilerKeysOrder extends ProfilerAbstract
 
         /** @var ProfilerStackModel $trace */
         foreach ($mapHashList as $trace) {
-            /** @var ProfilerWrongOrderModel $keyCrossOrderModel */
             $keyCrossOrderModel = $acquired->getModelByTrace($trace);
 
             switch ($trace->getAction()) {

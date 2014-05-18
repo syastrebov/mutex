@@ -54,7 +54,6 @@ class ProfilerCrossOrder extends ProfilerAbstract
      * Анализировать карту вызова блокировок
      *
      * @param ProfilerMapCollection $mapCollection
-     * @return mixed
      */
     public function validate(ProfilerMapCollection $mapCollection)
     {
@@ -76,7 +75,6 @@ class ProfilerCrossOrder extends ProfilerAbstract
 
         /** @var ProfilerStackModel $trace */
         foreach ($requestCollection as $trace) {
-            /** @var ProfilerCrossOrderModel $keyCrossOrderModel */
             $keyCrossOrderModel = $acquired->getModelByTrace($trace);
 
             switch ($trace->getAction()) {
