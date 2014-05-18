@@ -27,17 +27,25 @@ class ProfilerWrongOrderCollectionTest extends \PHPUnit_Framework_TestCase
      */
     private $collection;
 
+    /**
+     *
+     */
     public function setUp()
     {
         $this->collection = new ProfilerWrongOrderCollection();
     }
 
+    /**
+     *
+     */
     public function tearDown()
     {
         $this->collection = null;
     }
 
     /**
+     * Попытка получить несуществующую модель
+     *
      * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testGetModelByTraceNotFound()

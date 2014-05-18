@@ -27,11 +27,17 @@ class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
      */
     private $collection;
 
+    /**
+     *
+     */
     public function setUp()
     {
         $this->collection = new ProfilerCrossOrderCollection();
     }
 
+    /**
+     *
+     */
     public function tearDown()
     {
         $this->collection = null;

@@ -44,16 +44,25 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
         $this->collection = null;
     }
 
+    /**
+     * Тестирование добавления запросов
+     */
     public function testAppend()
     {
 
     }
 
+    /**
+     * Проверка наличия коллекции
+     */
     public function testHasCollection()
     {
 
     }
 
+    /**
+     * Получение коллекции по хешу запроса
+     */
     public function testGetCollectionByRequestHash()
     {
 
