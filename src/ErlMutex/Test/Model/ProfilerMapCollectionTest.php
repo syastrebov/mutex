@@ -18,18 +18,22 @@ use ErlMutex\Service\Mutex;
 use DateTime;
 
 /**
+ * Тестирование карты профайлера
+ *
  * Class ProfilerMapCollectionTest
  * @package ErlMutex\Test\Model
  */
 class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Коллекция карты профайлера
+     *
      * @var ProfilerMapCollection
      */
     private $collection;
 
     /**
-     *
+     * Задаем новую коллекцию для каждого теста
      */
     public function setUp()
     {
@@ -37,7 +41,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Удаляем коллекцию после каждого теста
      */
     public function tearDown()
     {
@@ -49,7 +53,50 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAppend()
     {
+        $this->collection->append(new ProfilerStack(
+            __FUNCTION__,
+            md5(__FUNCTION__ . 1),
+            __FILE__,
+            1,
+            __CLASS__,
+            __FUNCTION__,
+            'A',
+            Mutex::ACTION_GET,
+            '',
+            new DateTime()
+        ));
 
+        $this->assertEquals(1, count($this->collection));
+
+        $this->collection->append(new ProfilerStack(
+            __FUNCTION__,
+            md5(__FUNCTION__ . 1),
+            __FILE__,
+            1,
+            __CLASS__,
+            __FUNCTION__,
+            'A',
+            Mutex::ACTION_ACQUIRE,
+            '',
+            new DateTime()
+        ));
+
+        $this->assertEquals(1, count($this->collection));
+
+        $this->collection->append(new ProfilerStack(
+            __FUNCTION__,
+            md5(__FUNCTION__ . 2),
+            __FILE__,
+            1,
+            __CLASS__,
+            __FUNCTION__,
+            'A',
+            Mutex::ACTION_GET,
+            '',
+            new DateTime()
+        ));
+
+        $this->assertEquals(2, count($this->collection));
     }
 
     /**
@@ -57,7 +104,20 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasCollection()
     {
-
+        $this->assertFalse($this->collection->hasCollection(md5(__FUNCTION__)));
+        $this->collection->append(new ProfilerStack(
+            __FUNCTION__,
+            md5(__FUNCTION__),
+            __FILE__,
+            1,
+            __CLASS__,
+            __FUNCTION__,
+            'A',
+            Mutex::ACTION_GET,
+            '',
+            new DateTime()
+        ));
+        $this->assertTrue($this->collection->hasCollection(md5(__FUNCTION__)));
     }
 
     /**
@@ -65,7 +125,19 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCollectionByRequestHash()
     {
-
+        $this->collection->append(new ProfilerStack(
+            __FUNCTION__,
+            md5(__FUNCTION__),
+            __FILE__,
+            1,
+            __CLASS__,
+            __FUNCTION__,
+            'A',
+            Mutex::ACTION_GET,
+            '',
+            new DateTime()
+        ));
+        $this->assertNotNull($this->collection->getCollectionByRequestHash(md5(__FUNCTION__)));
     }
 
     /**
@@ -78,6 +150,9 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
         $this->collection->getCollectionByRequestHash(md5(__FUNCTION__));
     }
 
+    /**
+     * Тестирование уникальных коллекций
+     */
     public function testGetUniqueCollections()
     {
         $request1 = new ProfilerStack(
