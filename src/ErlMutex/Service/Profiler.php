@@ -15,6 +15,7 @@ namespace ErlMutex\Service;
 use ErlMutex\Exception\ProfilerException as Exception;
 use ErlMutex\Model\ProfilerMapCollection;
 use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Model\ProfilerStackCollection;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 use ErlMutex\ProfilerValidatorInterface;
@@ -49,9 +50,9 @@ class Profiler
     /**
      * Стек вызова блокировок
      *
-     * @var array
+     * @var ProfilerStackCollection
      */
-    private $stack = array();
+    private $stack;
 
     /**
      * Хранилище истории блокировок
@@ -88,6 +89,7 @@ class Profiler
 
         $this->requestUri   = $requestUri;
         $this->initDateTime = new DateTime();
+        $this->stack        = new ProfilerStackCollection($this->getRequestHash());
         $this->validators   = ProfilerValidatorCollection::getInstance();
     }
 
@@ -188,7 +190,7 @@ class Profiler
         }
 
         if ($model instanceof ProfilerStackModel) {
-            $this->stack[] = $model;
+            $this->stack->append($model);
             if ($this->storage) {
                 $this->storage->insert($model);
             }

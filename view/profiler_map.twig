@@ -11,9 +11,9 @@
             {% for requestUri, requests in map %}
             <div class="requestUri">
                 <h1>{{ requestUri }}</h1>
-                {% for requestHash, stack in requests %}
+                {% for request in requests %}
                 <div class="requestHash">
-                    <p>{{ requestHash }}</p>
+                    <p>{{ request.requestHash }}</p>
                     <table>
                         <thead>
                             <tr>
@@ -28,7 +28,7 @@
                                 <th>DateTime</th>
                             </tr>
                         </thead>
-                        {% for num, info in stack %}
+                        {% for num, info in request.collection %}
                         <tr>
                             <td class="num">{{ num }} </td>
                             {% if error.position is defined and num >= error.position %}

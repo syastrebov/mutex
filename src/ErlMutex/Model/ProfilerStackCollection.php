@@ -125,10 +125,14 @@ class ProfilerStackCollection extends AbstractCollection
      */
     public function asArray()
     {
-        $result = array();
+        $result = array(
+            'requestHash' => $this->getRequestHash(),
+            'collection'  => array(),
+        );
+
         foreach ($this->collection as $trace) {
             /** @var ProfilerStackModel $trace */
-            $result[] = $trace->asArray();
+            $result['collection'][] = $trace->asArray();
         }
 
         return $result;
