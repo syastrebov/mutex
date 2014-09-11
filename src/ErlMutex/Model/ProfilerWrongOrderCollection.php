@@ -7,7 +7,7 @@
  * @category erl
  * @package  erl
  * @author   Sergey Yastrebov <serg.yastrebov@gmail.com>
- * @link     https://github.com/syastrebov/erl
+ * @link     https://github.com/syastrebov/mutex-php
  */
 
 namespace ErlMutex\Model;
