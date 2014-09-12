@@ -24,6 +24,10 @@ use ErlMutex\LoggerInterface;
  */
 class Mutex
 {
+    const ACTION_GET     = 'get';
+    const ACTION_ACQUIRE = 'acquire';
+    const ACTION_RELEASE = 'release';
+
     /**
      * @var AdapterInterface
      */

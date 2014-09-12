@@ -13,6 +13,7 @@
 namespace ErlMutex\Adapter;
 
 use ErlMutex\Exception\Exception;
+use ErlMutex\Service\Mutex;
 
 /**
  * Адаптер для работы через socket
@@ -24,10 +25,6 @@ final class Socket implements AdapterInterface
 {
     const DEFAULT_HOST   = '127.0.0.1';
     const DEFAULT_PORT   = 7007;
-
-    const ACTION_GET     = 'get';
-    const ACTION_ACQUIRE = 'acquire';
-    const ACTION_RELEASE = 'release';
 
     /**
      * @var string
@@ -95,7 +92,7 @@ final class Socket implements AdapterInterface
     public function get($name, $timeout)
     {
         $this->send(array(
-            'cmd'     => self::ACTION_GET,
+            'cmd'     => Mutex::ACTION_GET,
             'name'    => $name,
             'timeout' => $timeout,
         ));
@@ -113,7 +110,7 @@ final class Socket implements AdapterInterface
     {
         $response = null;
         while (true) {
-            $this->send(['cmd' => self::ACTION_ACQUIRE, 'name' => $name]);
+            $this->send(['cmd' => Mutex::ACTION_ACQUIRE, 'name' => $name]);
             $response = $this->receive();
             if ($response == 'busy') {
                 usleep(10000);
@@ -133,7 +130,7 @@ final class Socket implements AdapterInterface
      */
     public function release($name)
     {
-        $this->send(['cmd' => self::ACTION_RELEASE, 'name' => $name]);
+        $this->send(['cmd' => Mutex::ACTION_RELEASE, 'name' => $name]);
         return $this->receive();
     }
 

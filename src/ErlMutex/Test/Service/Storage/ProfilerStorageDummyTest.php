@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Test\Service\Storage;
 
+use ErlMutex\Adapter\Socket;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
@@ -44,7 +45,7 @@ class ProfilerStorageDummyTest extends \PHPUnit_Framework_TestCase
      */
     public function testTruncate()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->getProfiler()

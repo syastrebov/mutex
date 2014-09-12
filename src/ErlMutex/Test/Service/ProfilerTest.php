@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Test\Service;
 
+use ErlMutex\Adapter\Socket;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
@@ -47,7 +48,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetProfiler()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex->establishConnection();
 
         $this->assertNotNull($this->mutex->get('A'));
@@ -78,7 +79,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDump()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -100,7 +101,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSave()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection()

@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Test\Service;
 
+use ErlMutex\Adapter\Socket;
 use ErlMutex\Entity\Profiler\MapCollection;
 use ErlMutex\Entity\Profiler\Stack;
 use ErlMutex\Service\Mutex;
@@ -36,7 +37,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $mutexes = array();
         for ($i = 0; $i < 2; $i++) {
-            $mutexes[$i] = new Mutex();
+            $mutexes[$i] = new Mutex(new Socket());
 
             /** @var Mutex $mutex */
             $mutex = &$mutexes[$i];
@@ -89,7 +90,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex();
+        $mutex = new Mutex(new Socket());
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -125,7 +126,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $mutexes = array();
         for ($i = 0; $i < 2; $i++) {
-            $mutexes[$i] = new Mutex();
+            $mutexes[$i] = new Mutex(new Socket());
 
             /** @var Mutex $mutex */
             $mutex = &$mutexes[$i];
@@ -176,7 +177,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex();
+        $mutex = new Mutex(new Socket());
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -215,7 +216,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex();
+        $mutex = new Mutex(new Socket());
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -244,7 +245,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex();
+        $mutex = new Mutex(new Socket());
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -271,7 +272,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex();
+        $mutex = new Mutex(new Socket());
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))
@@ -300,7 +301,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         ProfilerTest::createOutputDirIfNotExist(__CLASS__, __FUNCTION__);
         ProfilerStorageDummy::getInstance()->truncate();
 
-        $mutex = new Mutex();
+        $mutex = new Mutex(new Socket());
         $mutex
             ->establishConnection()
             ->setProfiler(new Profiler(__FUNCTION__))

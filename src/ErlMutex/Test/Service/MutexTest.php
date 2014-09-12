@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Test\Service;
 
+use ErlMutex\Adapter\Socket;
 use ErlMutex\Service\Logger\LoggerDummy;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
@@ -46,15 +47,16 @@ class MutexTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Неправильно заданные параметры подключения
-     *
-     * @expectedException \ErlMutex\Exception\Exception
      */
     public function testInvalidConnectionParams()
     {
-        $this->mutex = new Mutex('0.0.0.0', 0);
-        $this->mutex
-            ->setLogger(new LoggerDummy())
-            ->establishConnection();
+        $this->mutex = new Mutex(new Socket('0.0.0.0', 0));
+        $this->assertFalse(
+            $this->mutex
+                ->setLogger(new LoggerDummy())
+                ->establishConnection()
+                ->isAlive()
+        );
     }
 
     /**
@@ -62,7 +64,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testConnectionSuccess()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->assertTrue(
             $this->mutex
                 ->setProfiler(new Profiler(__FUNCTION__))
@@ -83,7 +85,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidPointerParams($name, $timeout)
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
         $this->mutex->get($name, $timeout);
     }
@@ -93,7 +95,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testConnectionFailure()
     {
-        $this->mutex = new Mutex('127.0.0.1', 7008);
+        $this->mutex = new Mutex(new Socket('127.0.0.1', 7008));
         $this->assertFalse(
             $this->mutex
                 ->setLogger(new LoggerDummy())
@@ -112,7 +114,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPointerSuccess()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -133,7 +135,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPointerWithoutConnection()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
         $this->assertEquals('A', $this->mutex->get('A'));
@@ -149,7 +151,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireSuccess()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -168,7 +170,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireWithoutConnection()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
         $this->assertEquals('A', $this->mutex->get('A'));
@@ -189,7 +191,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireWithoutPointer()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -207,7 +209,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireWithoutPointerAndConnection()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
         $this->assertFalse($this->mutex->acquire());
@@ -223,7 +225,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAlreadyAcquired()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -243,7 +245,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquiredBusy()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -257,7 +259,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
 
         unset($this->mutex);
 
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -276,7 +278,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testReleaseNotFound()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -298,7 +300,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireNotFound()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -320,7 +322,7 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisconnectWhileAcquired()
     {
-        $this->mutex = new Mutex();
+        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -345,14 +347,14 @@ class MutexTest extends \PHPUnit_Framework_TestCase
      */
     public function providerInvalidPointerParams()
     {
-        return array(
-            array(null, false),
-            array(1.2, false),
-            array(false, false),
-            array('A', -1),
-            array('A', 1.2),
-            array('A', true),
-            array('A', 'A'),
-        );
+        return [
+            [null, false],
+            [1.2, false],
+            [false, false],
+            ['A', -1],
+            ['A', 1.2],
+            ['A', true],
+            ['A', 'A'],
+        ];
     }
 }
