@@ -22,6 +22,9 @@ use ErlMutex\Exception\Exception;
  */
 final class Memcached implements AdapterInterface
 {
+    const TIMEOUT_DEFAULT = 5;
+    const TIMEOUT_MAX     = 10;
+
     /**
      * @var \Memcached
      */
@@ -84,9 +87,15 @@ final class Memcached implements AdapterInterface
             }
         }
 
-        $timeout = isset($this->timeout[$name]) ? ($this->timeout[$name] / 1000) : 30;
-        if (!($timeout > 0)) {
-            $timeout = 30;
+        $timeout = self::TIMEOUT_DEFAULT;
+        if (isset($this->timeout[$name])) {
+            $timeout = (int)($this->timeout[$name] / 1000);
+            if (!$timeout) {
+                $timeout = 1;
+            }
+        }
+        if ($timeout > self::TIMEOUT_MAX) {
+            $timeout = self::TIMEOUT_MAX;
         }
 
         return $this->adapter->set($name, true, $timeout);
@@ -110,7 +119,6 @@ final class Memcached implements AdapterInterface
      */
     public function isAlive()
     {
-        $servers = $this->adapter->getServerList();
-        return !empty($servers);
+        return $this->adapter->set(md5(__CLASS__ . __METHOD__), true);
     }
 }

@@ -41,10 +41,10 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $memcached = new \Memcached();
-        $memcached->addServer("127.0.0.1", 11211);
+        $memCached = new \Memcached();
+        $memCached->addServer("127.0.0.1", 11211);
 
-        $this->mutex = new Mutex(new Memcached($memcached));
+        $this->mutex = new Mutex(new Memcached($memCached));
     }
 
     /**
@@ -61,6 +61,24 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     public function testConnectionSuccess()
     {
         $this->assertTrue(
+            $this->mutex
+                ->setProfiler(new Profiler(__FUNCTION__))
+                ->establishConnection()
+                ->isAlive()
+        );
+
+        if (self::PROFILER_DUMP_ENABLED) {
+            $this->mutex->getProfiler()->dump();
+        }
+    }
+
+    /**
+     * Ошибка подключения к сервису
+     */
+    public function testConnectionFailure()
+    {
+        $this->mutex = new Mutex(new Memcached(new \Memcached()));
+        $this->assertFalse(
             $this->mutex
                 ->setProfiler(new Profiler(__FUNCTION__))
                 ->establishConnection()
@@ -161,25 +179,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Попытка повторной блокировки занятой секции (тест already_acquired)
-     */
-    public function testAlreadyAcquired()
-    {
-        $this->mutex
-            ->setProfiler(new Profiler(__FUNCTION__))
-            ->establishConnection();
-
-        $this->assertNotNull($this->mutex->get('A', 500));
-        $this->assertTrue($this->mutex->acquire());
-        $this->assertTrue($this->mutex->acquire());
-        $this->assertTrue($this->mutex->release());
-
-        if (self::PROFILER_DUMP_ENABLED) {
-            $this->mutex->getProfiler()->dump();
-        }
-    }
-
-    /**
      * Попытка блокировки занятой секции (тест busy)
      */
     public function testAcquiredBusy()
@@ -188,20 +187,21 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
-        $this->assertNotNull($this->mutex->get('A', 500));
+        $this->assertNotNull($this->mutex->get('A', 5));
         $this->assertTrue($this->mutex->acquire());
 
         if (self::PROFILER_DUMP_ENABLED) {
             $this->mutex->getProfiler()->dump();
         }
 
-        unset($this->mutex);
+        $this->tearDown();
+        $this->setUp();
 
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
-        $this->assertNotNull($this->mutex->get('A', 500));
+        $this->assertNotNull($this->mutex->get('A', 5));
         $this->assertTrue($this->mutex->acquire());
         $this->assertTrue($this->mutex->release());
 
@@ -219,10 +219,10 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
-        $this->assertNotNull($this->mutex->get('A', 500));
+        $this->assertNotNull($this->mutex->get('A', 1000));
         $this->assertTrue($this->mutex->acquire());
 
-        sleep(1);
+        sleep(2);
 
         $this->assertTrue($this->mutex->release());
 
@@ -240,8 +240,8 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
-        $this->assertNotNull($this->mutex->get('A', 500));
-        sleep(1);
+        $this->assertNotNull($this->mutex->get('A', 1000));
+        sleep(2);
 
         $this->assertTrue($this->mutex->acquire());
         $this->assertTrue($this->mutex->release());
@@ -260,16 +260,29 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
-        $this->assertNotNull($this->mutex->get('A'));
-        $this->assertTrue($this->mutex->acquire(), 1000);
+        $this->assertNotNull($this->mutex->get('A', 1000));
+        $this->assertTrue($this->mutex->acquire());
 
         $this->mutex->closeConnection();
 
-        $this->assertFalse($this->mutex->isAlive());
+        $this->assertTrue($this->mutex->isAlive());
         $this->assertTrue($this->mutex->release());
 
         if (self::PROFILER_DUMP_ENABLED) {
             $this->mutex->getProfiler()->dump();
         }
+    }
+
+    /**
+     * Ограничение на максимальное время ожидания
+     */
+    public function testMaxTimeout()
+    {
+        $this->mutex
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->establishConnection();
+
+        $this->assertNotNull($this->mutex->get('A', 20000));
+        $this->assertTrue($this->mutex->acquire());
     }
 }
