@@ -10,7 +10,7 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
 use DateTime;
 
@@ -20,7 +20,7 @@ use DateTime;
  * Class ProfilerStack
  * @package erl\Model
  */
-class ProfilerStack
+class Stack
 {
     /**
      * Запрашиваемый адрес (точка входа)

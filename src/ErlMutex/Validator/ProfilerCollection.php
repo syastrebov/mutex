@@ -12,7 +12,7 @@
 
 namespace ErlMutex\Validator;
 
-use ErlMutex\Model\AbstractCollection;
+use ErlMutex\Entity\AbstractCollection;
 use ErlMutex\ProfilerValidatorInterface;
 use ErlMutex\Exception\ProfilerException as Exception;
 

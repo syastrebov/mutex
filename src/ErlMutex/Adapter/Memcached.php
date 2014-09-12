@@ -18,7 +18,7 @@ namespace ErlMutex\Adapter;
  * Class Memcached
  * @package ErlMutex\Adapter
  */
-class Memcached
+final class Memcached implements AdapterInterface
 {
 
 }

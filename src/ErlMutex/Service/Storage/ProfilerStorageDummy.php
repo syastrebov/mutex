@@ -13,7 +13,7 @@
 namespace ErlMutex\Service\Storage;
 
 use ErlMutex\ProfilerStorageInterface;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
 
 /**
  * Хранилище для отладки

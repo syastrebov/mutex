@@ -1,22 +1,24 @@
 <?php
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity;
 
 use Iterator;
 use Countable;
 
 /**
+ * Базовая модель коллекции
+ *
  * Class AbstractCollection
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class AbstractCollection implements Iterator, Countable
+abstract class AbstractCollection implements Iterator, Countable
 {
     /**
      * Массив запросов
      *
      * @var array
      */
-    protected $collection = array();
+    protected $collection = [];
 
     /**
      * Return the current element

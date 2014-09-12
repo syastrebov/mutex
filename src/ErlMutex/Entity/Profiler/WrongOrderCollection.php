@@ -10,30 +10,31 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerWrongOrder as ProfilerWrongOrderModel;
+use ErlMutex\Entity\AbstractCollection;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackEntity;
+use ErlMutex\Entity\Profiler\WrongOrder as ProfilerWrongOrderEntity;
 use ErlMutex\Exception\ProfilerException as Exception;
 
 /**
  * Коллекция последовательности вызова ключей
  *
  * Class ProfilerWrongOrderCollection
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class ProfilerWrongOrderCollection extends AbstractCollection
+class WrongOrderCollection extends AbstractCollection
 {
     /**
      * Добавить модель
      *
-     * @param ProfilerStack $trace
+     * @param ProfilerStackEntity $trace
      * @return $this
      */
-    public function append(ProfilerStackModel $trace)
+    public function append(ProfilerStackEntity $trace)
     {
         if (!$this->hasModelByTrace($trace)) {
-            $this->collection[] = new ProfilerWrongOrderModel($trace);
+            $this->collection[] = new ProfilerWrongOrderEntity($trace);
         }
 
         return $this;
@@ -42,12 +43,12 @@ class ProfilerWrongOrderCollection extends AbstractCollection
     /**
      * Проверить есть ли такая модель по модели запроса
      *
-     * @param ProfilerStack $trace
+     * @param ProfilerStackEntity $trace
      * @return bool
      */
-    public function hasModelByTrace(ProfilerStackModel $trace)
+    public function hasModelByTrace(ProfilerStackEntity $trace)
     {
-        /** @var ProfilerWrongOrderModel $wrongOrderModel */
+        /** @var ProfilerWrongOrderEntity $wrongOrderModel */
         foreach ($this->collection as $wrongOrderModel) {
             if ($wrongOrderModel->getKey() === $trace->getKey()) {
                 return true;
@@ -60,13 +61,13 @@ class ProfilerWrongOrderCollection extends AbstractCollection
     /**
      * Получить модель по модели запроса
      *
-     * @param ProfilerStack $trace
-     * @return ProfilerWrongOrderModel
+     * @param ProfilerStackEntity $trace
+     * @return ProfilerWrongOrderEntity
      * @throws \ErlMutex\Exception\ProfilerException
      */
-    public function getModelByTrace(ProfilerStackModel $trace)
+    public function getModelByTrace(ProfilerStackEntity $trace)
     {
-        /** @var ProfilerWrongOrderModel $wrongOrderModel */
+        /** @var ProfilerWrongOrderEntity $wrongOrderModel */
         foreach ($this->collection as $wrongOrderModel) {
             if ($wrongOrderModel->getKey() === $trace->getKey()) {
                 return $wrongOrderModel;

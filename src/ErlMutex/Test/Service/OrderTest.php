@@ -12,8 +12,8 @@
 
 namespace ErlMutex\Test\Service;
 
-use ErlMutex\Model\ProfilerMapCollection;
-use ErlMutex\Model\ProfilerStack;
+use ErlMutex\Entity\Profiler\MapCollection;
+use ErlMutex\Entity\Profiler\Stack;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 use ErlMutex\Service\Storage\ProfilerStorageDummy;
@@ -326,9 +326,9 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateKeyHashActionsOrderWrongHashList()
     {
-        $collection = new ProfilerMapCollection(md5(__FUNCTION__));
+        $collection = new MapCollection(md5(__FUNCTION__));
         $collection
-            ->append(new ProfilerStack(
+            ->append(new Stack(
                 __FUNCTION__,
                 md5(__FUNCTION__),
                 __LINE__,
@@ -340,7 +340,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 '',
                 new \DateTime()
             ))
-            ->append(new ProfilerStack(
+            ->append(new Stack(
                 __FUNCTION__,
                 md5(__CLASS__ . __FUNCTION__),
                 __FILE__,

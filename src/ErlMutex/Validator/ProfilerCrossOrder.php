@@ -12,11 +12,11 @@
 
 namespace ErlMutex\Validator;
 
-use ErlMutex\Model\ProfilerCrossOrderCollection;
-use ErlMutex\Model\ProfilerMapCollection;
-use ErlMutex\Model\ProfilerCrossOrder as ProfilerCrossOrderModel;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerStackCollection;
+use ErlMutex\Entity\Profiler\CrossOrderCollection;
+use ErlMutex\Entity\Profiler\MapCollection;
+use ErlMutex\Entity\Profiler\CrossOrder as ProfilerCrossOrderEntity;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\StackCollection;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Exception\ProfilerException as Exception;
 
@@ -53,12 +53,12 @@ class ProfilerCrossOrder extends ProfilerAbstract
     /**
      * Анализировать карту вызова блокировок
      *
-     * @param ProfilerMapCollection $mapCollection
+     * @param MapCollection $mapCollection
      * @throws Exception
      */
-    public function validate(ProfilerMapCollection $mapCollection)
+    public function validate(MapCollection $mapCollection)
     {
-        /** @var ProfilerStackCollection $requestCollection */
+        /** @var StackCollection $requestCollection */
         foreach ($mapCollection as $requestCollection) {
             $this->validateCrossOrder($requestCollection);
         }
@@ -67,10 +67,10 @@ class ProfilerCrossOrder extends ProfilerAbstract
     /**
      * Проверка перехлестных вызовов блокировок
      *
-     * @param ProfilerStackCollection $requestCollection
+     * @param StackCollection $requestCollection
      * @throws Exception
      */
-    private function validateCrossOrder(ProfilerStackCollection $requestCollection)
+    private function validateCrossOrder(StackCollection $requestCollection)
     {
         $acquired = $this->getHashCrossOrderMap($requestCollection);
 
@@ -83,7 +83,7 @@ class ProfilerCrossOrder extends ProfilerAbstract
                     $keyCrossOrderModel->acquire();
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerCrossOrderModel $otherKeyCrossOrderModel */
+                        /** @var ProfilerCrossOrderEntity $otherKeyCrossOrderModel */
                         if ($otherKeyCrossOrderModel->isAcquired()) {
                             if ($otherKeyCrossOrderModel->getKey() !== $trace->getKey()) {
                                 $otherKeyCrossOrderModel->addContainKey($trace->getKey());
@@ -103,7 +103,7 @@ class ProfilerCrossOrder extends ProfilerAbstract
                     }
 
                     foreach ($acquired as $otherKeyCrossOrderModel) {
-                        /** @var ProfilerCrossOrderModel $otherKeyCrossOrderModel */
+                        /** @var ProfilerCrossOrderEntity $otherKeyCrossOrderModel */
                         $otherKeyCrossOrderModel->removeContainKey($trace->getKey());
                     }
 
@@ -117,12 +117,12 @@ class ProfilerCrossOrder extends ProfilerAbstract
     /**
      * Карта перекрестных связей для хеша вызовов
      *
-     * @param ProfilerStackCollection $requestCollection
-     * @return ProfilerCrossOrderCollection
+     * @param StackCollection $requestCollection
+     * @return CrossOrderCollection
      */
-    private function getHashCrossOrderMap(ProfilerStackCollection $requestCollection)
+    private function getHashCrossOrderMap(StackCollection $requestCollection)
     {
-        $collection = new ProfilerCrossOrderCollection();
+        $collection = new CrossOrderCollection();
         foreach ($requestCollection as $trace) {
             /** @var ProfilerStackModel $trace */
             $collection->append($trace);

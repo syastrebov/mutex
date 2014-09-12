@@ -10,30 +10,31 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerCrossOrder as ProfilerCrossOrderModel;
+use ErlMutex\Entity\AbstractCollection;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackEntity;
+use ErlMutex\Entity\Profiler\CrossOrder as ProfilerCrossOrderEntity;
 use ErlMutex\Exception\ProfilerException as Exception;
 
 /**
  * Коллекция последовательности вызова блокировок (деление по ключу)
  *
  * Class ProfilerCrossOrderCollection
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class ProfilerCrossOrderCollection extends AbstractCollection
+class CrossOrderCollection extends AbstractCollection
 {
     /**
      * Добавить модель
      *
-     * @param ProfilerStack $trace
+     * @param ProfilerStackEntity $trace
      * @return $this
      */
-    public function append(ProfilerStackModel $trace)
+    public function append(ProfilerStackEntity $trace)
     {
         if (!$this->hasModelByTrace($trace)) {
-            $this->collection[] = new ProfilerCrossOrderModel($trace->getKey());
+            $this->collection[] = new ProfilerCrossOrderEntity($trace->getKey());
         }
 
         return $this;
@@ -42,12 +43,12 @@ class ProfilerCrossOrderCollection extends AbstractCollection
     /**
      * Проверить есть ли такая модель по модели запроса
      *
-     * @param ProfilerStack $trace
+     * @param ProfilerStackEntity $trace
      * @return bool
      */
-    public function hasModelByTrace(ProfilerStackModel $trace)
+    public function hasModelByTrace(ProfilerStackEntity $trace)
     {
-        /** @var ProfilerCrossOrderModel $crossOrderModel */
+        /** @var ProfilerCrossOrderEntity $crossOrderModel */
         foreach ($this->collection as $crossOrderModel) {
             if ($crossOrderModel->getKey() === $trace->getKey()) {
                 return true;
@@ -60,13 +61,13 @@ class ProfilerCrossOrderCollection extends AbstractCollection
     /**
      * Получить модель по модели запроса
      *
-     * @param ProfilerStack $trace
-     * @return ProfilerCrossOrder
+     * @param ProfilerStackEntity $trace
+     * @return CrossOrder
      * @throws \ErlMutex\Exception\ProfilerException
      */
-    public function getModelByTrace(ProfilerStackModel $trace)
+    public function getModelByTrace(ProfilerStackEntity $trace)
     {
-        /** @var ProfilerCrossOrderModel $crossOrderModel */
+        /** @var ProfilerCrossOrderEntity $crossOrderModel */
         foreach ($this->collection as $crossOrderModel) {
             if ($crossOrderModel->getKey() === $trace->getKey()) {
                 return $crossOrderModel;

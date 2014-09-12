@@ -10,29 +10,30 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
+use ErlMutex\Entity\AbstractCollection;
 use ErlMutex\Exception\ProfilerException as Exception;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackEntity;
 
 /**
  * Карта коллекций запросов профайлера
  *
  * Class ProfilerMapCollection
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class ProfilerMapCollection extends AbstractCollection
+class MapCollection extends AbstractCollection
 {
     /**
      * Добавить запрос в коллекцию
      *
-     * @param ProfilerStackModel $trace
+     * @param ProfilerStackEntity $trace
      * @return $this
      */
-    public function append(ProfilerStackModel $trace)
+    public function append(ProfilerStackEntity $trace)
     {
         if (!$this->hasCollection($trace->getRequestHash())) {
-            $this->collection[] = new ProfilerStackCollection($trace->getRequestHash());
+            $this->collection[] = new StackCollection($trace->getRequestHash());
         }
 
         $this->getCollectionByRequestHash($trace->getRequestHash())->append($trace);
@@ -48,7 +49,7 @@ class ProfilerMapCollection extends AbstractCollection
     public function hasCollection($requestHash)
     {
         foreach ($this->collection as $existStackCollection) {
-            /** @var ProfilerStackCollection $existStackCollection */
+            /** @var StackCollection $existStackCollection */
             if ($existStackCollection->getRequestHash() === $requestHash) {
                 return true;
             }
@@ -61,13 +62,13 @@ class ProfilerMapCollection extends AbstractCollection
      * Получить ссылку на коллекцию по хешу запроса
      *
      * @param $requestHash
-     * @return ProfilerStackCollection
+     * @return StackCollection
      * @throws Exception
      */
     public function getCollectionByRequestHash($requestHash)
     {
         foreach ($this->collection as $existStackCollection) {
-            /** @var ProfilerStackCollection $existStackCollection */
+            /** @var StackCollection $existStackCollection */
             if ($existStackCollection->getRequestHash() === $requestHash) {
                 return $existStackCollection;
             }
@@ -79,22 +80,22 @@ class ProfilerMapCollection extends AbstractCollection
     /**
      * Получить уникальные коллекции
      *
-     * @return ProfilerMapCollection
+     * @return MapCollection
      */
     public function getUniqueCollections()
     {
-        $uniqueCollection = new ProfilerMapCollection();
-        /** @var ProfilerStackCollection $requestCollection */
+        $uniqueCollection = new MapCollection();
+        /** @var StackCollection $requestCollection */
         foreach ($this->collection as $requestCollection) {
             $exist = false;
-            /** @var ProfilerStackCollection $existRequestCollection */
+            /** @var StackCollection $existRequestCollection */
             foreach ($uniqueCollection as $existRequestCollection) {
                 if ($requestCollection->getModelHash() === $existRequestCollection->getModelHash()) {
                     $exist = true;
                 }
             }
             if (!$exist) {
-                /** @var ProfilerStackModel $trace */
+                /** @var ProfilerStackEntity $trace */
                 foreach ($requestCollection as $trace) {
                     $uniqueCollection->append($trace);
                 }
@@ -115,7 +116,7 @@ class ProfilerMapCollection extends AbstractCollection
     {
         $result = array();
         foreach ($this->collection as $existStackCollection) {
-            /** @var ProfilerStackCollection $existStackCollection */
+            /** @var StackCollection $existStackCollection */
             $result[$existStackCollection->getRequestUri()][] = $existStackCollection->asArray();
         }
 

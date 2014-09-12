@@ -14,7 +14,7 @@ namespace ErlMutex\Validator;
 
 use ErlMutex\ProfilerValidatorInterface;
 use ErlMutex\Exception\ProfilerException as Exception;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
 
 /**
  * Абстрактный класс валидатора профайлера

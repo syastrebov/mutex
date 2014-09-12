@@ -10,8 +10,9 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Test\Model;
-use ErlMutex\Model\ProfilerCrossOrder;
+namespace ErlMutex\Test\Entity\Profiler;
+
+use ErlMutex\Entity\Profiler\CrossOrder;
 
 /**
  * Тестирование модели перехлестных вызовов
@@ -19,12 +20,12 @@ use ErlMutex\Model\ProfilerCrossOrder;
  * Class ProfilerCrossOrderTest
  * @package ErlMutex\Test\Model
  */
-class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
+class CrossOrderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Модель перехлестных вызовов
      *
-     * @var ProfilerCrossOrder
+     * @var CrossOrder
      */
     private $profilerCrossOrderModel;
 
@@ -33,7 +34,7 @@ class ProfilerCrossOrderTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->profilerCrossOrderModel = new ProfilerCrossOrder(__CLASS__);
+        $this->profilerCrossOrderModel = new CrossOrder(__CLASS__);
     }
 
     /**

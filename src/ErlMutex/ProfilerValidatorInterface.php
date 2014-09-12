@@ -12,7 +12,7 @@
 
 namespace ErlMutex;
 
-use ErlMutex\Model\ProfilerMapCollection;
+use ErlMutex\Entity\Profiler\MapCollection;
 use ErlMutex\Exception\ProfilerException as Exception;
 
 /**
@@ -26,8 +26,8 @@ interface ProfilerValidatorInterface
     /**
      * Анализировать карту вызова блокировок
      *
-     * @param ProfilerMapCollection $mapCollection
+     * @param MapCollection $mapCollection
      * @throws Exception
      */
-    public function validate(ProfilerMapCollection $mapCollection);
+    public function validate(MapCollection $mapCollection);
 } 

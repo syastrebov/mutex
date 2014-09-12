@@ -10,10 +10,10 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Test\Model;
+namespace ErlMutex\Test\Entity\Profiler;
 
-use ErlMutex\Model\ProfilerMapCollection;
-use ErlMutex\Model\ProfilerStack;
+use ErlMutex\Entity\Profiler\MapCollection;
+use ErlMutex\Entity\Profiler\Stack;
 use ErlMutex\Service\Mutex;
 use DateTime;
 
@@ -23,12 +23,12 @@ use DateTime;
  * Class ProfilerMapCollectionTest
  * @package ErlMutex\Test\Model
  */
-class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
+class MapCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Коллекция карты профайлера
      *
-     * @var ProfilerMapCollection
+     * @var MapCollection
      */
     private $collection;
 
@@ -37,7 +37,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->collection = new ProfilerMapCollection();
+        $this->collection = new MapCollection();
     }
 
     /**
@@ -53,7 +53,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAppend()
     {
-        $this->collection->append(new ProfilerStack(
+        $this->collection->append(new Stack(
             __FUNCTION__,
             md5(__FUNCTION__ . 1),
             __FILE__,
@@ -68,7 +68,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($this->collection));
 
-        $this->collection->append(new ProfilerStack(
+        $this->collection->append(new Stack(
             __FUNCTION__,
             md5(__FUNCTION__ . 1),
             __FILE__,
@@ -83,7 +83,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($this->collection));
 
-        $this->collection->append(new ProfilerStack(
+        $this->collection->append(new Stack(
             __FUNCTION__,
             md5(__FUNCTION__ . 2),
             __FILE__,
@@ -105,7 +105,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
     public function testHasCollection()
     {
         $this->assertFalse($this->collection->hasCollection(md5(__FUNCTION__)));
-        $this->collection->append(new ProfilerStack(
+        $this->collection->append(new Stack(
             __FUNCTION__,
             md5(__FUNCTION__),
             __FILE__,
@@ -125,7 +125,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCollectionByRequestHash()
     {
-        $this->collection->append(new ProfilerStack(
+        $this->collection->append(new Stack(
             __FUNCTION__,
             md5(__FUNCTION__),
             __FILE__,
@@ -155,7 +155,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUniqueCollections()
     {
-        $request1 = new ProfilerStack(
+        $request1 = new Stack(
             __FUNCTION__,
             md5(__FUNCTION__ . 1),
             __FILE__,
@@ -168,7 +168,7 @@ class ProfilerMapCollectionTest extends \PHPUnit_Framework_TestCase
             new DateTime()
         );
 
-        $request2 = new ProfilerStack(
+        $request2 = new Stack(
             __FUNCTION__,
             md5(__FUNCTION__ . 2),
             __FILE__,

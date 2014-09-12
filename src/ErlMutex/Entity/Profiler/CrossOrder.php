@@ -10,7 +10,7 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
 use ErlMutex\Exception\ProfilerException;
 
@@ -18,9 +18,9 @@ use ErlMutex\Exception\ProfilerException;
  * Модель состояния последовательности вызова для отладчика
  *
  * Class ProfilerCrossOrder
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class ProfilerCrossOrder
+class CrossOrder
 {
     /**
      * Ключ блокировки

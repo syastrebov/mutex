@@ -10,18 +10,18 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
 use ErlMutex\Exception\ProfilerException;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
 
 /**
  * Модель профайлера для определения приоритета правильности последовательности
  *
  * Class ProfilerBaseOrder
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class ProfilerWrongOrder extends ProfilerCrossOrder
+class WrongOrder extends CrossOrder
 {
     /**
      * @var ProfilerStackModel

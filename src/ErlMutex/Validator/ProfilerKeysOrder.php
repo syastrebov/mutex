@@ -12,11 +12,11 @@
 
 namespace ErlMutex\Validator;
 
-use ErlMutex\Model\ProfilerMapCollection;
-use ErlMutex\Model\ProfilerWrongOrder as ProfilerWrongOrderModel;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerStackCollection;
-use ErlMutex\Model\ProfilerWrongOrderCollection;
+use ErlMutex\Entity\Profiler\MapCollection;
+use ErlMutex\Entity\Profiler\WrongOrder as ProfilerWrongOrderModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\StackCollection;
+use ErlMutex\Entity\Profiler\WrongOrderCollection;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Exception\ProfilerException as Exception;
 
@@ -44,13 +44,13 @@ class ProfilerKeysOrder extends ProfilerAbstract
     /**
      * Анализировать карту вызова блокировок
      *
-     * @param ProfilerMapCollection $mapCollection
+     * @param MapCollection $mapCollection
      * @throws Exception
      */
-    public function validate(ProfilerMapCollection $mapCollection)
+    public function validate(MapCollection $mapCollection)
     {
         $keysOrderMap = array();
-        /** @var ProfilerStackCollection $requestCollection */
+        /** @var StackCollection $requestCollection */
         foreach ($mapCollection as $requestCollection) {
             $requestKeysOrderMap = $this->getWrongOrderCanContainsMap($requestCollection);
             foreach ($requestKeysOrderMap as $wrongOrderModel) {
@@ -79,10 +79,10 @@ class ProfilerKeysOrder extends ProfilerAbstract
     /**
      * Возвращает какие вложенные ключи может хранить в себе ключ
      *
-     * @param ProfilerStackCollection $requestCollection
-     * @return ProfilerWrongOrderCollection
+     * @param StackCollection $requestCollection
+     * @return WrongOrderCollection
      */
-    private function getWrongOrderCanContainsMap(ProfilerStackCollection $requestCollection)
+    private function getWrongOrderCanContainsMap(StackCollection $requestCollection)
     {
         $acquired = $this->getWrongOrderCollection($requestCollection);
 
@@ -124,12 +124,12 @@ class ProfilerKeysOrder extends ProfilerAbstract
     /**
      * Карта неправильной последовательности для хеша вызовов
      *
-     * @param ProfilerStackCollection $requestCollection
-     * @return ProfilerWrongOrderCollection
+     * @param StackCollection $requestCollection
+     * @return WrongOrderCollection
      */
-    private function getWrongOrderCollection(ProfilerStackCollection $requestCollection)
+    private function getWrongOrderCollection(StackCollection $requestCollection)
     {
-        $collection = new ProfilerWrongOrderCollection();
+        $collection = new WrongOrderCollection();
         foreach ($requestCollection as $trace) {
             /** @var ProfilerStackModel $trace */
             $collection->append($trace);

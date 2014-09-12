@@ -23,6 +23,19 @@ use ErlMutex\Exception\Exception;
 interface AdapterInterface
 {
     /**
+     * Подключиться к сервису блокировок
+     *
+     * @throws \ErlMutex\Exception\Exception
+     * @return $this
+     */
+    public function establishConnection();
+
+    /**
+     * Закрыть соединение с сервисом
+     */
+    public function closeConnection();
+
+    /**
      * Получить указатель на блокировку
      *
      * @param string   $name    Имя указателя блокировки
@@ -48,4 +61,11 @@ interface AdapterInterface
      * @return bool
      */
     public function release($name=null);
+
+    /**
+     * Доступно ли подключение к сервису
+     *
+     * @return bool
+     */
+    public function isAlive();
 }

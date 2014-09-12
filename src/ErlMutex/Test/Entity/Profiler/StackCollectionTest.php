@@ -10,10 +10,10 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Test\Model;
+namespace ErlMutex\Test\Entity\Profiler;
 
-use ErlMutex\Model\ProfilerStackCollection;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\StackCollection;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
 use DateTime;
 
 /**
@@ -22,7 +22,7 @@ use DateTime;
  * Class ProfilerStackCollectionTest
  * @package ErlMutex\Test\Model
  */
-class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
+class StackCollectionTest extends \PHPUnit_Framework_TestCase
 {
     const REQUEST_1 = 'request_1';
     const REQUEST_2 = 'request_2';
@@ -30,7 +30,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * Коллекция запросов в пределах одной сессии
      *
-     * @var ProfilerStackCollection
+     * @var StackCollection
      */
     private $collection;
 
@@ -39,7 +39,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->collection = new ProfilerStackCollection(md5(self::REQUEST_1));
+        $this->collection = new StackCollection(md5(self::REQUEST_1));
     }
 
     /**
@@ -176,7 +176,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
         $counter = 0;
         foreach ($this->collection as $trace) {
             $counter++;
-            $this->assertInstanceOf('\ErlMutex\Model\ProfilerStack', $trace);
+            $this->assertInstanceOf('\ErlMutex\Entity\Profiler\Stack', $trace);
         }
 
         $this->assertEquals(2, $counter);
@@ -184,7 +184,7 @@ class ProfilerStackCollectionTest extends \PHPUnit_Framework_TestCase
         $counter = 0;
         foreach ($this->collection as $trace) {
             $counter++;
-            $this->assertInstanceOf('\ErlMutex\Model\ProfilerStack', $trace);
+            $this->assertInstanceOf('\ErlMutex\Entity\Profiler\Stack', $trace);
         }
 
         $this->assertEquals(2, $counter);

@@ -10,18 +10,19 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Model;
+namespace ErlMutex\Entity\Profiler;
 
+use ErlMutex\Entity\AbstractCollection;
 use ErlMutex\Exception\ProfilerException as Exception;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackEntity;
 
 /**
  * Коллекция моделей лога профайлера
  *
  * Class ProfilerStackCollection
- * @package ErlMutex\Model
+ * @package ErlMutex\Entity
  */
-class ProfilerStackCollection extends AbstractCollection
+class StackCollection extends AbstractCollection
 {
     /**
      * Уникальный хеш запроса
@@ -43,11 +44,11 @@ class ProfilerStackCollection extends AbstractCollection
     /**
      * Добавить запрос в коллекцию
      *
-     * @param ProfilerStack $trace
+     * @param ProfilerStackEntity $trace
      * @return $this
      * @throws Exception
      */
-    public function append(ProfilerStackModel $trace)
+    public function append(ProfilerStackEntity $trace)
     {
         if ($trace->getRequestHash() !== $this->requestHash) {
             throw new Exception('Передан запрос с неправильным хешом');
@@ -76,7 +77,7 @@ class ProfilerStackCollection extends AbstractCollection
     public function getRequestUri()
     {
         if (!empty($this->collection)) {
-            /** @var ProfilerStackModel $trace */
+            /** @var ProfilerStackEntity $trace */
             $trace = $this->collection[0];
             return $trace->getRequestUri();
         }
@@ -93,7 +94,7 @@ class ProfilerStackCollection extends AbstractCollection
     {
         $hash = '';
         foreach ($this->collection as $trace) {
-            /** @var ProfilerStackModel $trace */
+            /** @var ProfilerStackEntity $trace */
             $hash .= $trace->getModelHash();
         }
 
@@ -109,7 +110,7 @@ class ProfilerStackCollection extends AbstractCollection
     {
         $keys = array();
         foreach ($this->collection as $request) {
-            /** @var ProfilerStackModel $request */
+            /** @var ProfilerStackEntity $request */
             if (!in_array($request->getKey(), $keys, true)) {
                 $keys[] = $request->getKey();
             }
@@ -131,7 +132,7 @@ class ProfilerStackCollection extends AbstractCollection
         );
 
         foreach ($this->collection as $trace) {
-            /** @var ProfilerStackModel $trace */
+            /** @var ProfilerStackEntity $trace */
             $result['collection'][] = $trace->asArray();
         }
 

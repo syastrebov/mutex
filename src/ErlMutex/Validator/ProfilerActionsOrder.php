@@ -12,9 +12,9 @@
 
 namespace ErlMutex\Validator;
 
-use ErlMutex\Model\ProfilerMapCollection;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerStackCollection;
+use ErlMutex\Entity\Profiler\MapCollection;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\StackCollection;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Exception\ProfilerException as Exception;
 
@@ -35,13 +35,13 @@ class ProfilerActionsOrder extends ProfilerAbstract
     /**
      * Анализировать карту вызова блокировок
      *
-     * @param ProfilerMapCollection $mapCollection
+     * @param MapCollection $mapCollection
      * @throws Exception
      */
-    public function validate(ProfilerMapCollection $mapCollection)
+    public function validate(MapCollection $mapCollection)
     {
         foreach ($mapCollection as $requestCollection) {
-            /** @var ProfilerStackCollection $requestCollection */
+            /** @var StackCollection $requestCollection */
             $keys = $requestCollection->getKeys();
 
             foreach ($keys as $key) {
@@ -54,12 +54,12 @@ class ProfilerActionsOrder extends ProfilerAbstract
      * Проверка последовательности вызова блокировок по ключу
      * Если последовательность не совпадает, то функция возвращает исключение
      *
-     * @param string                  $key
-     * @param ProfilerStackCollection $requestCollection
+     * @param string          $key
+     * @param StackCollection $requestCollection
      *
      * @throws Exception
      */
-    private function validateKeyOrder($key, ProfilerStackCollection $requestCollection)
+    private function validateKeyOrder($key, StackCollection $requestCollection)
     {
         $wasGet     = false;
         $wasAcquire = false;

@@ -13,9 +13,9 @@
 namespace ErlMutex\Service;
 
 use ErlMutex\Exception\ProfilerException as Exception;
-use ErlMutex\Model\ProfilerMapCollection;
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
-use ErlMutex\Model\ProfilerStackCollection;
+use ErlMutex\Entity\Profiler\MapCollection;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\StackCollection;
 use ErlMutex\ProfilerStorageInterface;
 use DateTime;
 use ErlMutex\ProfilerValidatorInterface;
@@ -50,7 +50,7 @@ class Profiler
     /**
      * Стек вызова блокировок
      *
-     * @var ProfilerStackCollection
+     * @var StackCollection
      */
     private $stack;
 
@@ -89,7 +89,7 @@ class Profiler
 
         $this->requestUri   = $requestUri;
         $this->initDateTime = new DateTime();
-        $this->stack        = new ProfilerStackCollection($this->getRequestHash());
+        $this->stack        = new StackCollection($this->getRequestHash());
         $this->validators   = ProfilerValidatorCollection::getInstance();
     }
 
@@ -233,7 +233,7 @@ class Profiler
      *      * trace 2
      *      ...
      *
-     * @return ProfilerMapCollection
+     * @return MapCollection
      * @throws Exception
      */
     public function getMap()
@@ -242,7 +242,7 @@ class Profiler
             throw new Exception('Не задано хранилище');
         }
 
-        $map  = new ProfilerMapCollection();
+        $map  = new MapCollection();
         $list = $this->storage->getList();
         foreach ($list as $trace) {
             /** @var ProfilerStackModel $trace */
@@ -297,10 +297,10 @@ class Profiler
     /**
      * Проверка карты
      *
-     * @param ProfilerMapCollection $map
+     * @param MapCollection $map
      * @throws Exception
      */
-    public function validate(ProfilerMapCollection $map)
+    public function validate(MapCollection $map)
     {
         try {
             foreach ($this->validators as $validator) {

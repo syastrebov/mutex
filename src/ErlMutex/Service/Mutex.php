@@ -12,6 +12,7 @@
 
 namespace ErlMutex\Service;
 
+use ErlMutex\Adapter\AdapterInterface;
 use ErlMutex\Exception\Exception;
 use ErlMutex\LoggerInterface;
 
@@ -21,7 +22,7 @@ use ErlMutex\LoggerInterface;
  * @package erl
  * @author  Sergey Yastrebov <serg.yastrebov@gmail.com>
  */
-class Mutex
+class Mutex implements AdapterInterface
 {
     const DEFAULT_HOST   = '127.0.0.1';
     const DEFAULT_PORT   = 7007;

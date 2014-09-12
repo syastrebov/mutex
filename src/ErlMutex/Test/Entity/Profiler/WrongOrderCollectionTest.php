@@ -10,24 +10,24 @@
  * @link     https://github.com/syastrebov/mutex-php
  */
 
-namespace ErlMutex\Test\Model;
+namespace ErlMutex\Test\Entity\Profiler;
 
-use ErlMutex\Model\ProfilerCrossOrderCollection;
-use ErlMutex\Model\ProfilerStack;
+use ErlMutex\Entity\Profiler\Stack;
+use ErlMutex\Entity\Profiler\WrongOrderCollection;
 use ErlMutex\Service\Mutex;
 
 /**
- * Тестирование коллекции перехлестных вызовов
+ * Тестирование коллекции правильной последовательности вызова ключей
  *
- * Class ProfilerCrossOrderCollectionTest
+ * Class ProfilerWrongOrderCollectionTest
  * @package ErlMutex\Test\Model
  */
-class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
+class WrongOrderCollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Коллекция перехлестных вызовов
+     * Коллекция правильной последовательности вызова ключей
      *
-     * @var ProfilerCrossOrderCollection
+     * @var WrongOrderCollection
      */
     private $collection;
 
@@ -36,7 +36,7 @@ class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->collection = new ProfilerCrossOrderCollection();
+        $this->collection = new WrongOrderCollection();
     }
 
     /**
@@ -48,13 +48,13 @@ class ProfilerCrossOrderCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Получение несуществующей блокировки
+     * Попытка получить несуществующую модель
      *
      * @expectedException \ErlMutex\Exception\ProfilerException
      */
     public function testGetModelByTraceNotFound()
     {
-        $this->collection->getModelByTrace(new ProfilerStack(
+        $this->collection->getModelByTrace(new Stack(
             __FUNCTION__,
             md5(__FUNCTION__),
             __LINE__,

@@ -12,7 +12,7 @@
 
 namespace ErlMutex\Exception;
 
-use ErlMutex\Model\ProfilerStack as ProfilerStackModel;
+use ErlMutex\Entity\Profiler\Stack as ProfilerStackModel;
 
 /**
  * Исключение для профайлера
