@@ -15,37 +15,18 @@ namespace ErlMutex\Adapter;
 use ErlMutex\Exception\Exception;
 
 /**
- * Адаптер для работы через memcached
+ * Заглушка адаптера для отладки
  *
- * Class Memcached
+ * Class Dummy
  * @package ErlMutex\Adapter
  */
-final class Memcached implements AdapterInterface
+class Dummy implements AdapterInterface
 {
     /**
-     * @var \Memcached
-     */
-    private $adapter;
-
-    /**
-     * Время жизни блокировок
-     *
-     * @var array
-     */
-    private $timeout = [];
-
-    /**
-     * Constructor
-     *
-     * @param \Memcached $adapter
-     */
-    public function __construct(\Memcached $adapter)
-    {
-        $this->adapter = $adapter;
-    }
-
-    /**
      * Подключиться к сервису блокировок
+     *
+     * @throws \ErlMutex\Exception\Exception
+     * @return boolean
      */
     public function establishConnection() {}
 
@@ -63,40 +44,23 @@ final class Memcached implements AdapterInterface
      * @return string
      * @throws Exception
      */
-    public function get($name, $timeout)
-    {
-        $this->timeout[$name] = $timeout;
-    }
+    public function get($name, $timeout) {}
 
     /**
      * Установить блокировку
      *
      * @param string $name Имя указателя блокировки
-     * @return bool
+     * @return mixed
      */
-    public function acquire($name)
-    {
-        while (true) {
-            if ($this->adapter->get($name)) {
-                usleep(10000);
-            } else {
-                break;
-            }
-        }
-
-        return $this->adapter->set($name, true, isset($this->timeout[$name]) ? $this->timeout[$name] : 30);
-    }
+    public function acquire($name) {}
 
     /**
      * Снять блокировку
      *
      * @param string $name Имя указателя блокировки
-     * @return bool
+     * @return mixed
      */
-    public function release($name)
-    {
-        return $this->adapter->delete($name);
-    }
+    public function release($name) {}
 
     /**
      * Доступно ли подключение к сервису
@@ -107,4 +71,4 @@ final class Memcached implements AdapterInterface
     {
         return true;
     }
-}
+} 

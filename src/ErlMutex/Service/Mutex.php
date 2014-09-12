@@ -156,7 +156,8 @@ class Mutex
         $response   = $this->adapter->get($name, $timeout);
         $this->name = $name;
 
-        $this->log($name, $response, debug_backtrace());
+        $this->profilerLog($name, $response, debug_backtrace());
+
         return $this->name;
     }
 
@@ -171,12 +172,12 @@ class Mutex
         $name = $name ? : $this->name;
         if ($name) {
             $response = $this->adapter->acquire($name);
-            $this->log($name, $response, debug_backtrace());
+            $this->profilerLog($name, $response, debug_backtrace());
 
             return true;
 
         } else {
-            $this->log($name, 'Не задан указатель', debug_backtrace());
+            $this->profilerLog($name, 'Не задан указатель', debug_backtrace());
         }
 
         return false;
@@ -193,12 +194,12 @@ class Mutex
         $name = $name ? : $this->name;
         if ($name) {
             $response = $this->adapter->release($name);
-            $this->log($name, $response, debug_backtrace());
+            $this->profilerLog($name, $response, debug_backtrace());
 
             return true;
 
         } else {
-            $this->log($name, 'Не задан указатель', debug_backtrace());
+            $this->profilerLog($name, 'Не задан указатель', debug_backtrace());
         }
 
         return false;
@@ -211,7 +212,7 @@ class Mutex
      * @param mixed  $response
      * @param array  $stackTrace
      */
-    public function log($key, $response, $stackTrace)
+    public function profilerLog($key, $response, $stackTrace)
     {
         if ($this->profiler) {
             $this->profiler->log($key, $response, $stackTrace);

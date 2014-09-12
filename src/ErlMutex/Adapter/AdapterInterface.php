@@ -24,9 +24,6 @@ interface AdapterInterface
 {
     /**
      * Подключиться к сервису блокировок
-     *
-     * @throws \ErlMutex\Exception\Exception
-     * @return boolean
      */
     public function establishConnection();
 
@@ -50,7 +47,7 @@ interface AdapterInterface
      * Установить блокировку
      *
      * @param string $name Имя указателя блокировки
-     * @return bool
+     * @return mixed
      */
     public function acquire($name);
 
@@ -58,7 +55,7 @@ interface AdapterInterface
      * Снять блокировку
      *
      * @param string $name Имя указателя блокировки
-     * @return bool
+     * @return mixed
      */
     public function release($name);
 
