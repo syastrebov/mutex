@@ -58,7 +58,7 @@ final class Memcached implements AdapterInterface
      * Получить указатель на блокировку
      *
      * @param string   $name    Имя указателя блокировки
-     * @param int|bool $timeout Время жизни блокировки, микросекунды (по истечении времени блокировка снимается)
+     * @param int|bool $timeout Время жизни блокировки, милисекунды (по истечении времени блокировка снимается)
      *
      * @return string
      * @throws Exception
@@ -84,7 +84,12 @@ final class Memcached implements AdapterInterface
             }
         }
 
-        return $this->adapter->set($name, true, isset($this->timeout[$name]) ? $this->timeout[$name] : 30);
+        $timeout = isset($this->timeout[$name]) ? ($this->timeout[$name] / 1000) : 30;
+        if (!($timeout > 0)) {
+            $timeout = 30;
+        }
+
+        return $this->adapter->set($name, true, $timeout);
     }
 
     /**
@@ -105,6 +110,7 @@ final class Memcached implements AdapterInterface
      */
     public function isAlive()
     {
-        return true;
+        $servers = $this->adapter->getServerList();
+        return !empty($servers);
     }
 }

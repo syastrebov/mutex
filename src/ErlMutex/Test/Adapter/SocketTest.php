@@ -174,24 +174,6 @@ class SocketTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Установка блокировки без указателя
-     */
-    public function testAcquireWithoutPointer()
-    {
-        $this->mutex = new Mutex(new Socket());
-        $this->mutex
-            ->setProfiler(new Profiler(__FUNCTION__))
-            ->establishConnection();
-
-        $this->assertFalse($this->mutex->acquire());
-        $this->assertFalse($this->mutex->release());
-
-        if (self::PROFILER_DUMP_ENABLED) {
-            $this->mutex->getProfiler()->dump();
-        }
-    }
-
-    /**
      * Установка блокировки без указателя и подключения к сервису
      */
     public function testAcquireWithoutPointerAndConnection()

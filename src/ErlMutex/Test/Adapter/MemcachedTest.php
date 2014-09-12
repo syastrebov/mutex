@@ -12,8 +12,7 @@
 
 namespace ErlMutex\Test\Adapter;
 
-use ErlMutex\Adapter\Socket;
-use ErlMutex\Service\Logger\LoggerDummy;
+use ErlMutex\Adapter\Memcached;
 use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 
@@ -38,6 +37,17 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     private $mutex;
 
     /**
+     * Включаем мьютекс
+     */
+    public function setUp()
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer("127.0.0.1", 11211);
+
+        $this->mutex = new Mutex(new Memcached($memcached));
+    }
+
+    /**
      * Закрывать соединение с сервисом после каждого теста
      */
     public function tearDown()
@@ -46,59 +56,12 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Неправильно заданные параметры подключения
-     */
-    public function testInvalidConnectionParams()
-    {
-        $this->mutex = new Mutex(new \Memcached());
-        $this->assertFalse(
-            $this->mutex
-                ->setLogger(new LoggerDummy())
-                ->establishConnection()
-                ->isAlive()
-        );
-    }
-
-    /**
      * Успешное подключение к сервису
      */
     public function testConnectionSuccess()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->assertTrue(
             $this->mutex
-                ->setProfiler(new Profiler(__FUNCTION__))
-                ->establishConnection()
-                ->isAlive()
-        );
-
-        if (self::PROFILER_DUMP_ENABLED) {
-            $this->mutex->getProfiler()->dump();
-        }
-    }
-
-    /**
-     * Неправильно заданные параметры указателя блокировки
-     *
-     * @expectedException \ErlMutex\Exception\Exception
-     * @dataProvider providerInvalidPointerParams
-     */
-    public function testInvalidPointerParams($name, $timeout)
-    {
-        $this->mutex = new Mutex(new Socket());
-        $this->mutex->setProfiler(new Profiler(__FUNCTION__));
-        $this->mutex->get($name, $timeout);
-    }
-
-    /**
-     * Ошибка подключения к сервису
-     */
-    public function testConnectionFailure()
-    {
-        $this->mutex = new Mutex(new Socket('127.0.0.1', 7008));
-        $this->assertFalse(
-            $this->mutex
-                ->setLogger(new LoggerDummy())
                 ->setProfiler(new Profiler(__FUNCTION__))
                 ->establishConnection()
                 ->isAlive()
@@ -114,7 +77,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPointerSuccess()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -135,7 +97,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPointerWithoutConnection()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
         $this->assertEquals('A', $this->mutex->get('A'));
@@ -151,7 +112,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireSuccess()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -170,7 +130,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireWithoutConnection()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
         $this->assertEquals('A', $this->mutex->get('A'));
@@ -187,29 +146,10 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Установка блокировки без указателя
-     */
-    public function testAcquireWithoutPointer()
-    {
-        $this->mutex = new Mutex(new Socket());
-        $this->mutex
-            ->setProfiler(new Profiler(__FUNCTION__))
-            ->establishConnection();
-
-        $this->assertFalse($this->mutex->acquire());
-        $this->assertFalse($this->mutex->release());
-
-        if (self::PROFILER_DUMP_ENABLED) {
-            $this->mutex->getProfiler()->dump();
-        }
-    }
-
-    /**
      * Установка блокировки без указателя и подключения к сервису
      */
     public function testAcquireWithoutPointerAndConnection()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex->setProfiler(new Profiler(__FUNCTION__));
 
         $this->assertFalse($this->mutex->acquire());
@@ -225,7 +165,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testAlreadyAcquired()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -245,7 +184,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquiredBusy()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -259,7 +197,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
 
         unset($this->mutex);
 
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -278,7 +215,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testReleaseNotFound()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -286,7 +222,7 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->mutex->get('A', 500));
         $this->assertTrue($this->mutex->acquire());
 
-        sleep(40);
+        sleep(1);
 
         $this->assertTrue($this->mutex->release());
 
@@ -300,14 +236,12 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testAcquireNotFound()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
 
         $this->assertNotNull($this->mutex->get('A', 500));
-
-        sleep(160);
+        sleep(1);
 
         $this->assertTrue($this->mutex->acquire());
         $this->assertTrue($this->mutex->release());
@@ -322,7 +256,6 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisconnectWhileAcquired()
     {
-        $this->mutex = new Mutex(new Socket());
         $this->mutex
             ->setProfiler(new Profiler(__FUNCTION__))
             ->establishConnection();
@@ -338,23 +271,5 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase
         if (self::PROFILER_DUMP_ENABLED) {
             $this->mutex->getProfiler()->dump();
         }
-    }
-
-    /**
-     * Неправильно заданные параметры указателя блокировки
-     *
-     * @return array
-     */
-    public function providerInvalidPointerParams()
-    {
-        return [
-            [null,  false],
-            [1.2,   false],
-            [false, false],
-            ['A',   -1],
-            ['A',   1.2],
-            ['A',   true],
-            ['A',   'A'],
-        ];
     }
 }

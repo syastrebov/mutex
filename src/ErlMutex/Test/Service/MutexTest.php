@@ -38,6 +38,21 @@ class MutexTest extends \PHPUnit_Framework_TestCase
     {
         $this->mutex = null;
     }
+
+    /**
+     * Установка блокировки без указателя
+     */
+    public function testAcquireWithoutPointer()
+    {
+        $this->mutex = new Mutex(new Dummy());
+        $this->mutex
+            ->setProfiler(new Profiler(__FUNCTION__))
+            ->establishConnection();
+
+        $this->assertFalse($this->mutex->acquire());
+        $this->assertFalse($this->mutex->release());
+    }
+
     /**
      * Неправильно заданные параметры указателя блокировки
      *

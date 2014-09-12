@@ -84,7 +84,7 @@ final class Socket implements AdapterInterface
      * Получить указатель на блокировку
      *
      * @param string   $name    Имя указателя блокировки
-     * @param int|bool $timeout Время жизни блокировки, микросекунды (по истечении времени блокировка снимается)
+     * @param int|bool $timeout Время жизни блокировки, милисекунды (по истечении времени блокировка снимается)
      *
      * @return string
      * @throws Exception
