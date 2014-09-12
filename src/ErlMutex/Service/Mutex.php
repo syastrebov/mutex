@@ -22,29 +22,12 @@ use ErlMutex\LoggerInterface;
  * @package erl
  * @author  Sergey Yastrebov <serg.yastrebov@gmail.com>
  */
-class Mutex implements AdapterInterface
+class Mutex
 {
-    const DEFAULT_HOST   = '127.0.0.1';
-    const DEFAULT_PORT   = 7007;
-
-    const ACTION_GET     = 'get';
-    const ACTION_ACQUIRE = 'acquire';
-    const ACTION_RELEASE = 'release';
-
     /**
-     * @var string
+     * @var AdapterInterface
      */
-    private $hostname;
-
-    /**
-     * @var int
-     */
-    private $port;
-
-    /**
-     * @var resource
-     */
-    private $socket;
+    private $adapter;
 
     /**
      * @var string
@@ -64,15 +47,12 @@ class Mutex implements AdapterInterface
     /**
      * Constructor
      *
-     * @param string $hostname Хост сервиса блокировок
-     * @param int    $port     Порт сервиса блокировок (по умолчанию 7007)
-     *
+     * @param AdapterInterface $adapter
      * @throws Exception
      */
-    public function __construct($hostname=self::DEFAULT_HOST, $port=self::DEFAULT_PORT)
+    public function __construct(AdapterInterface $adapter)
     {
-        $this->hostname = $hostname;
-        $this->port     = $port;
+        $this->adapter = $adapter;
     }
 
     /**
@@ -116,7 +96,7 @@ class Mutex implements AdapterInterface
      */
     public function isAlive()
     {
-        return $this->socket && !feof($this->socket);
+        return $this->adapter->isAlive();
     }
 
     /**
@@ -127,13 +107,11 @@ class Mutex implements AdapterInterface
      */
     public function establishConnection()
     {
-        $this->socket = @fsockopen($this->hostname, $this->port, $errno, $errstr);
-        if (!$this->socket) {
-            if ($errno === 0) {
-                throw new Exception(sprintf('%s', $errstr));
-            }
+        try {
+            $this->adapter->establishConnection();
+        } catch (Exception $e) {
             if ($this->logger) {
-                $this->logger->insert(sprintf('%s (%s)', $errstr, $errno));
+                $this->logger->insert($e->getMessage());
             }
         }
 
@@ -142,14 +120,13 @@ class Mutex implements AdapterInterface
 
     /**
      * Закрыть соединение с сервисом
+     *
+     * @return $this
      */
     public function closeConnection()
     {
-        if ($this->socket) {
-            @fclose($this->socket);
-        }
-
-        $this->socket = null;
+        $this->adapter->closeConnection();
+        return $this;
     }
 
     /**
@@ -161,7 +138,7 @@ class Mutex implements AdapterInterface
      * @return string
      * @throws Exception
      */
-    public function get($name, $timeout=false)
+    public function get($name, $timeout = false)
     {
         $this->name = null;
 
@@ -172,13 +149,7 @@ class Mutex implements AdapterInterface
             throw new Exception('Недопустимое время блокировки.');
         }
 
-        $this->send(array(
-            'cmd'     => self::ACTION_GET,
-            'name'    => $name,
-            'timeout' => $timeout,
-        ));
-
-        $response   = $this->receive();
+        $response   = $this->adapter->get($name, $timeout);
         $this->name = $name;
 
         $this->log($name, $response, debug_backtrace());
@@ -191,22 +162,13 @@ class Mutex implements AdapterInterface
      * @param string $name Имя указателя блокировки
      * @return bool
      */
-    public function acquire($name=null)
+    public function acquire($name = null)
     {
         $name = $name ? : $this->name;
         if ($name) {
-            $response = null;
-            while (true) {
-                $this->send(array('cmd' => self::ACTION_ACQUIRE, 'name' => $name));
-                $response = $this->receive();
-                if ($response == 'busy') {
-                    usleep(10000);
-                } else {
-                    break;
-                }
-            }
-
+            $response = $this->adapter->acquire($name);
             $this->log($name, $response, debug_backtrace());
+
             return true;
 
         } else {
@@ -222,12 +184,11 @@ class Mutex implements AdapterInterface
      * @param string $name Имя указателя блокировки
      * @return bool
      */
-    public function release($name=null)
+    public function release($name = null)
     {
         $name = $name ? : $this->name;
         if ($name) {
-            $this->send(array('cmd' => self::ACTION_RELEASE, 'name' => $name));
-            $response = $this->receive();
+            $response = $this->adapter->release($name);
             $this->log($name, $response, debug_backtrace());
 
             return true;
@@ -259,40 +220,5 @@ class Mutex implements AdapterInterface
     public function __destruct()
     {
         $this->closeConnection();
-    }
-
-    /**
-     * Отправить запрос
-     *
-     * @param array $data отправляемый запрос на сервис
-     * @return bool
-     */
-    private function send(array $data)
-    {
-        if ($this->isAlive()) {
-            @fwrite($this->socket, json_encode($data));
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Получить ответ
-     *
-     * @return string
-     */
-    private function receive()
-    {
-        $input = '';
-        while (false !== ($char = @fgetc($this->socket))) {
-            if ($char === "\000") {
-                return $input;
-            } else {
-                $input .= $char;
-            }
-        }
-
-        return null;
     }
 }

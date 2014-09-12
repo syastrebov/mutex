@@ -13,7 +13,6 @@
 namespace ErlMutex\Adapter;
 
 use ErlMutex\Exception\Exception;
-use ErlMutex\LoggerInterface;
 
 /**
  * Адаптер для работы через socket
@@ -46,16 +45,6 @@ final class Socket implements AdapterInterface
     private $socket;
 
     /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * Constructor
      *
      * @param string $hostname Хост сервиса блокировок
@@ -73,21 +62,13 @@ final class Socket implements AdapterInterface
      * Подключиться к сервису блокировок
      *
      * @throws \ErlMutex\Exception\Exception
-     * @return $this
      */
     public function establishConnection()
     {
-        $this->socket = @fsockopen($this->hostname, $this->port, $errno, $errstr);
+        $this->socket = @fsockopen($this->hostname, $this->port, $errorCode, $errorMessage);
         if (!$this->socket) {
-            if ($errno === 0) {
-                throw new Exception(sprintf('%s', $errstr));
-            }
-            if ($this->logger) {
-                $this->logger->insert(sprintf('%s (%s)', $errstr, $errno));
-            }
+            throw new Exception(sprintf('%s (%s)', $errorMessage, $errorCode));
         }
-
-        return $this;
     }
 
     /**
@@ -111,82 +92,49 @@ final class Socket implements AdapterInterface
      * @return string
      * @throws Exception
      */
-    public function get($name, $timeout = false)
+    public function get($name, $timeout)
     {
-        $this->name = null;
-
-        if ((!is_int($name) && !is_string($name)) || strlen($name) == 0 || $name === null) {
-            throw new Exception('Недопустимое имя блокировки.');
-        }
-        if ((!is_int($timeout) && $timeout !== false) || (is_int($timeout) && $timeout < 0)) {
-            throw new Exception('Недопустимое время блокировки.');
-        }
-
         $this->send(array(
             'cmd'     => self::ACTION_GET,
             'name'    => $name,
             'timeout' => $timeout,
         ));
 
-        $response   = $this->receive();
-        $this->name = $name;
-
-        $this->log($name, $response, debug_backtrace());
-        return $this->name;
+        return $this->receive();
     }
 
     /**
      * Установить блокировку
      *
      * @param string $name Имя указателя блокировки
-     * @return bool
+     * @return string
      */
-    public function acquire($name = null)
+    public function acquire($name)
     {
-        $name = $name ? : $this->name;
-        if ($name) {
-            $response = null;
-            while (true) {
-                $this->send(['cmd' => self::ACTION_ACQUIRE, 'name' => $name]);
-                $response = $this->receive();
-                if ($response == 'busy') {
-                    usleep(10000);
-                } else {
-                    break;
-                }
+        $response = null;
+        while (true) {
+            $this->send(['cmd' => self::ACTION_ACQUIRE, 'name' => $name]);
+            $response = $this->receive();
+            if ($response == 'busy') {
+                usleep(10000);
+            } else {
+                break;
             }
-
-            $this->log($name, $response, debug_backtrace());
-            return true;
-
-        } else {
-            $this->log($name, 'Не задан указатель', debug_backtrace());
         }
 
-        return false;
+        return $response;
     }
 
     /**
      * Снять блокировку
      *
      * @param string $name Имя указателя блокировки
-     * @return bool
+     * @return string
      */
-    public function release($name = null)
+    public function release($name)
     {
-        $name = $name ? : $this->name;
-        if ($name) {
-            $this->send(['cmd' => self::ACTION_RELEASE, 'name' => $name]);
-            $response = $this->receive();
-            $this->log($name, $response, debug_backtrace());
-
-            return true;
-
-        } else {
-            $this->log($name, 'Не задан указатель', debug_backtrace());
-        }
-
-        return false;
+        $this->send(['cmd' => self::ACTION_RELEASE, 'name' => $name]);
+        return $this->receive();
     }
 
     /**
@@ -197,14 +145,6 @@ final class Socket implements AdapterInterface
     public function isAlive()
     {
         return $this->socket && !feof($this->socket);
-    }
-
-    /**
-     * Destructor
-     */
-    public function __destruct()
-    {
-        $this->closeConnection();
     }
 
     /**
