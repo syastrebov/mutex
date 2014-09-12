@@ -17,7 +17,7 @@ use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 
 /**
- * Тестирование мьютекса через memcached
+ * Тестирование memcached адаптера
  *
  * Class Test
  * @package Test

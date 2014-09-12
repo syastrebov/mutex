@@ -18,7 +18,7 @@ use ErlMutex\Service\Mutex;
 use ErlMutex\Service\Profiler;
 
 /**
- * Тестирование мьютекса на сокетах
+ * Тестирование сокет адаптера
  *
  * Class Test
  * @package Test
