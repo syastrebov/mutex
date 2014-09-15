@@ -26,11 +26,6 @@ abstract class AbstractCache implements AdapterInterface
     const TIMEOUT_MAX     = 10;
 
     /**
-     * @var mixed
-     */
-    protected $adapter;
-
-    /**
      * Время жизни блокировок
      *
      * @var array
@@ -70,7 +65,7 @@ abstract class AbstractCache implements AdapterInterface
     public function acquire($name)
     {
         while (true) {
-            if ($this->adapter->get($name)) {
+            if ($this->getCache($name)) {
                 usleep(10000);
             } else {
                 break;
@@ -88,7 +83,7 @@ abstract class AbstractCache implements AdapterInterface
             $timeout = self::TIMEOUT_MAX;
         }
 
-        return $this->adapter->set($name, true, $timeout);
+        return $this->setCache($name, true, $timeout);
     }
 
     /**
@@ -99,7 +94,7 @@ abstract class AbstractCache implements AdapterInterface
      */
     public function release($name)
     {
-        return $this->adapter->delete($name);
+        return $this->deleteCache($name);
     }
 
     /**
@@ -109,6 +104,33 @@ abstract class AbstractCache implements AdapterInterface
      */
     public function isAlive()
     {
-        return $this->adapter->set(md5(__CLASS__ . __METHOD__), true);
+        return $this->setCache(md5(__CLASS__ . __METHOD__), true);
     }
+
+    /**
+     * Установить значение в кеш
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $timeout
+     *
+     * @return bool
+     */
+    abstract protected function setCache($key, $value, $timeout = null);
+
+    /**
+     * Получить значение из кеша
+     *
+     * @param string $key
+     * @return mixed
+     */
+    abstract protected function getCache($key);
+
+    /**
+     * Удалить значение из кеша
+     *
+     * @param $key
+     * @return bool
+     */
+    abstract protected function deleteCache($key);
 }
