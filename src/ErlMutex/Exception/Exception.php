@@ -14,9 +14,9 @@ namespace ErlMutex\Exception;
 
 /**
  * Class Exception
- * @package erl
+ * @package ErlMutex\Exception
  */
-class Exception extends \Exception
+final class Exception extends \Exception
 {
 
 }
